@@ -2,6 +2,7 @@ import { expect } from "chai";
 import "@nomiclabs/hardhat-ethers";
 import { ethers, deployments } from "hardhat";
 import parseDataURI from "data-urls";
+import { getSeed } from "./utils"
 
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
@@ -125,7 +126,8 @@ describe("SingleEditionMintable", () => {
           name: "Testing Token 1/10",
           description: "This is a testing token for all",
           animation_url:
-            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1",
+            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
+            + `&seed=${getSeed(1, minterContract.address)}`,
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -200,7 +202,8 @@ describe("SingleEditionMintable", () => {
           name: "Testing Token 1",
           description: "This is a testing token for all",
           animation_url:
-            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1",
+            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
+            + `&seed=${getSeed(1, minterContract.address)}`,
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -381,7 +384,8 @@ describe("SingleEditionMintable", () => {
           name: "Testing Token 10/10",
           description: "This is a testing token for all",
           animation_url:
-            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=10",
+            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=10"
+            + `&seed=${getSeed(10, minterContract.address)}`,
           properties: { number: 10, name: "Testing Token" },
         })
       );
