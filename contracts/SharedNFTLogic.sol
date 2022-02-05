@@ -31,7 +31,7 @@ contract SharedNFTLogic is IPublicSharedMetadata {
     }
 
     /// @notice Generates determinable seed phrase
-    /// @dev results in 12 character phrase ending with "="
+    /// @dev results in 12 character phrase
     /// @param tokenOfEdition Token ID for specific token
     /// @param tokenAddress Address of the NFT
     function createSeed(uint256 tokenOfEdition, address tokenAddress)
@@ -39,16 +39,19 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         pure
         returns (string memory)
     {
-        return Base64.encode(
+        // take first 8 bytes from hash of token id and address
+        bytes8 tokenHash = bytes8(
+            keccak256(
                 abi.encodePacked(
-                    bytes8(keccak256(
-                        abi.encodePacked(
-                            tokenOfEdition,
-                            tokenAddress
-                        )
-                    )
+                    tokenOfEdition,
+                    tokenAddress
                 )
             )
+        );
+
+        // encode hash
+        return base64Encode(
+            abi.encodePacked(tokenHash)
         );
     }
 
