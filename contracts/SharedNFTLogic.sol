@@ -30,6 +30,28 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         return StringsUpgradeable.toString(value);
     }
 
+    /// @notice Generates determinable seed phrase
+    /// @dev results in 12 character phrase ending with "="
+    /// @param tokenOfEdition Token ID for specific token
+    /// @param tokenAddress Address of the NFT
+    function createSeed(uint256 tokenOfEdition, address tokenAddress)
+        public
+        pure
+        returns (string memory)
+    {
+        return Base64.encode(
+                abi.encodePacked(
+                    bytes8(keccak256(
+                        abi.encodePacked(
+                            tokenOfEdition,
+                            tokenAddress
+                        )
+                    )
+                )
+            )
+        );
+    }
+
     /// Generate edition metadata from storage information as base64-json blob
     /// Combines the media data and metadata
     /// @param name Name of NFT in metadata
@@ -38,18 +60,21 @@ contract SharedNFTLogic is IPublicSharedMetadata {
     /// @param animationUrl URL of animation to render for edition
     /// @param tokenOfEdition Token ID for specific token
     /// @param editionSize Size of entire edition to show
+    /// @param tokenAddress Address of the NFT
     function createMetadataEdition(
         string memory name,
         string memory description,
         string memory imageUrl,
         string memory animationUrl,
         uint256 tokenOfEdition,
-        uint256 editionSize
+        uint256 editionSize,
+        address tokenAddress
     ) external pure returns (string memory) {
         string memory _tokenMediaData = tokenMediaData(
             imageUrl,
             animationUrl,
-            tokenOfEdition
+            tokenOfEdition,
+            tokenAddress
         );
         bytes memory json = createMetadataJSON(
             name,
@@ -125,7 +150,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
     function tokenMediaData(
         string memory imageUrl,
         string memory animationUrl,
-        uint256 tokenOfEdition
+        uint256 tokenOfEdition,
+        address tokenAddress
     ) public pure returns (string memory) {
         bool hasImage = bytes(imageUrl).length > 0;
         bool hasAnimation = bytes(animationUrl).length > 0;
@@ -141,6 +167,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         animationUrl,
                         "?id=",
                         numberToString(tokenOfEdition),
+                        "&seed=",
+                        createSeed(tokenOfEdition, tokenAddress),
                         '", "'
                     )
                 );
@@ -165,6 +193,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         animationUrl,
                         "?id=",
                         numberToString(tokenOfEdition),
+                        "&seed=",
+                        createSeed(tokenOfEdition, tokenAddress),
                         '", "'
                     )
                 );

@@ -324,7 +324,8 @@ contract SingleEditionMintable is
                 imageUrl,
                 animationUrl,
                 tokenId,
-                editionSize
+                editionSize,
+                address(this)
             );
     }
 
