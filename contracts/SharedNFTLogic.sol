@@ -19,6 +19,21 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         return Base64.encode(unencoded);
     }
 
+    /// @notice converts address to string
+    /// @param _address address to return as a string
+    function addressToString(address _address) public pure returns(string memory) {
+        bytes20 _bytes = bytes20(_address);
+        bytes memory HEX = "0123456789abcdef";
+        bytes memory _string = new bytes(42);
+        _string[0] = '0';
+        _string[1] = 'x';
+        for(uint i = 0; i < 20; i++) {
+            _string[2+i*2] = HEX[uint8(_bytes[i] >> 4)];
+            _string[3+i*2] = HEX[uint8(_bytes[i] & 0x0f)];
+        }
+        return string(_string);
+    }
+
     /// Proxy to openzeppelin's toString function
     /// @param value number to return as a string
     function numberToString(uint256 value)
@@ -172,6 +187,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         numberToString(tokenOfEdition),
                         "&seed=",
                         createSeed(tokenOfEdition, tokenAddress),
+                        "&address=",
+                        addressToString(tokenAddress),
                         '", "'
                     )
                 );
@@ -198,6 +215,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         numberToString(tokenOfEdition),
                         "&seed=",
                         createSeed(tokenOfEdition, tokenAddress),
+                        "&address=",
+                        addressToString(tokenAddress),
                         '", "'
                     )
                 );
