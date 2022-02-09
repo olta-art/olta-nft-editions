@@ -127,7 +127,8 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
-            + `&seed=${getSeed(1, minterContract.address)}`,
+            + `&seed=${getSeed(1, minterContract.address)}`
+            + `&address=${minterContract.address.toLowerCase()}`,
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -203,7 +204,8 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
-            + `&seed=${getSeed(1, minterContract.address)}`,
+            + `&seed=${getSeed(1, minterContract.address)}`
+            + `&address=${minterContract.address.toLowerCase()}`,
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -385,7 +387,8 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=10"
-            + `&seed=${getSeed(10, minterContract.address)}`,
+            + `&seed=${getSeed(10, minterContract.address)}`
+            + `&address=${minterContract.address.toLowerCase()}`,
           properties: { number: 10, name: "Testing Token" },
         })
       );
