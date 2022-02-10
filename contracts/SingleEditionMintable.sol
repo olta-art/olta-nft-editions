@@ -336,6 +336,7 @@ contract SingleEditionMintable is
         returns (bool)
     {
         return
+            type(IEditionSingleMintable).interfaceId == interfaceId ||
             type(IERC2981Upgradeable).interfaceId == interfaceId ||
             ERC721Upgradeable.supportsInterface(interfaceId);
     }
