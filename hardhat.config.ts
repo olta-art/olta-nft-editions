@@ -18,8 +18,9 @@ const config: HardhatUserConfig = {
     apiKey: process.env.ETHERSCAN_API_KEY,
   },
   gasReporter: {
-    currency: 'USD',
-    gasPrice: 60, 
+    currency: 'GBP',
+    gasPrice: 120,
+    coinmarketcap: process.env.COINMARKETCAP_KEY,
   },
   networks,
   namedAccounts: {
