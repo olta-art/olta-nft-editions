@@ -36,10 +36,16 @@ describe("SingleEditionMintable", () => {
       "Testing Token",
       "TEST",
       "This is a testing token for all",
-      "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      {
+        url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        label: [0,0,1]
+      },
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        label: [0,0,1]
+      },
       10,
       10
     );

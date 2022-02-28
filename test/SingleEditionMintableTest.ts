@@ -2,7 +2,6 @@ import { expect } from "chai";
 import "@nomiclabs/hardhat-ethers";
 import { ethers, deployments } from "hardhat";
 import parseDataURI from "data-urls";
-import { getSeed } from "./utils"
 
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
@@ -37,10 +36,16 @@ describe("SingleEditionMintable", () => {
       "Testing Token",
       "TEST",
       "This is a testing token for all",
-      "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      {
+        url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        label: [0,0,1]
+      },
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        label: [0,0,1]
+      },
       // 1% royalty since BPS
       10,
       10
@@ -77,10 +82,17 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        {
+          url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          label: [0,0,1]
+        },
+        {
+          url: "",
+          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          label: [0,0,1]
+        },
+        // 1% royalty since BPS
         10,
         10
       );
@@ -127,7 +139,6 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
-            + `&seed=${getSeed(1, minterContract.address)}`
             + `&address=${minterContract.address.toLowerCase()}`,
           properties: { number: 1, name: "Testing Token" },
         })
@@ -139,10 +150,17 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        {
+          url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          label: [0,0,1]
+        },
+        {
+          url: "",
+          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          label: [0,0,1]
+        },
+        // 1% royalty since BPS
         0,
         0
       );
@@ -204,7 +222,6 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
-            + `&seed=${getSeed(1, minterContract.address)}`
             + `&address=${minterContract.address.toLowerCase()}`,
           properties: { number: 1, name: "Testing Token" },
         })
@@ -231,10 +248,16 @@ describe("SingleEditionMintable", () => {
           "test name",
           "SYM",
           "description",
-          "animation",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          "uri",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          {
+            url: "animaion",
+            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            label: [0,0,1]
+          },
+          {
+            url: "uri",
+            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            label: [0,0,1]
+          },
           12,
           12
         )
@@ -291,10 +314,16 @@ describe("SingleEditionMintable", () => {
           "Testing Token",
           "TEST",
           "This is a testing token for all",
-          "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          "",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          {
+            url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            label: [0,0,1]
+          },
+          {
+            url: "",
+            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            label: [0,0,1]
+          },
           // 2% royalty since BPS
           200,
           200
@@ -318,10 +347,16 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        {
+          url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          label: [0,0,1]
+        },
+        {
+          url: "",
+          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          label: [0,0,1]
+        },
         0,
         0
       );
@@ -387,7 +422,6 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=10"
-            + `&seed=${getSeed(10, minterContract.address)}`
             + `&address=${minterContract.address.toLowerCase()}`,
           properties: { number: 10, name: "Testing Token" },
         })
