@@ -5,6 +5,7 @@ pragma solidity 0.8.6;
 import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
 import {Base64} from "base64-sol/base64.sol";
 import {IPublicSharedMetadata} from "./IPublicSharedMetadata.sol";
+import {Versions} from "./Versions.sol";
 
 /// Shared NFT logic for rendering metadata associated with editions
 /// @dev Can safely be used for generic base64Encode and numberToString functions
@@ -43,6 +44,43 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         returns (string memory)
     {
         return StringsUpgradeable.toString(value);
+    }
+
+    // Proxy to olta's uintArray3ToString function
+    function uintArray3ToString (uint8[3] memory label)
+        internal
+        pure
+        returns (string memory)
+    {
+        return Versions.uintArray3ToString(label);
+    }
+
+    // TODO: need to include image url
+    // NOTE: not being used yet
+    function createVersionData(
+        Versions.Version memory version,
+        uint256 tokenOfEdition,
+        address tokenAddress
+    )
+        internal
+        pure
+        returns (bytes memory)
+    {
+        return
+            abi.encodePacked(
+                '"animation_url": "',
+                version.url,
+                "?id=",
+                numberToString(tokenOfEdition),
+                "&address=",
+                addressToString(tokenAddress),
+                // TODO: bytes32ToString
+                // '",  "animation_hash": "',
+                // version.animationHash,
+                '", "version_label": "',
+                uintArray3ToString(version.label),
+                '"'
+            );
     }
 
     /// Generate edition metadata from storage information as base64-json blob
