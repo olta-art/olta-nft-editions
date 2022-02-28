@@ -45,31 +45,6 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         return StringsUpgradeable.toString(value);
     }
 
-    /// @notice Generates determinable seed phrase
-    /// @dev results in 12 character phrase
-    /// @param tokenOfEdition Token ID for specific token
-    /// @param tokenAddress Address of the NFT
-    function createSeed(uint256 tokenOfEdition, address tokenAddress)
-        public
-        pure
-        returns (string memory)
-    {
-        // take first 8 bytes from hash of token id and address
-        bytes8 tokenHash = bytes8(
-            keccak256(
-                abi.encodePacked(
-                    tokenOfEdition,
-                    tokenAddress
-                )
-            )
-        );
-
-        // encode hash
-        return base64Encode(
-            abi.encodePacked(tokenHash)
-        );
-    }
-
     /// Generate edition metadata from storage information as base64-json blob
     /// Combines the media data and metadata
     /// @param name Name of NFT in metadata
@@ -185,8 +160,6 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         animationUrl,
                         "?id=",
                         numberToString(tokenOfEdition),
-                        "&seed=",
-                        createSeed(tokenOfEdition, tokenAddress),
                         "&address=",
                         addressToString(tokenAddress),
                         '", "'
@@ -199,7 +172,7 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                     abi.encodePacked(
                         'image": "',
                         imageUrl,
-                        "?id=",
+                        "?id=", // if just url "/id" this will work with arweave pathmanifests
                         numberToString(tokenOfEdition),
                         '", "'
                     )
@@ -213,8 +186,6 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         animationUrl,
                         "?id=",
                         numberToString(tokenOfEdition),
-                        "&seed=",
-                        createSeed(tokenOfEdition, tokenAddress),
                         "&address=",
                         addressToString(tokenAddress),
                         '", "'
