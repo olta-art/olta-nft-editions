@@ -129,7 +129,7 @@ library Versions {
         view
         returns (Version[] memory)
     {
-        Version[] memory versionArray = new Version[](_labels.length - 1);
+        Version[] memory versionArray = new Version[](_labels.length);
 
         for (uint256 index = 0; index < _labels.length; index++) {
                 versionArray[index] = set.versions[_labels[index]];
