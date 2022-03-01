@@ -8,6 +8,27 @@ import {
   SingleEditionMintableCreator,
   SingleEditionMintable,
 } from "../typechain";
+import { BigNumberish } from "ethers";
+
+type Label = [BigNumberish, BigNumberish, BigNumberish]
+
+const defaultVersion = () => {
+  return {
+    urls: [
+      // animation
+      {
+        url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+      // image
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      }
+    ],
+    label: [0,0,1] as Label
+  }
+}
 
 describe("SingleEditionMintable", () => {
   let signer: SignerWithAddress;
@@ -36,16 +57,7 @@ describe("SingleEditionMintable", () => {
       "Testing Token",
       "TEST",
       "This is a testing token for all",
-      {
-        url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-        label: [0,0,1]
-      },
-      {
-        url: "",
-        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-        label: [0,0,1]
-      },
+      defaultVersion(),
       // 1% royalty since BPS
       10,
       10
@@ -82,16 +94,7 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        {
-          url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-          label: [0,0,1]
-        },
-        {
-          url: "",
-          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-          label: [0,0,1]
-        },
+        defaultVersion(),
         // 1% royalty since BPS
         10,
         10
@@ -118,7 +121,6 @@ describe("SingleEditionMintable", () => {
         );
 
       const tokenURI = await minterContract.tokenURI(1);
-      console.log(tokenURI);
       const parsedTokenURI = parseDataURI(tokenURI);
       if (!parsedTokenURI) {
         throw "No parsed token uri";
@@ -150,16 +152,7 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        {
-          url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-          label: [0,0,1]
-        },
-        {
-          url: "",
-          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-          label: [0,0,1]
-        },
+        defaultVersion(),
         // 1% royalty since BPS
         0,
         0
@@ -249,13 +242,16 @@ describe("SingleEditionMintable", () => {
           "SYM",
           "description",
           {
-            url: "animaion",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-            label: [0,0,1]
-          },
-          {
-            url: "uri",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            urls: [
+              {
+                url: "animation",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                url: "image",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              }
+            ],
             label: [0,0,1]
           },
           12,
@@ -315,13 +311,16 @@ describe("SingleEditionMintable", () => {
           "TEST",
           "This is a testing token for all",
           {
-            url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-            label: [0,0,1]
-          },
-          {
-            url: "",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            urls: [
+              {
+                url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              }
+            ],
             label: [0,0,1]
           },
           // 2% royalty since BPS
@@ -348,13 +347,16 @@ describe("SingleEditionMintable", () => {
         "TEST",
         "This is a testing token for all",
         {
-          url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-          label: [0,0,1]
-        },
-        {
-          url: "",
-          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+          urls: [
+            {
+              url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+              sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              url: "",
+              sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            }
+          ],
           label: [0,0,1]
         },
         0,
@@ -411,7 +413,6 @@ describe("SingleEditionMintable", () => {
 
       // Check metadata from edition
       const uriData = Buffer.from(parsedTokenURI.body).toString("utf-8");
-      console.log({ tokenURI, uriData });
       const metadata = JSON.parse(uriData);
 
       expect(parsedTokenURI.mimeType.type).to.equal("application");
@@ -444,15 +445,18 @@ describe("SingleEditionMintable", () => {
 
         minterContract.addEditionVersion(
           {
-            url: "newURL",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+            urls: [
+              {
+                url: "newURL",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              {
+                url: "newURL",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+              }
+            ],
             label: [0,0,2]
           },
-          {
-            url: "newURL",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
-            label: [0,0,2]
-          }
         )
         expect(await minterContract.getURIs()).to.deep.eq(
           [
@@ -467,7 +471,7 @@ describe("SingleEditionMintable", () => {
       it("#updateEditionURLs()", async () => {
         await minterContract.updateEditionURLs(
           [0,0,1],
-          "",
+          0, // TODO: replace with enum? 
           "updatedURL"
         )
 
@@ -485,15 +489,18 @@ describe("SingleEditionMintable", () => {
         // Update version
         await minterContract.addEditionVersion(
           {
-            url: "",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            urls: [
+              {
+                url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              }
+            ],
             label: [0,0,2]
           },
-          {
-            url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
-            label: [0,0,2]
-          }
         )
         //const v0 = await minterContract.getURIsOfVersion([0,0,0])
         // TODO: revert on doesn't exist?
@@ -522,61 +529,67 @@ describe("SingleEditionMintable", () => {
         // Update version
         await minterContract.addEditionVersion(
           {
-            url: "",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
-            label: [0,0,2]
-          },
-          {
-            url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+            urls: [
+              {
+                url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+              }
+            ],
             label: [0,0,2]
           }
         )
 
-        const [image, animaion] = await minterContract.getVersionHistory()
-        // image url
-        expect(image).to.deep.eq(
+        const history = await minterContract.getVersionHistory()
+        expect(history).to.deep.eq(
           [
             [
-              "",
-              "0x0000000000000000000000000000000000000000000000000000000000000000",
-              [0,0,1]
+              [
+                [
+                  "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+                  "0x0000000000000000000000000000000000000000000000000000000000000000"
+                ],
+                [
+                  "",
+                  "0x0000000000000000000000000000000000000000000000000000000000000000"
+                ]
+              ],
+              [0, 0, 1]
             ],
             [
-              "",
-              "0x0000000000000000000000000000000000000000000000000000000000000001",
-              [0,0,2]
+              [
+                [
+                  "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
+                  "0x0000000000000000000000000000000000000000000000000000000000000001"
+                ],
+                [
+                  "",
+                  "0x0000000000000000000000000000000000000000000000000000000000000001"
+                ]
+              ],
+              [0, 0, 2]
             ]
           ]
         )
-        // animation url
-        expect(animaion).to.deep.eq(
-          [
-            [
-              "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-              "0x0000000000000000000000000000000000000000000000000000000000000000",
-              [0,0,1]
-            ],
-            [
-              "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
-              "0x0000000000000000000000000000000000000000000000000000000000000001",
-              [0,0,2]
-            ]
-          ]
-        );
       });
       it("updates tokenURI metadata with new urls", async () => {
 
         // Update version
         minterContract.addEditionVersion(
           {
-            url: "",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
-            label: [0,0,2]
-          },
-          {
-            url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+            urls: [
+              {
+                url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              }
+            ],
             label: [0,0,2]
           }
         )

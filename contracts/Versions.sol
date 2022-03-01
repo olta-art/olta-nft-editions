@@ -16,6 +16,7 @@ import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Stri
     [x] needs to retrieve all versions (public pure read)
     [x] needs to retrieve latest version (public pure read) -> so animationURL can be dynamiclly updated
     [ ] do we need a delete? - what if we flag versions instead?
+    [x] store any number of urls
 
     [ ] do we need patch notes?
 
@@ -27,11 +28,15 @@ import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Stri
 
 library Versions {
 
+    struct UrlWithHash {
+        string url;
+        bytes32 sha256hash;
+    }
+
     // NOTE: store 'key' in mapping for easy access
     // NOTE: uint8[3] enforce number only labeling - may be handy to order on contract
     struct Version {
-        string url;
-        bytes32 sha256hash;
+        UrlWithHash[] urls;
         uint8[3] label;
     }
 
@@ -43,19 +48,15 @@ library Versions {
     }
 
     function createVersion(
-        string memory url,
-        bytes32 sha256hash,
+        UrlWithHash[] memory urls,
         uint8[3] memory label
     )
         internal
         pure
         returns (Version memory)
     {
-        return Version(
-            url,
-            sha256hash,
-            label
-        );
+        Version memory version = Version(urls, label);
+        return version;
     }
 
     function addVersion(
@@ -66,17 +67,20 @@ library Versions {
         string memory labelKey = uintArray3ToString(version.label);
 
         require(
-            bytes(
-                set.versions[labelKey].url
-            ).length == 0,
-            "A version with that label already exists"
+            set.versions[labelKey].urls.length == 0,
+            "#Versions: A version with that label already exists"
         );
 
         // add to labels array
         set.labels.push(labelKey);
 
-        // store url and hash in mapping
-        set.versions[labelKey] = version;
+        // store urls and hashes in mapping
+        for (uint256 i = 0; i < version.urls.length; i++){
+            set.versions[labelKey].urls.push(version.urls[i]);
+        }
+
+        // store label
+        set.versions[labelKey].label = version.label;
     }
 
     function getVersion(
@@ -91,12 +95,18 @@ library Versions {
     }
 
     // NOTE: only update url is possible and should result in same hash
+    // NOTE: index must be known updating url
     function updateVersionURL(
         Set storage set,
         uint8[3] memory label,
+        uint256 index,
         string memory newUrl
     ) internal {
-        set.versions[uintArray3ToString(label)].url = newUrl;
+        require(
+            set.versions[uintArray3ToString(label)].urls.length != 0,
+            "#Versions: The version does not exist"
+        );
+        set.versions[uintArray3ToString(label)].urls[index].url = newUrl;
     }
 
     function getAllLabels(
@@ -147,6 +157,10 @@ library Versions {
         view
         returns (Version memory)
     {
+        require(
+            set.labels.length != 0,
+            "#Versions: No versions exist"
+        );
         return set.versions[
             set.labels[set.labels.length - 1]
         ];

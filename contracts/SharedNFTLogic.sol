@@ -57,31 +57,31 @@ contract SharedNFTLogic is IPublicSharedMetadata {
 
     // TODO: need to include image url
     // NOTE: not being used yet
-    function createVersionData(
-        Versions.Version memory version,
-        uint256 tokenOfEdition,
-        address tokenAddress
-    )
-        internal
-        pure
-        returns (bytes memory)
-    {
-        return
-            abi.encodePacked(
-                '"animation_url": "',
-                version.url,
-                "?id=",
-                numberToString(tokenOfEdition),
-                "&address=",
-                addressToString(tokenAddress),
-                // TODO: bytes32ToString
-                // '",  "animation_hash": "',
-                // version.animationHash,
-                '", "version_label": "',
-                uintArray3ToString(version.label),
-                '"'
-            );
-    }
+    // function createVersionData(
+    //     Versions.Version memory version,
+    //     uint256 tokenOfEdition,
+    //     address tokenAddress
+    // )
+    //     internal
+    //     pure
+    //     returns (bytes memory)
+    // {
+    //     return
+    //         abi.encodePacked(
+    //             '"animation_url": "',
+    //             version.url,
+    //             "?id=",
+    //             numberToString(tokenOfEdition),
+    //             "&address=",
+    //             addressToString(tokenAddress),
+    //             // TODO: bytes32ToString
+    //             // '",  "animation_hash": "',
+    //             // version.animationHash,
+    //             '", "version_label": "',
+    //             uintArray3ToString(version.label),
+    //             '"'
+    //         );
+    // }
 
     /// Generate edition metadata from storage information as base64-json blob
     /// Combines the media data and metadata
