@@ -91,7 +91,12 @@ library Versions {
         view
         returns (Version memory)
     {
-        return set.versions[uintArray3ToString(label)];
+        Version memory version = set.versions[uintArray3ToString(label)];
+        require(
+            version.urls.length != 0,
+            "#Versions: The version does not exist"
+        );
+        return version;
     }
 
     // NOTE: only update url is possible and should result in same hash
@@ -102,11 +107,16 @@ library Versions {
         uint256 index,
         string memory newUrl
     ) internal {
+        string memory labelKey = uintArray3ToString(label);
         require(
-            set.versions[uintArray3ToString(label)].urls.length != 0,
+            set.versions[labelKey].urls.length != 0,
             "#Versions: The version does not exist"
         );
-        set.versions[uintArray3ToString(label)].urls[index].url = newUrl;
+        require(
+            set.versions[labelKey].urls.length > index,
+            "#Versions: The url does not exist on that version"
+        );
+        set.versions[labelKey].urls[index].url = newUrl;
     }
 
     function getAllLabels(
@@ -139,10 +149,11 @@ library Versions {
         view
         returns (Version[] memory)
     {
+        require(_labels.length != 0, "#Versions: No labels provided");
         Version[] memory versionArray = new Version[](_labels.length);
 
-        for (uint256 index = 0; index < _labels.length; index++) {
-                versionArray[index] = set.versions[_labels[index]];
+        for (uint256 i = 0; i < _labels.length; i++) {
+                versionArray[i] = set.versions[_labels[i]];
         }
 
         return versionArray;
