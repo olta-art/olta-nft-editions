@@ -23,8 +23,13 @@ import {IEditionSingleMintable} from "./IEditionSingleMintable.sol";
 import {Versions} from "./Versions.sol";
 
 /**
-    // TODO: add changes to orignial and updated description
     This is a smart contract for handling dynamic contract minting.
+
+    This is a fork of Zora NFT Editions
+    changes:
+        - Media urls are versioned allowing for updatable content preserving history
+        - The NFT contract address is included in edition url query for easyier access to query the graph from within the NFT
+        - SupportsInterface function includes IEditionSingleMintable
 
     @dev This allows creators to mint a unique serial edition of the same media within a custom contract
     @author iain nash
@@ -52,6 +57,7 @@ contract SingleEditionMintable is
         Animation,
         Image
     }
+    // Versions of Media Urls
     Versions.Set private versions;
 
     // Total size of edition that can be minted
@@ -79,7 +85,7 @@ contract SingleEditionMintable is
       @param _name Name of edition, used in the title as "$NAME NUMBER/TOTAL"
       @param _symbol Symbol of the new token contract
       @param _description Description of edition, used in the description field of the NFT
-      @param _version Animation URL and Image URL of the edition. Strongly encouraged to be used, if necessary, only animation URL can be used. One of animation and image url need to exist in a edition to render the NFT.
+      @param _version Version of the media consisting of urls and hashes of animation and image content
       @param _editionSize Number of editions that can be minted in total. If 0, unlimited editions can be minted.
       @param _royaltyBPS BPS of the royalty set on the contract. Can be 0 for no royalty.
       @dev Function to create a new edition. Can only be called by the allowed creator
@@ -100,6 +106,7 @@ contract SingleEditionMintable is
         // Set ownership to original sender of contract call
         transferOwnership(_owner);
         description = _description;
+        // Add first version
         versions.addVersion(_version);
         editionSize = _editionSize;
         royaltyBPS = _royaltyBPS;
@@ -213,10 +220,12 @@ contract SingleEditionMintable is
         allowedMinters[minter] = allowed;
     }
 
-    // TODO: is it worth seprating out into two sperate functions?
     /**
-      @dev Allows for updates of edition urls by the owner of the edition.
+      @dev Updates a url of specified version by the owner of the edition.
            Only URLs can be updated (data-uris are supported), hashes cannot be updated.
+      @param _label The label of the specified version
+      @param _urlKey The index of the url to update 0=animation, 1=image
+      @param _url The url to be updated to
      */
     function updateVersionURL(
         uint8[3] memory _label,
@@ -227,6 +236,11 @@ contract SingleEditionMintable is
         emit VersionURLUpdated(_label, _urlKey, _url);
     }
 
+    /**
+      @dev Adds new version of the media updating the urls rendered in the metadata.
+           The order added determins order stored, the label has no effect.
+      @param _version The version to be added consisting of urls, hashes and a label
+     */
     function addVersion(
         Versions.Version memory _version
     ) public onlyOwner {
@@ -284,6 +298,7 @@ contract SingleEditionMintable is
 
     /**
       @dev Get URIs for edition NFT
+            Will get URIs from the last version added
       @return imageUrl, imageHash, animationUrl, animationHash
      */
     function getURIs()
@@ -306,7 +321,9 @@ contract SingleEditionMintable is
     }
 
     /**
-      @dev Get URIs for edition NFT
+      @dev Get URIs for edition NFT of a version
+           Will get URIs from the last version added
+      @param label The label of the version
       @return imageUrl, imageHash, animationUrl, animationHash
      */
     function getURIsOfVersion(
@@ -348,6 +365,7 @@ contract SingleEditionMintable is
 
     /**
         @dev Get URI for given token id
+             Will get URIs from the last version added
         @param tokenId token id to get uri for
         @return base64-encoded json metadata object
     */
@@ -372,8 +390,9 @@ contract SingleEditionMintable is
     }
 
     /**
-        @dev Get URI for given token id
+        @dev Get URI for given token id of version
         @param tokenId token id to get uri for
+        @param label the label of the version
         @return base64-encoded json metadata object
     */
     function tokenURIOfVersion(
