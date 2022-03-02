@@ -310,19 +310,7 @@ describe("SingleEditionMintable", () => {
           "Testing Token",
           "TEST",
           "This is a testing token for all",
-          {
-            urls: [
-              {
-                url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
-              },
-              {
-                url: "",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-              }
-            ],
-            label: [0,0,1]
-          },
+          defaultVersion(),
           // 2% royalty since BPS
           200,
           200
@@ -346,19 +334,7 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        {
-          urls: [
-            {
-              url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-              sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
-            },
-            {
-              url: "",
-              sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-            }
-          ],
-          label: [0,0,1]
-        },
+        defaultVersion(),
         0,
         0
       );
@@ -468,62 +444,108 @@ describe("SingleEditionMintable", () => {
         )
       });
 
-      it("#updateEditionURLs()", async () => {
-        await minterContract.updateEditionURLs(
-          [0,0,1],
-          0, // TODO: replace with enum? 
-          "updatedURL"
-        )
+      describe("#updateEditionURLs()", () => {
+        it("reverts when version doesn't exist", async () => {
+          // Update image URL on non exisiting version
+          await expect(
+            minterContract.updateEditionURLs(
+              [0,0,2],
+              1,
+              "updatedImageURL"
+            )
+          ).to.be.revertedWith("#Versions: The version does not exist")
+        });
 
-        expect(
-          await minterContract.getURIs()
-        ).to.deep.eq([
-          "",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          "updatedURL",
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ])
+        it("reverts when urlKey doesn't exist", async () => {
+          // Update image URL on non exisiting version
+          await expect(
+            minterContract.updateEditionURLs(
+              [0,0,1],
+              2,
+              "updatedImageURL"
+            )
+          ).to.be.revertedWith("#Versions: The url does not exist on that version")
+        });
+
+        it("updates version url", async () => {
+          // Update animation URL
+          await minterContract.updateEditionURLs(
+            [0,0,1],
+            0,
+            "updatedAnimationURL"
+          )
+
+          expect(
+            await minterContract.getURIs()
+          ).to.deep.eq([
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "updatedAnimationURL",
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ])
+
+          // Update image URL
+          await minterContract.updateEditionURLs(
+            [0,0,1],
+            1,
+            "updatedImageURL"
+          )
+          expect(
+            await minterContract.getURIs()
+          ).to.deep.eq([
+            "updatedImageURL",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "updatedAnimationURL",
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ])
+        });
       });
-      it("#getURIsOfVersion()", async () => {
 
-        // Update version
-        await minterContract.addEditionVersion(
-          {
-            urls: [
-              {
-                url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-              },
-              {
-                url: "",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-              }
-            ],
-            label: [0,0,2]
-          },
-        )
-        //const v0 = await minterContract.getURIsOfVersion([0,0,0])
-        // TODO: revert on doesn't exist?
+      describe("#getURIsOfVersion()", () => {
+        it("reverts when version doesn't exist", async () => {
+          await expect(
+             minterContract.getURIsOfVersion([0,0,2])
+          ).to.be.revertedWith("#Versions: The version does not exist")
+        })
+        it("gets URIs",async () => {
 
-        // version 0.0.1
-        expect(
-          await minterContract.getURIsOfVersion([0,0,1])
-        ).to.deep.eq([
-          "",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-          "0x0000000000000000000000000000000000000000000000000000000000000000"
-        ])
-        // version 0.0.2
-        expect(
-          await minterContract.getURIsOfVersion([0,0,2])
-        ).to.deep.eq([
-          "",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
-          "0x0000000000000000000000000000000000000000000000000000000000000001"
-        ])
+          // Update version
+          await minterContract.addEditionVersion(
+            {
+              urls: [
+                {
+                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                },
+                {
+                  url: "",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                }
+              ],
+              label: [0,0,2]
+            },
+          )
 
+          // version 0.0.1
+          expect(
+            await minterContract.getURIsOfVersion([0,0,1])
+          ).to.deep.eq([
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ])
+          // version 0.0.2
+          expect(
+            await minterContract.getURIsOfVersion([0,0,2])
+          ).to.deep.eq([
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ])
+
+        })
       })
       it("#getVersionHistory()", async () => {
         // Update version
@@ -531,7 +553,7 @@ describe("SingleEditionMintable", () => {
           {
             urls: [
               {
-                url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
+                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
               },
               {
@@ -562,7 +584,7 @@ describe("SingleEditionMintable", () => {
             [
               [
                 [
-                  "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
+                  "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                   "0x0000000000000000000000000000000000000000000000000000000000000001"
                 ],
                 [
@@ -582,7 +604,7 @@ describe("SingleEditionMintable", () => {
           {
             urls: [
               {
-                url: "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo",
+                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
               },
               {
@@ -609,7 +631,7 @@ describe("SingleEditionMintable", () => {
             name: "Testing Token 1/10",
             description: "This is a testing token for all",
             animation_url:
-              "https://arweave.net/EQUlbuJMiyhIQbUwQ7Z17feOfsNFyIQB2tqz9vpcmPo?id=1"
+              "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k?id=1"
               + `&address=${minterContract.address.toLowerCase()}`,
             properties: { number: 1, name: "Testing Token" },
           })
