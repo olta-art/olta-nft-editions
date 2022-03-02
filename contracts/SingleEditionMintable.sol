@@ -221,15 +221,8 @@ contract SingleEditionMintable is
         uint8 _urlKey,
         string memory _url
     ) public onlyOwner {
-        if(_urlKey ==  uint8(URLS.Animation)){
-            versions.updateVersionURL(_label, uint8(URLS.Animation), _url);
-            // TODO: emit event
-        }
-
-        if(_urlKey ==  uint8(URLS.Image)){
-            versions.updateVersionURL(_label, uint8(URLS.Image), _url);
-            // TODO: emit event
-        }
+        versions.updateVersionURL(_label, _urlKey, _url);
+        // TODO: emit event
     }
 
     function addEditionVersion(
@@ -307,7 +300,6 @@ contract SingleEditionMintable is
             latest.urls[uint8(URLS.Image)].sha256hash,
             latest.urls[uint8(URLS.Animation)].url,
             latest.urls[uint8(URLS.Animation)].sha256hash
-            
         );
     }
 
