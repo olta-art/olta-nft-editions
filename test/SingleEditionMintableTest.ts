@@ -142,6 +142,7 @@ describe("SingleEditionMintable", () => {
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
             + `&address=${minterContract.address.toLowerCase()}`,
+          media_version: "0.0.1",
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -216,6 +217,7 @@ describe("SingleEditionMintable", () => {
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
             + `&address=${minterContract.address.toLowerCase()}`,
+          media_version: "0.0.1",
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -400,6 +402,7 @@ describe("SingleEditionMintable", () => {
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=10"
             + `&address=${minterContract.address.toLowerCase()}`,
+          media_version: "0.0.1",
           properties: { number: 10, name: "Testing Token" },
         })
       );
@@ -650,6 +653,7 @@ describe("SingleEditionMintable", () => {
             animation_url:
               "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k?id=1"
               + `&address=${minterContract.address.toLowerCase()}`,
+            media_version: "0.0.2",
             properties: { number: 1, name: "Testing Token" },
           })
         );

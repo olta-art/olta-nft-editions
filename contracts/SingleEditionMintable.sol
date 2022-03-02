@@ -18,7 +18,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
-import {SharedNFTLogic} from "./SharedNFTLogic.sol";
+import {SharedNFTLogic, MediaData} from "./SharedNFTLogic.sol";
 import {IEditionSingleMintable} from "./IEditionSingleMintable.sol";
 import {Versions} from "./Versions.sol";
 
@@ -376,13 +376,16 @@ contract SingleEditionMintable is
         returns (string memory)
     {
         require(_exists(tokenId), "No token");
-        // TODO: add version labal to metadata
+        Versions.Version memory version = versions.getLatestVersion();
         return
             sharedNFTLogic.createMetadataEdition(
                 name(),
                 description,
-                versions.getLatestVersion().urls[uint8(URLS.Image)].url,
-                versions.getLatestVersion().urls[uint8(URLS.Animation)].url,
+                MediaData(
+                    version.urls[uint8(URLS.Image)].url,
+                    version.urls[uint8(URLS.Animation)].url,
+                    version.label
+                ),
                 tokenId,
                 editionSize,
                 address(this)
@@ -404,13 +407,17 @@ contract SingleEditionMintable is
         returns (string memory)
     {
         require(_exists(tokenId), "No token");
-        // TODO: add version labal to metadata
+        Versions.Version memory version = versions.getVersion(label);
+
         return
             sharedNFTLogic.createMetadataEdition(
                 name(),
                 description,
-                versions.getVersion(label).urls[uint8(URLS.Image)].url,
-                versions.getVersion(label).urls[uint8(URLS.Animation)].url,
+                MediaData(
+                    version.urls[uint8(URLS.Image)].url,
+                    version.urls[uint8(URLS.Animation)].url,
+                    version.label
+                ),
                 tokenId,
                 editionSize,
                 address(this)

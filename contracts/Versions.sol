@@ -177,9 +177,8 @@ library Versions {
         ];
     }
 
-    // NOTE: public to be used in SharedNFTLogic
     function uintArray3ToString (uint8[3] memory label)
-        public
+        internal
         pure
         returns (string memory)
     {

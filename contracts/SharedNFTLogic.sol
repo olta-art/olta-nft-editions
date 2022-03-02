@@ -7,6 +7,12 @@ import {Base64} from "base64-sol/base64.sol";
 import {IPublicSharedMetadata} from "./IPublicSharedMetadata.sol";
 import {Versions} from "./Versions.sol";
 
+struct MediaData{
+    string imageUrl;
+    string animationUrl;
+    uint8[3] label;
+}
+
 /// Shared NFT logic for rendering metadata associated with editions
 /// @dev Can safely be used for generic base64Encode and numberToString functions
 contract SharedNFTLogic is IPublicSharedMetadata {
@@ -18,6 +24,17 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         returns (string memory)
     {
         return Base64.encode(unencoded);
+    }
+
+    /// Proxy to openzeppelin's toString function
+    /// @param value number to return as a string
+    function numberToString(uint256 value)
+        public
+        pure
+        override
+        returns (string memory)
+    {
+        return StringsUpgradeable.toString(value);
     }
 
     /// @notice converts address to string
@@ -35,75 +52,33 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         return string(_string);
     }
 
-    /// Proxy to openzeppelin's toString function
-    /// @param value number to return as a string
-    function numberToString(uint256 value)
-        public
-        pure
-        override
-        returns (string memory)
-    {
-        return StringsUpgradeable.toString(value);
-    }
-
     // Proxy to olta's uintArray3ToString function
     function uintArray3ToString (uint8[3] memory label)
-        internal
+        public
         pure
         returns (string memory)
     {
         return Versions.uintArray3ToString(label);
     }
 
-    // TODO: need to include image url
-    // NOTE: not being used yet
-    // function createVersionData(
-    //     Versions.Version memory version,
-    //     uint256 tokenOfEdition,
-    //     address tokenAddress
-    // )
-    //     internal
-    //     pure
-    //     returns (bytes memory)
-    // {
-    //     return
-    //         abi.encodePacked(
-    //             '"animation_url": "',
-    //             version.url,
-    //             "?id=",
-    //             numberToString(tokenOfEdition),
-    //             "&address=",
-    //             addressToString(tokenAddress),
-    //             // TODO: bytes32ToString
-    //             // '",  "animation_hash": "',
-    //             // version.animationHash,
-    //             '", "version_label": "',
-    //             uintArray3ToString(version.label),
-    //             '"'
-    //         );
-    // }
-
     /// Generate edition metadata from storage information as base64-json blob
     /// Combines the media data and metadata
     /// @param name Name of NFT in metadata
     /// @param description Description of NFT in metadata
-    /// @param imageUrl URL of image to render for edition
-    /// @param animationUrl URL of animation to render for edition
+    /// @param media The image Url, animation Url and version label of the media to be rendered
     /// @param tokenOfEdition Token ID for specific token
     /// @param editionSize Size of entire edition to show
     /// @param tokenAddress Address of the NFT
     function createMetadataEdition(
         string memory name,
         string memory description,
-        string memory imageUrl,
-        string memory animationUrl,
+        MediaData memory media,
         uint256 tokenOfEdition,
         uint256 editionSize,
         address tokenAddress
     ) external pure returns (string memory) {
         string memory _tokenMediaData = tokenMediaData(
-            imageUrl,
-            animationUrl,
+            media,
             tokenOfEdition,
             tokenAddress
         );
@@ -176,30 +151,31 @@ contract SharedNFTLogic is IPublicSharedMetadata {
 
     /// Generates edition metadata from storage information as base64-json blob
     /// Combines the media data and metadata
-    /// @param imageUrl URL of image to render for edition
-    /// @param animationUrl URL of animation to render for edition
+    /// @param media urls of image and animation media with version label
     function tokenMediaData(
-        string memory imageUrl,
-        string memory animationUrl,
+        MediaData memory media,
         uint256 tokenOfEdition,
         address tokenAddress
     ) public pure returns (string memory) {
-        bool hasImage = bytes(imageUrl).length > 0;
-        bool hasAnimation = bytes(animationUrl).length > 0;
+        bool hasImage = bytes(media.imageUrl).length > 0;
+        bool hasAnimation = bytes(media.animationUrl).length > 0;
         if (hasImage && hasAnimation) {
             return
                 string(
                     abi.encodePacked(
                         'image": "',
-                        imageUrl,
+                        media.imageUrl,
                         "?id=",
                         numberToString(tokenOfEdition),
                         '", "animation_url": "',
-                        animationUrl,
+                        media.animationUrl,
                         "?id=",
                         numberToString(tokenOfEdition),
                         "&address=",
                         addressToString(tokenAddress),
+                        '", "',
+                        'media_version": "',
+                        uintArray3ToString(media.label),
                         '", "'
                     )
                 );
@@ -209,9 +185,12 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                 string(
                     abi.encodePacked(
                         'image": "',
-                        imageUrl,
+                        media.imageUrl,
                         "?id=", // if just url "/id" this will work with arweave pathmanifests
                         numberToString(tokenOfEdition),
+                        '", "',
+                        'media_version": "',
+                        uintArray3ToString(media.label),
                         '", "'
                     )
                 );
@@ -221,11 +200,14 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                 string(
                     abi.encodePacked(
                         'animation_url": "',
-                        animationUrl,
+                        media.animationUrl,
                         "?id=",
                         numberToString(tokenOfEdition),
                         "&address=",
                         addressToString(tokenAddress),
+                        '", "',
+                        'media_version": "',
+                        uintArray3ToString(media.label),
                         '", "'
                     )
                 );
