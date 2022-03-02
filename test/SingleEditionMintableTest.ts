@@ -417,23 +417,26 @@ describe("SingleEditionMintable", () => {
           );
 
       })
-      it("#addEditionVersion()", async () => {
+      it("#addVersion()", async () => {
+        await expect (
+          minterContract.addVersion(
+            {
+              urls: [
+                {
+                  url: "newURL",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                },
+                {
+                  url: "newURL",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+                }
+              ],
+              label: [0,0,2]
+            },
+          )
+        ).to.emit(minterContract, "VersionAdded")
+            .withArgs([0,0,2])
 
-        minterContract.addEditionVersion(
-          {
-            urls: [
-              {
-                url: "newURL",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-              },
-              {
-                url: "newURL",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
-              }
-            ],
-            label: [0,0,2]
-          },
-        )
         expect(await minterContract.getURIs()).to.deep.eq(
           [
             'newURL',
@@ -444,11 +447,11 @@ describe("SingleEditionMintable", () => {
         )
       });
 
-      describe("#updateEditionURLs()", () => {
+      describe("#updateVersionURL()", () => {
         it("reverts when version doesn't exist", async () => {
           // Update image URL on non exisiting version
           await expect(
-            minterContract.updateEditionURLs(
+            minterContract.updateVersionURL(
               [0,0,2],
               1,
               "updatedImageURL"
@@ -459,7 +462,7 @@ describe("SingleEditionMintable", () => {
         it("reverts when urlKey doesn't exist", async () => {
           // Update image URL on non exisiting version
           await expect(
-            minterContract.updateEditionURLs(
+            minterContract.updateVersionURL(
               [0,0,1],
               2,
               "updatedImageURL"
@@ -469,11 +472,18 @@ describe("SingleEditionMintable", () => {
 
         it("updates version url", async () => {
           // Update animation URL
-          await minterContract.updateEditionURLs(
-            [0,0,1],
-            0,
-            "updatedAnimationURL"
-          )
+          await expect(
+            minterContract.updateVersionURL(
+              [0,0,1],
+              0,
+              "updatedAnimationURL"
+            )
+          ).to.emit(minterContract, "VersionURLUpdated")
+            .withArgs(
+              [0,0,1],
+              0,
+              "updatedAnimationURL"
+            )
 
           expect(
             await minterContract.getURIs()
@@ -485,11 +495,18 @@ describe("SingleEditionMintable", () => {
           ])
 
           // Update image URL
-          await minterContract.updateEditionURLs(
-            [0,0,1],
-            1,
-            "updatedImageURL"
-          )
+          await expect(
+            minterContract.updateVersionURL(
+              [0,0,1],
+              1,
+              "updatedImageURL"
+            )
+          ).to.emit(minterContract, "VersionURLUpdated")
+            .withArgs(
+              [0,0,1],
+              1,
+              "updatedImageURL"
+            )
           expect(
             await minterContract.getURIs()
           ).to.deep.eq([
@@ -510,7 +527,7 @@ describe("SingleEditionMintable", () => {
         it("gets URIs",async () => {
 
           // Update version
-          await minterContract.addEditionVersion(
+          await minterContract.addVersion(
             {
               urls: [
                 {
@@ -549,7 +566,7 @@ describe("SingleEditionMintable", () => {
       })
       it("#getVersionHistory()", async () => {
         // Update version
-        await minterContract.addEditionVersion(
+        await minterContract.addVersion(
           {
             urls: [
               {
@@ -600,7 +617,7 @@ describe("SingleEditionMintable", () => {
       it("updates tokenURI metadata with new urls", async () => {
 
         // Update version
-        minterContract.addEditionVersion(
+        minterContract.addVersion(
           {
             urls: [
               {

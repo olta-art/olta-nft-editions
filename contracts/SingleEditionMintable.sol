@@ -40,6 +40,8 @@ contract SingleEditionMintable is
     using Versions for Versions.Set;
     event PriceChanged(uint256 amount);
     event EditionSold(uint256 price, address owner);
+    event VersionURLUpdated(uint8[3] label, uint8 index, string url);
+    event VersionAdded(uint8[3] label);
 
     // metadata
     string private description;
@@ -216,20 +218,20 @@ contract SingleEditionMintable is
       @dev Allows for updates of edition urls by the owner of the edition.
            Only URLs can be updated (data-uris are supported), hashes cannot be updated.
      */
-    function updateEditionURLs(
+    function updateVersionURL(
         uint8[3] memory _label,
         uint8 _urlKey,
         string memory _url
     ) public onlyOwner {
         versions.updateVersionURL(_label, _urlKey, _url);
-        // TODO: emit event
+        emit VersionURLUpdated(_label, _urlKey, _url);
     }
 
-    function addEditionVersion(
+    function addVersion(
         Versions.Version memory _version
     ) public onlyOwner {
         versions.addVersion(_version);
-        // TODO: emit event
+        emit VersionAdded(_version.label);
     }
 
     function getVersionHistory()
