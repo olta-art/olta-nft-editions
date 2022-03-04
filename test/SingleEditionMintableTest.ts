@@ -420,37 +420,109 @@ describe("SingleEditionMintable", () => {
           );
 
       })
-      it("#addVersion()", async () => {
-        await expect (
-          minterContract.addVersion(
-            {
-              urls: [
-                {
-                  url: "newURL",
-                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-                },
-                {
-                  url: "newURL",
-                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
-                }
-              ],
-              label: [0,0,2]
-            },
-          )
-        ).to.emit(minterContract, "VersionAdded")
-            .withArgs([0,0,2])
+      describe("#addVersion()", () => {
+        const createMockVersion = (label: Label) => {
+          return {
+            urls: [
+              {
+                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              }
+            ],
+            label
+          }
+        }
+        it("reverts if not creator", async () => {
+          const [_, other] = await ethers.getSigners()
+          await expect (
+            minterContract
+            .connect(other)
+            .addVersion(createMockVersion([1,0,0]))
+          ).to.be.revertedWith("Ownable: caller is not the owner")
+        })
+        it("throws if version label too big", async () => {
+          try{
+            await minterContract.addVersion(
+              createMockVersion([0,0,256])
+            )
+          }
+          catch(error: any){
+              expect(error.code).to.eq("INVALID_ARGUMENT")
+          }
+        })
+        it("adds version", async () => {
+          await expect (
+            minterContract.addVersion(
+              {
+                urls: [
+                  {
+                    url: "newURL",
+                    sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                  },
+                  {
+                    url: "newURL",
+                    sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  }
+                ],
+                label: [0,0,2]
+              },
+            )
+          ).to.emit(minterContract, "VersionAdded")
+              .withArgs([0,0,2])
 
-        expect(await minterContract.getURIs()).to.deep.eq(
-          [
-            'newURL',
-            '0x0000000000000000000000000000000000000000000000000000000000000001',
-            'newURL',
-            '0x0000000000000000000000000000000000000000000000000000000000000001'
-          ]
-        )
+          expect(await minterContract.getURIs()).to.deep.eq(
+            [
+              'newURL',
+              '0x0000000000000000000000000000000000000000000000000000000000000001',
+              'newURL',
+              '0x0000000000000000000000000000000000000000000000000000000000000001'
+            ]
+          )
+        });
+        it("adds large number of versions", async () => {
+          const versions: Label[] = []
+          // populate versions // 10 * 5 * 2 = 100
+          for (let major = 0; major < 2; major++) {
+            for (let minor = 0; minor < 5; minor++) {
+              for (let patch = 0; patch < 10; patch++) {
+                const version = [major, minor, patch] as Label
+                versions.push(version)
+              }
+            }
+          }
+
+          // adds 99 versions
+          for (let i = 2; i < versions.length; i++) {
+            // skip already added
+            if(i == 1) continue
+
+            await expect(
+              minterContract.addVersion(
+                createMockVersion(versions[i])
+              )
+            ).to.emit(minterContract, "VersionAdded")
+          }
+        });
       });
 
       describe("#updateVersionURL()", () => {
+        it("reverts if not creator", async () => {
+          const [_, other] = await ethers.getSigners()
+          await expect (
+            minterContract
+              .connect(other)
+              .updateVersionURL(
+                [0,0,2],
+                1,
+                "updatedImageURL"
+              )
+          ).to.be.revertedWith("Ownable: caller is not the owner")
+        })
+
         it("reverts when version doesn't exist", async () => {
           // Update image URL on non exisiting version
           await expect(
@@ -620,21 +692,23 @@ describe("SingleEditionMintable", () => {
       it("updates tokenURI metadata with new urls", async () => {
 
         // Update version
-        minterContract.addVersion(
-          {
-            urls: [
-              {
-                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-              },
-              {
-                url: "",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-              }
-            ],
-            label: [0,0,2]
-          }
-        )
+        await expect (
+          minterContract.addVersion(
+            {
+              urls: [
+                {
+                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                },
+                {
+                  url: "",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                }
+              ],
+              label: [0,0,2]
+            }
+          )
+        ).to.emit(minterContract, "VersionAdded")
 
         const updatedTokenURI = await minterContract.tokenURI(1);
         const updatedParsedTokenURI = parseDataURI(updatedTokenURI);
