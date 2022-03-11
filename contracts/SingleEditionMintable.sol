@@ -106,12 +106,14 @@ contract SingleEditionMintable is
         // Set ownership to original sender of contract call
         transferOwnership(_owner);
         description = _description;
-        // Add first version
-        versions.addVersion(_version);
         editionSize = _editionSize;
         royaltyBPS = _royaltyBPS;
         // Set edition id start to be 1 not 0
         atEditionId.increment();
+
+        // Add first version
+        versions.addVersion(_version);
+        emit VersionAdded(_version.label);
     }
 
 
