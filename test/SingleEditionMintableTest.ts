@@ -689,6 +689,27 @@ describe("SingleEditionMintable", () => {
           ]
         )
       });
+      it("emits version added event on creation", async () => {
+        await dynamicSketch.createEdition(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          // 1% royalty since BPS
+          10,
+          10
+        )
+        const editionResult = await dynamicSketch.getEditionAtId(1);
+        const newMinterContract = (await ethers.getContractAt(
+          "SingleEditionMintable",
+          editionResult
+        )) as SingleEditionMintable;
+        // get VersionAddeded events from newMinterContract
+        const filter = newMinterContract.filters.VersionAdded()
+        const events = await newMinterContract.queryFilter(filter)
+        // expect first event to equal the label of first version
+        expect(events[0].args[0]).to.be.deep.eq([0, 0, 1])
+      })
       it("updates tokenURI metadata with new urls", async () => {
 
         // Update version
