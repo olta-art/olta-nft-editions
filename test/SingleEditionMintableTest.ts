@@ -689,7 +689,7 @@ describe("SingleEditionMintable", () => {
           ]
         )
       });
-      it("emits version added event on creation", async () => {
+      it.only("emits version added event on creation", async () => {
         await dynamicSketch.createEdition(
           "Testing Token",
           "TEST",
