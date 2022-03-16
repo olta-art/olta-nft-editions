@@ -49,7 +49,7 @@ contract SingleEditionMintable is
     event VersionAdded(uint8[3] label);
 
     // metadata
-    string private description;
+    string public description;
 
     // Media Urls
     // animation_url and image_url metadata
@@ -65,7 +65,7 @@ contract SingleEditionMintable is
     // Current token id minted
     CountersUpgradeable.Counter private atEditionId;
     // Royalty amount in bps
-    uint256 royaltyBPS;
+    uint256 public royaltyBPS;
     // Addresses allowed to mint edition
     mapping(address => bool) allowedMinters;
 
