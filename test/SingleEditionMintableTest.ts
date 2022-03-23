@@ -15,16 +15,16 @@ type Label = [BigNumberish, BigNumberish, BigNumberish]
 const defaultVersion = () => {
   return {
     urls: [
+      // image
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      },
       // animation
       {
         url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
         sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
       },
-      // image
-      {
-        url: "",
-        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-      }
     ],
     label: [0,0,1] as Label
   }
@@ -246,11 +246,11 @@ describe("SingleEditionMintable", () => {
           {
             urls: [
               {
-                url: "animation",
+                url: "image",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
               },
               {
-                url: "image",
+                url: "animation",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
               }
             ],
@@ -460,11 +460,11 @@ describe("SingleEditionMintable", () => {
               {
                 urls: [
                   {
-                    url: "newURL",
+                    url: "imageUrl",
                     sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
                   },
                   {
-                    url: "newURL",
+                    url: "animationUrl",
                     sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
                   }
                 ],
@@ -476,9 +476,9 @@ describe("SingleEditionMintable", () => {
 
           expect(await minterContract.getURIs()).to.deep.eq(
             [
-              'newURL',
+              'imageUrl',
               '0x0000000000000000000000000000000000000000000000000000000000000001',
-              'newURL',
+              'animationUrl',
               '0x0000000000000000000000000000000000000000000000000000000000000001'
             ]
           )
@@ -550,13 +550,13 @@ describe("SingleEditionMintable", () => {
           await expect(
             minterContract.updateVersionURL(
               [0,0,1],
-              0,
+              1,
               "updatedAnimationURL"
             )
           ).to.emit(minterContract, "VersionURLUpdated")
             .withArgs(
               [0,0,1],
-              0,
+              1,
               "updatedAnimationURL"
             )
 
@@ -573,13 +573,13 @@ describe("SingleEditionMintable", () => {
           await expect(
             minterContract.updateVersionURL(
               [0,0,1],
-              1,
+              0,
               "updatedImageURL"
             )
           ).to.emit(minterContract, "VersionURLUpdated")
             .withArgs(
               [0,0,1],
-              1,
+              0,
               "updatedImageURL"
             )
           expect(
@@ -606,12 +606,12 @@ describe("SingleEditionMintable", () => {
             {
               urls: [
                 {
-                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
-                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-                },
-                {
                   url: "",
                   sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                },
+                {
+                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
                 }
               ],
               label: [0,0,2]
@@ -645,12 +645,12 @@ describe("SingleEditionMintable", () => {
           {
             urls: [
               {
-                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
-                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-              },
-              {
                 url: "",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+              },
+              {
+                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
               }
             ],
             label: [0,0,2]
@@ -663,11 +663,11 @@ describe("SingleEditionMintable", () => {
             [
               [
                 [
-                  "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+                  "",
                   "0x0000000000000000000000000000000000000000000000000000000000000000"
                 ],
                 [
-                  "",
+                  "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
                   "0x0000000000000000000000000000000000000000000000000000000000000000"
                 ]
               ],
@@ -676,11 +676,11 @@ describe("SingleEditionMintable", () => {
             [
               [
                 [
-                  "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  "",
                   "0x0000000000000000000000000000000000000000000000000000000000000001"
                 ],
                 [
-                  "",
+                  "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                   "0x0000000000000000000000000000000000000000000000000000000000000001"
                 ]
               ],
@@ -718,12 +718,12 @@ describe("SingleEditionMintable", () => {
             {
               urls: [
                 {
-                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
-                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-                },
-                {
                   url: "",
                   sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                },
+                {
+                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
                 }
               ],
               label: [0,0,2]

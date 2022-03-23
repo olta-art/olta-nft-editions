@@ -53,9 +53,10 @@ contract SingleEditionMintable is
 
     // Media Urls
     // animation_url and image_url metadata
+    // TODO: swap these around and test they match
     enum URLS  {
-        Animation,
-        Image
+        Image,
+        Animation
     }
     // Versions of Media Urls
     Versions.Set private versions;
