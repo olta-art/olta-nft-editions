@@ -33,7 +33,7 @@ Contributions are very welcome, you can reach out to us on discord or take a loo
 
 ### Where is the factory contract deployed:
 
-**Mumbai**: [0xc95B8a16F31030b303DE1082fd90c4e02795F34e](https://mumbai.polygonscan.com/address/0xc95B8a16F31030b303DE1082fd90c4e02795F34e)
+It's not yet :(
 
 ### How do I create a new edition?
 
