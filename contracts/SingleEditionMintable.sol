@@ -5,8 +5,8 @@
 █▄░█ █▀▀ ▀█▀   █▀▀ █▀▄ █ ▀█▀ █ █▀█ █▄░█ █▀
 █░▀█ █▀░ ░█░   ██▄ █▄▀ █ ░█░ █ █▄█ █░▀█ ▄█
 
-▀█ █▀█ █▀█ ▄▀█
-█▄ █▄█ █▀▄ █▀█
+▀█ █▀█ █▀█ ▄▀█   ▀▄▀   █▀█ █  ▀█▀ ▄▀█
+█▄ █▄█ █▀▄ █▀█   █░█   █▄█ █▄ ░█░ █▀█
 
  */
 
@@ -18,11 +18,18 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
-import {SharedNFTLogic} from "./SharedNFTLogic.sol";
+import {SharedNFTLogic, MediaData} from "./SharedNFTLogic.sol";
 import {IEditionSingleMintable} from "./IEditionSingleMintable.sol";
+import {Versions} from "./Versions.sol";
 
 /**
     This is a smart contract for handling dynamic contract minting.
+
+    This is a fork of Zora NFT Editions
+    changes:
+        - Media urls are versioned allowing for updatable content preserving history
+        - The NFT contract address is included in edition url query for easyier access to query the graph from within the NFT
+        - SupportsInterface function includes IEditionSingleMintable
 
     @dev This allows creators to mint a unique serial edition of the same media within a custom contract
     @author iain nash
@@ -35,28 +42,32 @@ contract SingleEditionMintable is
     OwnableUpgradeable
 {
     using CountersUpgradeable for CountersUpgradeable.Counter;
+    using Versions for Versions.Set;
     event PriceChanged(uint256 amount);
     event EditionSold(uint256 price, address owner);
+    event VersionURLUpdated(uint8[3] label, uint8 index, string url);
+    event VersionAdded(uint8[3] label);
+    event ApprovedMinter(address indexed owner, address indexed minter, bool approved);
 
     // metadata
-    string private description;
+    string public description;
 
     // Media Urls
-    // animation_url field in the metadata
-    string private animationUrl;
-    // Hash for the associated animation
-    bytes32 private animationHash;
-    // Image in the metadata
-    string private imageUrl;
-    // Hash for the associated image
-    bytes32 private imageHash;
+    // animation_url and image_url metadata
+    // TODO: swap these around and test they match
+    enum URLS  {
+        Image,
+        Animation
+    }
+    // Versions of Media Urls
+    Versions.Set private versions;
 
     // Total size of edition that can be minted
     uint256 public editionSize;
     // Current token id minted
     CountersUpgradeable.Counter private atEditionId;
     // Royalty amount in bps
-    uint256 royaltyBPS;
+    uint256 public royaltyBPS;
     // Addresses allowed to mint edition
     mapping(address => bool) allowedMinters;
 
@@ -76,10 +87,7 @@ contract SingleEditionMintable is
       @param _name Name of edition, used in the title as "$NAME NUMBER/TOTAL"
       @param _symbol Symbol of the new token contract
       @param _description Description of edition, used in the description field of the NFT
-      @param _imageUrl Image URL of the edition. Strongly encouraged to be used, if necessary, only animation URL can be used. One of animation and image url need to exist in a edition to render the NFT.
-      @param _imageHash SHA256 of the given image in bytes32 format (0xHASH). If no image is included, the hash can be zero.
-      @param _animationUrl Animation URL of the edition. Not required, but if omitted image URL needs to be included. This follows the opensea spec for NFTs
-      @param _animationHash The associated hash of the animation in sha-256 bytes32 format. If animation is omitted the hash can be zero.
+      @param _version Version of the media consisting of urls and hashes of animation and image content
       @param _editionSize Number of editions that can be minted in total. If 0, unlimited editions can be minted.
       @param _royaltyBPS BPS of the royalty set on the contract. Can be 0 for no royalty.
       @dev Function to create a new edition. Can only be called by the allowed creator
@@ -91,10 +99,7 @@ contract SingleEditionMintable is
         string memory _name,
         string memory _symbol,
         string memory _description,
-        string memory _animationUrl,
-        bytes32 _animationHash,
-        string memory _imageUrl,
-        bytes32 _imageHash,
+        Versions.Version memory _version,
         uint256 _editionSize,
         uint256 _royaltyBPS
     ) public initializer {
@@ -103,14 +108,14 @@ contract SingleEditionMintable is
         // Set ownership to original sender of contract call
         transferOwnership(_owner);
         description = _description;
-        animationUrl = _animationUrl;
-        animationHash = _animationHash;
-        imageUrl = _imageUrl;
-        imageHash = _imageHash;
         editionSize = _editionSize;
         royaltyBPS = _royaltyBPS;
         // Set edition id start to be 1 not 0
         atEditionId.increment();
+
+        // Add first version
+        versions.addVersion(_version);
+        emit VersionAdded(_version.label);
     }
 
 
@@ -217,18 +222,43 @@ contract SingleEditionMintable is
      */
     function setApprovedMinter(address minter, bool allowed) public onlyOwner {
         allowedMinters[minter] = allowed;
+        emit ApprovedMinter(_msgSender(), minter, allowed);
     }
 
     /**
-      @dev Allows for updates of edition urls by the owner of the edition.
+      @dev Updates a url of specified version by the owner of the edition.
            Only URLs can be updated (data-uris are supported), hashes cannot be updated.
+      @param _label The label of the specified version
+      @param _urlKey The index of the url to update 0=animation, 1=image
+      @param _url The url to be updated to
      */
-    function updateEditionURLs(
-        string memory _imageUrl,
-        string memory _animationUrl
+    function updateVersionURL(
+        uint8[3] memory _label,
+        uint8 _urlKey,
+        string memory _url
     ) public onlyOwner {
-        imageUrl = _imageUrl;
-        animationUrl = _animationUrl;
+        versions.updateVersionURL(_label, _urlKey, _url);
+        emit VersionURLUpdated(_label, _urlKey, _url);
+    }
+
+    /**
+      @dev Adds new version of the media updating the urls rendered in the metadata.
+           The order added determins order stored, the label has no effect.
+      @param _version The version to be added consisting of urls, hashes and a label
+     */
+    function addVersion(
+        Versions.Version memory _version
+    ) public onlyOwner {
+        versions.addVersion(_version);
+        emit VersionAdded(_version.label);
+    }
+
+    function getVersionHistory()
+        public
+        view
+        returns (Versions.Version[] memory)
+    {
+        return versions.getAllVersions();
     }
 
     /// Returns the number of editions allowed to mint (max_uint256 when open edition)
@@ -243,7 +273,7 @@ contract SingleEditionMintable is
 
     /**
         @param tokenId Token ID to burn
-        User burn function for token id 
+        User burn function for token id
      */
     function burn(uint256 tokenId) public {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "Not approved");
@@ -273,6 +303,7 @@ contract SingleEditionMintable is
 
     /**
       @dev Get URIs for edition NFT
+            Will get URIs from the last version added
       @return imageUrl, imageHash, animationUrl, animationHash
      */
     function getURIs()
@@ -285,7 +316,40 @@ contract SingleEditionMintable is
             bytes32
         )
     {
-        return (imageUrl, imageHash, animationUrl, animationHash);
+        Versions.Version memory latest = versions.getLatestVersion();
+        return (
+            latest.urls[uint8(URLS.Image)].url,
+            latest.urls[uint8(URLS.Image)].sha256hash,
+            latest.urls[uint8(URLS.Animation)].url,
+            latest.urls[uint8(URLS.Animation)].sha256hash
+        );
+    }
+
+    /**
+      @dev Get URIs for edition NFT of a version
+           Will get URIs from the last version added
+      @param label The label of the version
+      @return imageUrl, imageHash, animationUrl, animationHash
+     */
+    function getURIsOfVersion(
+        uint8[3] memory label
+    )
+        public
+        view
+        returns (
+            string memory,
+            bytes32,
+            string memory,
+            bytes32
+        )
+    {
+        Versions.Version memory version = versions.getVersion(label);
+        return (
+            version.urls[uint8(URLS.Image)].url,
+            version.urls[uint8(URLS.Image)].sha256hash,
+            version.urls[uint8(URLS.Animation)].url,
+            version.urls[uint8(URLS.Animation)].sha256hash
+        );
     }
 
     /**
@@ -306,6 +370,7 @@ contract SingleEditionMintable is
 
     /**
         @dev Get URI for given token id
+             Will get URIs from the last version added
         @param tokenId token id to get uri for
         @return base64-encoded json metadata object
     */
@@ -316,13 +381,48 @@ contract SingleEditionMintable is
         returns (string memory)
     {
         require(_exists(tokenId), "No token");
+        Versions.Version memory version = versions.getLatestVersion();
+        return
+            sharedNFTLogic.createMetadataEdition(
+                name(),
+                description,
+                MediaData(
+                    version.urls[uint8(URLS.Image)].url,
+                    version.urls[uint8(URLS.Animation)].url,
+                    version.label
+                ),
+                tokenId,
+                editionSize,
+                address(this)
+            );
+    }
+
+    /**
+        @dev Get URI for given token id of version
+        @param tokenId token id to get uri for
+        @param label the label of the version
+        @return base64-encoded json metadata object
+    */
+    function tokenURIOfVersion(
+        uint256 tokenId,
+        uint8[3] memory label
+    )
+        public
+        view
+        returns (string memory)
+    {
+        require(_exists(tokenId), "No token");
+        Versions.Version memory version = versions.getVersion(label);
 
         return
             sharedNFTLogic.createMetadataEdition(
                 name(),
                 description,
-                imageUrl,
-                animationUrl,
+                MediaData(
+                    version.urls[uint8(URLS.Image)].url,
+                    version.urls[uint8(URLS.Animation)].url,
+                    version.label
+                ),
                 tokenId,
                 editionSize,
                 address(this)
@@ -336,6 +436,7 @@ contract SingleEditionMintable is
         returns (bool)
     {
         return
+            type(IEditionSingleMintable).interfaceId == interfaceId ||
             type(IERC2981Upgradeable).interfaceId == interfaceId ||
             ERC721Upgradeable.supportsInterface(interfaceId);
     }

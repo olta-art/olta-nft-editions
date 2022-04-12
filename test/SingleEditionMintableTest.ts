@@ -2,13 +2,33 @@ import { expect } from "chai";
 import "@nomiclabs/hardhat-ethers";
 import { ethers, deployments } from "hardhat";
 import parseDataURI from "data-urls";
-import { getSeed } from "./utils"
 
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
   SingleEditionMintableCreator,
   SingleEditionMintable,
 } from "../typechain";
+import { BigNumberish } from "ethers";
+
+type Label = [BigNumberish, BigNumberish, BigNumberish]
+
+const defaultVersion = () => {
+  return {
+    urls: [
+      // image
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+      },
+      // animation
+      {
+        url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
+    ],
+    label: [0,0,1] as Label
+  }
+}
 
 describe("SingleEditionMintable", () => {
   let signer: SignerWithAddress;
@@ -37,10 +57,7 @@ describe("SingleEditionMintable", () => {
       "Testing Token",
       "TEST",
       "This is a testing token for all",
-      "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
-      "",
-      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      defaultVersion(),
       // 1% royalty since BPS
       10,
       10
@@ -77,10 +94,8 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        defaultVersion(),
+        // 1% royalty since BPS
         10,
         10
       );
@@ -106,7 +121,6 @@ describe("SingleEditionMintable", () => {
         );
 
       const tokenURI = await minterContract.tokenURI(1);
-      console.log(tokenURI);
       const parsedTokenURI = parseDataURI(tokenURI);
       if (!parsedTokenURI) {
         throw "No parsed token uri";
@@ -127,8 +141,8 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
-            + `&seed=${getSeed(1, minterContract.address)}`
             + `&address=${minterContract.address.toLowerCase()}`,
+          media_version: "0.0.1",
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -139,10 +153,8 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        defaultVersion(),
+        // 1% royalty since BPS
         0,
         0
       );
@@ -204,8 +216,8 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
-            + `&seed=${getSeed(1, minterContract.address)}`
             + `&address=${minterContract.address.toLowerCase()}`,
+          media_version: "0.0.1",
           properties: { number: 1, name: "Testing Token" },
         })
       );
@@ -231,10 +243,19 @@ describe("SingleEditionMintable", () => {
           "test name",
           "SYM",
           "description",
-          "animation",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          "uri",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          {
+            urls: [
+              {
+                url: "image",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+              },
+              {
+                url: "animation",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              }
+            ],
+            label: [0,0,1]
+          },
           12,
           12
         )
@@ -291,10 +312,7 @@ describe("SingleEditionMintable", () => {
           "Testing Token",
           "TEST",
           "This is a testing token for all",
-          "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
-          "",
-          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          defaultVersion(),
           // 2% royalty since BPS
           200,
           200
@@ -318,10 +336,7 @@ describe("SingleEditionMintable", () => {
         "Testing Token",
         "TEST",
         "This is a testing token for all",
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
-        "",
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        defaultVersion(),
         0,
         0
       );
@@ -376,7 +391,6 @@ describe("SingleEditionMintable", () => {
 
       // Check metadata from edition
       const uriData = Buffer.from(parsedTokenURI.body).toString("utf-8");
-      console.log({ tokenURI, uriData });
       const metadata = JSON.parse(uriData);
 
       expect(parsedTokenURI.mimeType.type).to.equal("application");
@@ -387,11 +401,358 @@ describe("SingleEditionMintable", () => {
           description: "This is a testing token for all",
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=10"
-            + `&seed=${getSeed(10, minterContract.address)}`
             + `&address=${minterContract.address.toLowerCase()}`,
+          media_version: "0.0.1",
           properties: { number: 10, name: "Testing Token" },
         })
       );
+    });
+    describe("versions", () => {
+      beforeEach(async()  => {
+
+        // Mint first edition
+        await expect(minterContract.mintEdition(signerAddress))
+          .to.emit(minterContract, "Transfer")
+          .withArgs(
+            "0x0000000000000000000000000000000000000000",
+            signerAddress,
+            1
+          );
+
+      })
+      describe("#addVersion()", () => {
+        const createMockVersion = (label: Label) => {
+          return {
+            urls: [
+              {
+                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              }
+            ],
+            label
+          }
+        }
+        it("reverts if not creator", async () => {
+          const [_, other] = await ethers.getSigners()
+          await expect (
+            minterContract
+            .connect(other)
+            .addVersion(createMockVersion([1,0,0]))
+          ).to.be.revertedWith("Ownable: caller is not the owner")
+        })
+        it("throws if version label too big", async () => {
+          try{
+            await minterContract.addVersion(
+              createMockVersion([0,0,256])
+            )
+          }
+          catch(error: any){
+              expect(error.code).to.eq("INVALID_ARGUMENT")
+          }
+        })
+        it("adds version", async () => {
+          await expect (
+            minterContract.addVersion(
+              {
+                urls: [
+                  {
+                    url: "imageUrl",
+                    sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                  },
+                  {
+                    url: "animationUrl",
+                    sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+                  }
+                ],
+                label: [0,0,2]
+              },
+            )
+          ).to.emit(minterContract, "VersionAdded")
+              .withArgs([0,0,2])
+
+          expect(await minterContract.getURIs()).to.deep.eq(
+            [
+              'imageUrl',
+              '0x0000000000000000000000000000000000000000000000000000000000000001',
+              'animationUrl',
+              '0x0000000000000000000000000000000000000000000000000000000000000001'
+            ]
+          )
+        });
+        it("adds large number of versions", async () => {
+          const versions: Label[] = []
+          // populate versions // 10 * 5 * 2 = 100
+          for (let major = 0; major < 2; major++) {
+            for (let minor = 0; minor < 5; minor++) {
+              for (let patch = 0; patch < 10; patch++) {
+                const version = [major, minor, patch] as Label
+                versions.push(version)
+              }
+            }
+          }
+
+          // adds 99 versions
+          for (let i = 2; i < versions.length; i++) {
+            // skip already added
+            if(i == 1) continue
+
+            await expect(
+              minterContract.addVersion(
+                createMockVersion(versions[i])
+              )
+            ).to.emit(minterContract, "VersionAdded")
+          }
+        });
+      });
+
+      describe("#updateVersionURL()", () => {
+        it("reverts if not creator", async () => {
+          const [_, other] = await ethers.getSigners()
+          await expect (
+            minterContract
+              .connect(other)
+              .updateVersionURL(
+                [0,0,2],
+                1,
+                "updatedImageURL"
+              )
+          ).to.be.revertedWith("Ownable: caller is not the owner")
+        })
+
+        it("reverts when version doesn't exist", async () => {
+          // Update image URL on non exisiting version
+          await expect(
+            minterContract.updateVersionURL(
+              [0,0,2],
+              1,
+              "updatedImageURL"
+            )
+          ).to.be.revertedWith("#Versions: The version does not exist")
+        });
+
+        it("reverts when urlKey doesn't exist", async () => {
+          // Update image URL on non exisiting version
+          await expect(
+            minterContract.updateVersionURL(
+              [0,0,1],
+              2,
+              "updatedImageURL"
+            )
+          ).to.be.revertedWith("#Versions: The url does not exist on that version")
+        });
+
+        it("updates version url", async () => {
+          // Update animation URL
+          await expect(
+            minterContract.updateVersionURL(
+              [0,0,1],
+              1,
+              "updatedAnimationURL"
+            )
+          ).to.emit(minterContract, "VersionURLUpdated")
+            .withArgs(
+              [0,0,1],
+              1,
+              "updatedAnimationURL"
+            )
+
+          expect(
+            await minterContract.getURIs()
+          ).to.deep.eq([
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "updatedAnimationURL",
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ])
+
+          // Update image URL
+          await expect(
+            minterContract.updateVersionURL(
+              [0,0,1],
+              0,
+              "updatedImageURL"
+            )
+          ).to.emit(minterContract, "VersionURLUpdated")
+            .withArgs(
+              [0,0,1],
+              0,
+              "updatedImageURL"
+            )
+          expect(
+            await minterContract.getURIs()
+          ).to.deep.eq([
+            "updatedImageURL",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "updatedAnimationURL",
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ])
+        });
+      });
+
+      describe("#getURIsOfVersion()", () => {
+        it("reverts when version doesn't exist", async () => {
+          await expect(
+             minterContract.getURIsOfVersion([0,0,2])
+          ).to.be.revertedWith("#Versions: The version does not exist")
+        })
+        it("gets URIs",async () => {
+
+          // Update version
+          await minterContract.addVersion(
+            {
+              urls: [
+                {
+                  url: "",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                },
+                {
+                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                }
+              ],
+              label: [0,0,2]
+            },
+          )
+
+          // version 0.0.1
+          expect(
+            await minterContract.getURIsOfVersion([0,0,1])
+          ).to.deep.eq([
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ])
+          // version 0.0.2
+          expect(
+            await minterContract.getURIsOfVersion([0,0,2])
+          ).to.deep.eq([
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+            "0x0000000000000000000000000000000000000000000000000000000000000001"
+          ])
+
+        })
+      })
+      it("#getVersionHistory()", async () => {
+        // Update version
+        await minterContract.addVersion(
+          {
+            urls: [
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+              },
+              {
+                url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              }
+            ],
+            label: [0,0,2]
+          }
+        )
+
+        const history = await minterContract.getVersionHistory()
+        expect(history).to.deep.eq(
+          [
+            [
+              [
+                [
+                  "",
+                  "0x0000000000000000000000000000000000000000000000000000000000000000"
+                ],
+                [
+                  "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+                  "0x0000000000000000000000000000000000000000000000000000000000000000"
+                ]
+              ],
+              [0, 0, 1]
+            ],
+            [
+              [
+                [
+                  "",
+                  "0x0000000000000000000000000000000000000000000000000000000000000001"
+                ],
+                [
+                  "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  "0x0000000000000000000000000000000000000000000000000000000000000001"
+                ]
+              ],
+              [0, 0, 2]
+            ]
+          ]
+        )
+      });
+      it("emits version added event on creation", async () => {
+        await dynamicSketch.createEdition(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          // 1% royalty since BPS
+          10,
+          10
+        )
+        const editionResult = await dynamicSketch.getEditionAtId(1);
+        const newMinterContract = (await ethers.getContractAt(
+          "SingleEditionMintable",
+          editionResult
+        )) as SingleEditionMintable;
+        // get VersionAddeded events from newMinterContract
+        const filter = newMinterContract.filters.VersionAdded()
+        const events = await newMinterContract.queryFilter(filter)
+        // expect first event to equal the label of first version
+        expect(events[0].args[0]).to.be.deep.eq([0, 0, 1])
+      })
+      it("updates tokenURI metadata with new urls", async () => {
+
+        // Update version
+        await expect (
+          minterContract.addVersion(
+            {
+              urls: [
+                {
+                  url: "",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                },
+                {
+                  url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                }
+              ],
+              label: [0,0,2]
+            }
+          )
+        ).to.emit(minterContract, "VersionAdded")
+
+        const updatedTokenURI = await minterContract.tokenURI(1);
+        const updatedParsedTokenURI = parseDataURI(updatedTokenURI);
+        if (!updatedParsedTokenURI) {
+          throw "No parsed token uri";
+        }
+
+        // Check metadata from edition
+        const updatedUriData = Buffer.from(updatedParsedTokenURI.body).toString("utf-8");
+        const updatedMetadata = JSON.parse(updatedUriData);
+
+        expect(JSON.stringify(updatedMetadata)).to.equal(
+          JSON.stringify({
+            name: "Testing Token 1/10",
+            description: "This is a testing token for all",
+            animation_url:
+              "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k?id=1"
+              + `&address=${minterContract.address.toLowerCase()}`,
+            media_version: "0.0.2",
+            properties: { number: 1, name: "Testing Token" },
+          })
+        );
+      });
     });
   });
 });
