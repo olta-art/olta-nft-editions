@@ -47,6 +47,7 @@ contract SingleEditionMintable is
     event EditionSold(uint256 price, address owner);
     event VersionURLUpdated(uint8[3] label, uint8 index, string url);
     event VersionAdded(uint8[3] label);
+    event ApprovedMinter(address indexed owner, address indexed minter, bool approved);
 
     // metadata
     string public description;
@@ -221,6 +222,7 @@ contract SingleEditionMintable is
      */
     function setApprovedMinter(address minter, bool allowed) public onlyOwner {
         allowedMinters[minter] = allowed;
+        emit ApprovedMinter(_msgSender(), minter, allowed);
     }
 
     /**
