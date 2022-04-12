@@ -1,4 +1,25 @@
-# Zora NFT Editions
+# Olta NFT Editions [WIP]
+
+These are a fork of [Zora NFT Editions](https://github.com/ourzora/nft-editions) with a few additions with a specific focus on NFT's with webpage content.
+
+## This is still a work in progress!
+We are currently testing these contracts locally along with a Dutch Auction House and a subgraph. Mumbai deployments coming soon!
+
+Contributions are very welcome, you can reach out to us on discord or take a look at the current issues and create a pull request.
+
+### What have we changed?
+1. Added versioning for the animation and image urls. The implementation makes use of `Versions.sol` library contract to store a history of versions
+2. The contract address to the animation url for easier querying of subgraphs from within the NFT content.
+3. Support interface check for `IEditionSingleMintable.sol` useful for checking sales contracts.
+
+### How does versioning work?
+- Each version consist of an animation url, animation content hash, image url, image content hash and a version label.
+- The last added version is assumed to be the latest and used for generating the metadata (this may change)
+- It is still possible to update urls of a version.
+- The versioning label follows the [semantic versioning](https://semver.org/) specification. This is to keep things neat and more easily order versions off-chain. The exact implementation uses is an array `[uint8, uint8, uint8]` limiting the max increment to 255.
+
+### How to query the subgraph?
+- TODO:
 
 ### What are these contracts?
 1. `SingleEditionMintable`
@@ -10,45 +31,9 @@
    Contract that includes dynamic metadata generation for your editions removing the need for a centralized server.
    imageUrl and animationUrl can be base64-encoded data-uris for these contracts totally removing the need for IPFS
 
-### How do I create a new contract?
-
-### Directly on the blockchain:
-1. Find/Deploy the `SingleEditionMintableCreator` contract
-2. Call `createEdition` on the `SingleEditionMintableCreator`
-
-### Through a GUI:
-
-Rinkeby: https://edition-drop.vercel.app/?network=4
-
-Mainnet: https://edition-drop.vercel.app/?network=1
-
-Polygon: https://edition-drop.vercel.app/?network=137
-
-Mumbai: https://edition-drop.vercel.app/?network=80001
-
-
 ### Where is the factory contract deployed:
 
-
-**Mainnet ETH**: [0x91A8713155758d410DFAc33a63E193AE3E89F909](https://etherscan.io/address/0x91A8713155758d410DFAc33a63E193AE3E89F909)
-
-note: ~ Deployed with 1.0.1 version of code. Missing public getter for description.
-
-
-**Rinkeby**: [0x85FaDB8Debc0CED38d0647329fC09143d01Af660](https://rinkeby.etherscan.io/address/0x85FaDB8Debc0CED38d0647329fC09143d01Af660)
-
-note: ~ Deployed with 1.0.1 version of code. Missing public getter for description.
-
-
-**Polygon**: [0x4500590AfC7f12575d613457aF01F06b1eEE57a3](https://polygonscan.com/address/0x4500590AfC7f12575d613457aF01F06b1eEE57a3)
-
-note: Deployed with 1.0.2 version of code with public getter for description.
-
-
-**Mumbai**: [0x773E5B82179E6CE1CdF8c5C0d736e797b3ceDDDC](https://mumbai.polygonscan.com/address/0x773E5B82179E6CE1CdF8c5C0d736e797b3ceDDDC)
-
-note: Deployed with 1.0.2 version of code with public getter for description.
-
+It's not yet :(
 
 ### How do I create a new edition?
 
@@ -84,24 +69,3 @@ Now that you have a edition, there are multiple options for lazy-minting and sal
 * All metadata is stored/generated on-chain -- only image/video assets are stored off-chain
 * Permissionless and open-source
 * Simple integrated ethereum-based sales, can be easily extended with custom interface code
-
-### Potential use cases for these contracts:
-
-* Giveaways for events showing if you’ve attended 
-* Serial editioned artworks that can be sold in the Zora auction house / work in any ERC721 market
-* Fundraisers for fixed-eth amounts
-* Can be used to issue tokens in response for contributing to a fundraiser
-* Tickets/access tokens allowing holders to access a discord or mint
-
-### Deploying:
-(Replace network with desired network)
-
-`hardhat deploy --network rinkeby`
-
-### Verifying:
-
-`hardhat sourcify --network rinkeby && hardhat etherscan-verify --network rinkeby`
-
-### Bug Bounty
-5 ETH for any critical bugs that could result in loss of funds.
-Rewards will be given for smaller bugs or ideas.
