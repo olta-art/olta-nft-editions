@@ -205,17 +205,17 @@ describe.only("mint any id feature", () => {
 
     // failing
     it("reverts if edition id out of range", async () => {
-      expect(
-        await minterContract.mintEdition(
+      await expect(
+         minterContract.mintEdition(
           toMintData(signerAddress, 0)
         )
-      ).to.be.revertedWith("edition id out of range")
+      ).to.be.revertedWith("Edition id out of range")
 
-      expect(
-        await minterContract.mintEdition(
+      await expect(
+         minterContract.mintEdition(
           toMintData(signerAddress, 11)
         )
-      ).to.be.revertedWith("edition id out of range")
+      ).to.be.revertedWith("Edition id out of range")
     });
 
   });
