@@ -181,6 +181,7 @@ contract SingleEditionMintable is
      */
     function mintEdition(MintData memory to) external override returns (uint256) {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
+        require(_isInRange(to.id), "Edition id out of range");
         MintData[] memory toMint = new MintData[](1);
         toMint[0] = to;
         return _mintEditions(toMint);
@@ -280,6 +281,14 @@ contract SingleEditionMintable is
         _burn(tokenId);
     }
 
+    function _isInRange(uint256 tokenId)
+        internal
+        view
+        returns (bool)
+    {
+        return ((tokenId > 0) && (tokenId < editionSize + 1));
+    }
+
     /**
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
@@ -292,7 +301,7 @@ contract SingleEditionMintable is
         uint256 endAt = startAt + recipients.length - 1;
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
         for (uint256 index = 0; index < recipients.length; index++) {
-            // TODO: require id is in range
+            require(_isInRange(recipients[index].id), "Edition id out of range");
             _mint(
                 recipients[index].to,
                 recipients[index].id
