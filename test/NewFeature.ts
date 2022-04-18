@@ -164,7 +164,7 @@ describe.only("mint any id feature", () => {
         toMintData(await s2.getAddress(), 9),
         toMintData(await s3.getAddress(), 8),
         toMintData(await s2.getAddress(), 7),
-        toMintData(await s3.getAddress(), 10),
+        toMintData(await s3.getAddress(), 6),
       ]);
       await expect(minterContract.mintEditions([toMintData(signerAddress, 11)])).to.be.reverted;
     });
