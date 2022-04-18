@@ -19,7 +19,7 @@ import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cou
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
 import {SharedNFTLogic, MediaData} from "./SharedNFTLogic.sol";
-import {IEditionSingleMintable} from "./IEditionSingleMintable.sol";
+import {IEditionSingleMintable, MintData} from "./IEditionSingleMintable.sol";
 import {Versions} from "./Versions.sol";
 
 /**
@@ -132,11 +132,11 @@ contract SingleEditionMintable is
       @dev This allows the user to purchase a edition edition
            at the given price in the contract.
      */
-    function purchase() external payable returns (uint256) {
+    function purchase(uint256 id) external payable returns (uint256) {
         require(salePrice > 0, "Not for sale");
         require(msg.value == salePrice, "Wrong price");
-        address[] memory toMint = new address[](1);
-        toMint[0] = msg.sender;
+        MintData[] memory toMint = new MintData[](1);
+        toMint[0] = MintData(msg.sender, id);
         emit EditionSold(salePrice, msg.sender);
         return _mintEditions(toMint);
     }
@@ -179,9 +179,9 @@ contract SingleEditionMintable is
       @param to address to send the newly minted edition to
       @dev This mints one edition to the given address by an allowed minter on the edition instance.
      */
-    function mintEdition(address to) external override returns (uint256) {
+    function mintEdition(MintData memory to) external override returns (uint256) {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
-        address[] memory toMint = new address[](1);
+        MintData[] memory toMint = new MintData[](1);
         toMint[0] = to;
         return _mintEditions(toMint);
     }
@@ -190,7 +190,7 @@ contract SingleEditionMintable is
       @param recipients list of addresses to send the newly minted editions to
       @dev This mints multiple editions to the given list of addresses.
      */
-    function mintEditions(address[] memory recipients)
+    function mintEditions(MintData[] memory recipients)
         external
         override
         returns (uint256)
@@ -284,7 +284,7 @@ contract SingleEditionMintable is
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
      */
-    function _mintEditions(address[] memory recipients)
+    function _mintEditions(MintData[] memory recipients)
         internal
         returns (uint256)
     {
@@ -293,8 +293,8 @@ contract SingleEditionMintable is
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
         while (atEditionId.current() <= endAt) {
             _mint(
-                recipients[atEditionId.current() - startAt],
-                atEditionId.current()
+                recipients[atEditionId.current() - startAt].to,
+                recipients[atEditionId.current() - startAt].id
             );
             atEditionId.increment();
         }
