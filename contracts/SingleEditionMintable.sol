@@ -291,10 +291,11 @@ contract SingleEditionMintable is
         uint256 startAt = atEditionId.current();
         uint256 endAt = startAt + recipients.length - 1;
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
-        while (atEditionId.current() <= endAt) {
+        for (uint256 index = 0; index < recipients.length; index++) {
+            // TODO: require id is in range
             _mint(
-                recipients[atEditionId.current() - startAt].to,
-                recipients[atEditionId.current() - startAt].id
+                recipients[index].to,
+                recipients[index].id
             );
             atEditionId.increment();
         }
