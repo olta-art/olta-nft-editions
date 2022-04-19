@@ -75,6 +75,8 @@ contract SingleEditionMintable is
     mapping(uint256 => bool) seedsUsed;
     // Mapping from tokenId to seed
     mapping(uint256 => uint256) seedOfTokens;
+    // the last used seed closest to zero
+    uint256 private _lastUsedSeed;
 
     // Price for sale
     uint256 public salePrice;
@@ -321,8 +323,10 @@ contract SingleEditionMintable is
       @dev Private function to find the next availble un-used seed
      */
     function _findNextSeed() private view returns (uint256) {
+        if(_lastUsedSeed == 0) return 1;
+
         uint256 next;
-        for (uint256 i = 1; i < editionSize; i++) {
+        for (uint256 i = _lastUsedSeed; i < editionSize; i++) {
             if(seedsUsed[i] == false){
                 next = i;
                 break;
@@ -343,12 +347,13 @@ contract SingleEditionMintable is
         uint256 endAt = startAt + recipients.length - 1;
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
         while (atEditionId.current() <= endAt) {
-            // check if seed has been used
+            // auto allocate next seed
             uint256 next = _findNextSeed();
 
             // allocate seed to id
             seedsUsed[next] = true;
             seedOfTokens[atEditionId.current()] = next;
+            _lastUsedSeed = next;
 
             _mint(
                 recipients[atEditionId.current() - startAt],
@@ -370,6 +375,8 @@ contract SingleEditionMintable is
         uint256 startAt = atEditionId.current();
         uint256 endAt = startAt + recipients.length - 1;
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
+
+        uint256 nextSeed = _findNextSeed();
         while (atEditionId.current() <= endAt) {
             // check if seed has been used
             require(seedsUsed[seeds[atEditionId.current() - startAt]] == false, "Seed already used");
@@ -379,6 +386,12 @@ contract SingleEditionMintable is
             // allocate seed to id
             seedsUsed[seeds[atEditionId.current() - startAt]] = true;
             seedOfTokens[atEditionId.current()] = seeds[atEditionId.current() - startAt];
+            if(nextSeed == seeds[atEditionId.current() - startAt]){
+                // cache last used seed
+                _lastUsedSeed = nextSeed;
+                // update next seed
+                nextSeed = _findNextSeed();
+            }
 
             _mint(
                 recipients[atEditionId.current() - startAt],

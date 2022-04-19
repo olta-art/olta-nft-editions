@@ -229,4 +229,95 @@ describe.only("mint with seed feature", () => {
       await expect(minterContract["mintEditions(address[],uint256[])"]([signerAddress],[11])).to.be.reverted;
     });
   });
+
+  describe("benchmark gas", () => {
+    let signer: SignerWithAddress;
+    let signerAddress: string;
+    let minterContract: SingleEditionMintable;
+    beforeEach(async () => {
+      signer = (await ethers.getSigners())[1];
+      signerAddress = await signer.getAddress()
+      await dynamicSketch.createEdition(
+        "Testing Token",
+        "TEST",
+        "This is a testing token for all",
+        defaultVersion(),
+        1000,
+        10
+      );
+
+      const editionResult = await dynamicSketch.getEditionAtId(0);
+      minterContract = (await ethers.getContractAt(
+        "SingleEditionMintable",
+        editionResult
+      )) as SingleEditionMintable
+    })
+
+    it("auto allocates next seed and with cache", async () => {
+      // create large group of used seeds between 1 and 99
+      const generatedAddresses: string[] = []
+      const generatedSeeds: number[] = []
+      for (let i = 2; i < 100; i++) {
+        generatedAddresses.push(signerAddress)
+        generatedSeeds.push(i)
+      }
+
+      await minterContract["mintEditions(address[],uint256[])"](
+        generatedAddresses,
+        generatedSeeds
+      )
+
+      // recorded gas usage 131738
+      let tx =  await minterContract["mintEdition(address)"](signerAddress)
+      let reciept = await tx.wait()
+      const seed1GasPrice = reciept.gasUsed
+
+      const metadata1 = await fetchMetadata(99, minterContract)
+      expect(
+        metadata1.animation_url
+      ).to.equal(
+        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=99"
+        + `&address=${minterContract.address.toLowerCase()}`
+        + `&seed=1`
+      );
+
+      // recorded gas usage 353278
+      tx =  await minterContract["mintEdition(address)"](signerAddress)
+      reciept = await tx.wait()
+      const seed100GasPrice = reciept.gasUsed
+
+      const metadata2 = await fetchMetadata(100, minterContract)
+      expect(
+        metadata2.animation_url
+      ).to.equal(
+        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=100"
+        + `&address=${minterContract.address.toLowerCase()}`
+        + `&seed=100`
+      );
+
+      // recorded gas usage 117490
+      tx =  await minterContract["mintEdition(address)"](signerAddress)
+      reciept = await tx.wait()
+      const seed101GasPrice = reciept.gasUsed
+
+      const metadata3 = await fetchMetadata(101, minterContract)
+      expect(
+        metadata3.animation_url
+      ).to.equal(
+        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=101"
+        + `&address=${minterContract.address.toLowerCase()}`
+        + `&seed=101`
+      );
+
+      console.log(`
+        gas:
+        intial purchase: ${seed1GasPrice.toString()}
+        gap purchase: ${seed100GasPrice.toString()}
+        after gap purchase: ${seed101GasPrice.toString()}
+      `)
+
+      expect(seed1GasPrice.lt(seed100GasPrice))
+      expect(seed101GasPrice.lt(seed100GasPrice))
+    })
+  })
 });
