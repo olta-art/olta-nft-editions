@@ -71,8 +71,10 @@ contract SingleEditionMintable is
     // Addresses allowed to mint edition
     mapping(address => bool) allowedMinters;
 
-    // Mapping from seed to token ID
-    mapping(uint256 => uint256) seedsUsed;
+    // Mapping from seed to bool
+    mapping(uint256 => bool) seedsUsed;
+    // Mapping from tokenId to seed
+    mapping(uint256 => uint256) seedOfTokens;
 
     // Price for sale
     uint256 public salePrice;
@@ -316,6 +318,20 @@ contract SingleEditionMintable is
     }
 
     /**
+      @dev Private function to find the next availble un-used seed
+     */
+    function _findNextSeed() private view returns (uint256) {
+        uint256 next;
+        for (uint256 i = 1; i < editionSize; i++) {
+            if(seedsUsed[i] == false){
+                next = i;
+                break;
+            }
+        }
+        return next;
+    }
+
+    /**
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
      */
@@ -327,11 +343,12 @@ contract SingleEditionMintable is
         uint256 endAt = startAt + recipients.length - 1;
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
         while (atEditionId.current() <= endAt) {
-             // check if seed has been used
-            require(seedsUsed[atEditionId.current()] == 0, "Seed already used");
+            // check if seed has been used
+            uint256 next = _findNextSeed();
 
             // allocate seed to id
-            seedsUsed[atEditionId.current()] = atEditionId.current();
+            seedsUsed[next] = true;
+            seedOfTokens[atEditionId.current()] = next;
 
             _mint(
                 recipients[atEditionId.current() - startAt],
@@ -355,12 +372,13 @@ contract SingleEditionMintable is
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
         while (atEditionId.current() <= endAt) {
             // check if seed has been used
-            require(seedsUsed[seeds[atEditionId.current() - startAt]] == 0, "Seed already used");
+            require(seedsUsed[seeds[atEditionId.current() - startAt]] == false, "Seed already used");
             // check if seed is out of range
             require(_isSeedInRange(seeds[atEditionId.current() - startAt]), "Seed out of range");
 
             // allocate seed to id
-            seedsUsed[ seeds[atEditionId.current() - startAt]] = atEditionId.current();
+            seedsUsed[seeds[atEditionId.current() - startAt]] = true;
+            seedOfTokens[atEditionId.current()] = seeds[atEditionId.current() - startAt];
 
             _mint(
                 recipients[atEditionId.current() - startAt],
@@ -464,7 +482,7 @@ contract SingleEditionMintable is
                 tokenId,
                 editionSize,
                 address(this),
-                seedsUsed[tokenId]
+                seedOfTokens[tokenId]
             );
     }
 
@@ -497,7 +515,7 @@ contract SingleEditionMintable is
                 tokenId,
                 editionSize,
                 address(this),
-                seedsUsed[tokenId]
+                seedOfTokens[tokenId]
             );
     }
 

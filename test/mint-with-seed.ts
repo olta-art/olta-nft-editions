@@ -129,7 +129,7 @@ describe.only("mint with seed feature", () => {
       const metadata1 = await fetchMetadata(1, minterContract)
 
       expect(
-        JSON.stringify(metadata1.animation_url)
+        metadata1.animation_url
       ).to.equal(
         "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
         + `&address=${minterContract.address.toLowerCase()}`
@@ -148,7 +148,7 @@ describe.only("mint with seed feature", () => {
       const metadata2 = await fetchMetadata(2, minterContract)
 
       expect(
-        JSON.stringify(metadata2.animation_url)
+        metadata2.animation_url
       ).to.equal(
         "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=2"
         + `&address=${minterContract.address.toLowerCase()}`
@@ -168,7 +168,7 @@ describe.only("mint with seed feature", () => {
       const metadata3 = await fetchMetadata(3, minterContract)
 
       expect(
-        JSON.stringify(metadata3.animation_url)
+        metadata3.animation_url
       ).to.equal(
         "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=3"
         + `&address=${minterContract.address.toLowerCase()}`
