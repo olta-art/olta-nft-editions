@@ -71,6 +71,9 @@ contract SingleEditionMintable is
     // Addresses allowed to mint edition
     mapping(address => bool) allowedMinters;
 
+    // Mapping from seed to token ID
+    mapping(uint256 => uint256) seedsUsed;
+
     // Price for sale
     uint256 public salePrice;
 
@@ -187,6 +190,21 @@ contract SingleEditionMintable is
     }
 
     /**
+      @param to address to send the newly minted edition to
+      @param seed uint256 to seed newly minted edition with
+      @dev This mints one edition to the given address by an allowed minter on the edition instance.
+     */
+    function mintEdition(address to, uint256 seed) external override returns (uint256) {
+        require(_isAllowedToMint(), "Needs to be an allowed minter");
+        require(seedsUsed[seed] == 0, "Seed already used");
+        address[] memory toMint = new address[](1);
+        toMint[0] = to;
+        uint256[] memory toMintSeed = new uint256[](1);
+        toMintSeed[0] = seed;
+        return _mintEditions(toMint, toMintSeed);
+    }
+
+    /**
       @param recipients list of addresses to send the newly minted editions to
       @dev This mints multiple editions to the given list of addresses.
      */
@@ -197,6 +215,20 @@ contract SingleEditionMintable is
     {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
         return _mintEditions(recipients);
+    }
+
+    /**
+      @param recipients list of addresses to send the newly minted editions to
+      @dev This mints multiple editions to the given list of addresses.
+     */
+    function mintEditions(address[] memory recipients, uint256[] memory seeds)
+        external
+        override
+        returns (uint256)
+    {
+        require(_isAllowedToMint(), "Needs to be an allowed minter");
+        require(recipients.length == seeds.length, "Recipients and seeds must be same length");
+        return _mintEditions(recipients, seeds);
     }
 
     /**
@@ -302,6 +334,33 @@ contract SingleEditionMintable is
     }
 
     /**
+      @dev Private function to mint als without any access checks.
+           Called by the public edition minting functions.
+     */
+    function _mintEditions(address[] memory recipients, uint256[] memory seeds)
+        internal
+        returns (uint256)
+    {
+        uint256 startAt = atEditionId.current();
+        uint256 endAt = startAt + recipients.length - 1;
+        require(editionSize == 0 || endAt <= editionSize, "Sold out");
+        while (atEditionId.current() <= endAt) {
+            // check if seed has been used
+            require(seedsUsed[seeds[atEditionId.current() - startAt]] == 0, "Seed already used");
+
+            // allocate seed to id
+            seeds[seedsUsed[atEditionId.current() - startAt]] = atEditionId.current();
+
+            _mint(
+                recipients[atEditionId.current() - startAt],
+                atEditionId.current()
+            );
+            atEditionId.increment();
+        }
+        return atEditionId.current();
+    }
+
+    /**
       @dev Get URIs for edition NFT
             Will get URIs from the last version added
       @return imageUrl, imageHash, animationUrl, animationHash
@@ -393,7 +452,8 @@ contract SingleEditionMintable is
                 ),
                 tokenId,
                 editionSize,
-                address(this)
+                address(this),
+                seedsUsed[tokenId]
             );
     }
 
@@ -425,7 +485,8 @@ contract SingleEditionMintable is
                 ),
                 tokenId,
                 editionSize,
-                address(this)
+                address(this),
+                seedsUsed[tokenId]
             );
     }
 

@@ -75,12 +75,14 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         MediaData memory media,
         uint256 tokenOfEdition,
         uint256 editionSize,
-        address tokenAddress
+        address tokenAddress,
+        uint256 tokenSeed
     ) external pure returns (string memory) {
         string memory _tokenMediaData = tokenMediaData(
             media,
             tokenOfEdition,
-            tokenAddress
+            tokenAddress,
+            tokenSeed
         );
         bytes memory json = createMetadataJSON(
             name,
@@ -155,7 +157,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
     function tokenMediaData(
         MediaData memory media,
         uint256 tokenOfEdition,
-        address tokenAddress
+        address tokenAddress,
+        uint256 tokenSeed
     ) public pure returns (string memory) {
         bool hasImage = bytes(media.imageUrl).length > 0;
         bool hasAnimation = bytes(media.animationUrl).length > 0;
@@ -173,6 +176,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         numberToString(tokenOfEdition),
                         "&address=",
                         addressToString(tokenAddress),
+                        "&seed=",
+                        numberToString(tokenSeed),
                         '", "',
                         'media_version": "',
                         uintArray3ToString(media.label),
@@ -205,6 +210,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         numberToString(tokenOfEdition),
                         "&address=",
                         addressToString(tokenAddress),
+                        "&seed=",
+                        numberToString(tokenSeed),
                         '", "',
                         'media_version": "',
                         uintArray3ToString(media.label),
