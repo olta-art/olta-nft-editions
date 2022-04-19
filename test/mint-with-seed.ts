@@ -193,11 +193,11 @@ describe.only("mint with seed feature", () => {
     it("reverts if seed out of range", async () => {
       await expect(
          minterContract["mintEdition(address,uint256)"](signerAddress, 0)
-      ).to.be.revertedWith("Edition id out of range")
+      ).to.be.revertedWith("Seed out of range")
 
       await expect(
          minterContract["mintEdition(address,uint256)"](signerAddress, 11)
-      ).to.be.revertedWith("Edition id out of range")
+      ).to.be.revertedWith("Seed out of range")
     });
 
     it("creates a set of editions with specific seeds", async () => {

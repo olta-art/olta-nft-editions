@@ -311,6 +311,10 @@ contract SingleEditionMintable is
         _burn(tokenId);
     }
 
+    function _isSeedInRange(uint256 seed) private view returns (bool) {
+        return ((seed > 0) && (seed < editionSize + 1));
+    }
+
     /**
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
@@ -352,6 +356,8 @@ contract SingleEditionMintable is
         while (atEditionId.current() <= endAt) {
             // check if seed has been used
             require(seedsUsed[seeds[atEditionId.current() - startAt]] == 0, "Seed already used");
+            // check if seed is out of range
+            require(_isSeedInRange(seeds[atEditionId.current() - startAt]), "Seed out of range");
 
             // allocate seed to id
             seedsUsed[ seeds[atEditionId.current() - startAt]] = atEditionId.current();
