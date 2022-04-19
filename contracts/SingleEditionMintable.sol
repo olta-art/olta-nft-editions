@@ -196,7 +196,6 @@ contract SingleEditionMintable is
      */
     function mintEdition(address to, uint256 seed) external override returns (uint256) {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
-        require(seedsUsed[seed] == 0, "Seed already used");
         address[] memory toMint = new address[](1);
         toMint[0] = to;
         uint256[] memory toMintSeed = new uint256[](1);
@@ -324,6 +323,12 @@ contract SingleEditionMintable is
         uint256 endAt = startAt + recipients.length - 1;
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
         while (atEditionId.current() <= endAt) {
+             // check if seed has been used
+            require(seedsUsed[atEditionId.current()] == 0, "Seed already used");
+
+            // allocate seed to id
+            seedsUsed[atEditionId.current()] = atEditionId.current();
+
             _mint(
                 recipients[atEditionId.current() - startAt],
                 atEditionId.current()
@@ -349,7 +354,7 @@ contract SingleEditionMintable is
             require(seedsUsed[seeds[atEditionId.current() - startAt]] == 0, "Seed already used");
 
             // allocate seed to id
-            seeds[seedsUsed[atEditionId.current() - startAt]] = atEditionId.current();
+            seedsUsed[ seeds[atEditionId.current() - startAt]] = atEditionId.current();
 
             _mint(
                 recipients[atEditionId.current() - startAt],
