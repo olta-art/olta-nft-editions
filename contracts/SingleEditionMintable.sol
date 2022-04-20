@@ -209,7 +209,8 @@ contract SingleEditionMintable is
     /**
       @param to address to send the newly minted edition to
       @param seed uint256 to seed newly minted edition with
-      @dev This mints one edition to the given address by an allowed minter on the edition instance.
+      @dev This mints one edition with given seed to the given address
+        by an allowed minter on the edition instance.
      */
     function mintEditionWithSeed(address to, uint256 seed) external override returns (uint256) {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
@@ -325,14 +326,20 @@ contract SingleEditionMintable is
         _burn(tokenId);
     }
 
+
+    /**
+        @param seed uint256 of the seed
+        @dev  checks to see if seed is in valid range
+    */
     function _isSeedInRange(uint256 seed) private view returns (bool) {
         return ((seed > 0) && (seed < editionSize + 1));
     }
 
     /**
-      @dev Private function to find the next availble un-used seed closest to zero
+      @return uint256 next un-used seed
+      @dev Intenral function to find the next availble un-used seed closest to zero
      */
-    function _findNextSeed() private view returns (uint256) {
+    function _findNextSeed() internal view returns (uint256) {
         if(_lastUsedSeed == 0) return 1;
 
         uint256 next;
@@ -378,6 +385,7 @@ contract SingleEditionMintable is
     /**
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
+           allocates next availble seed
      */
     function _mintEditions(address[] memory recipients)
         internal
@@ -401,6 +409,7 @@ contract SingleEditionMintable is
     /**
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
+           allocates requested seeds
      */
     function _mintEditionsWithSeed(MintData[] memory recipients)
         internal
