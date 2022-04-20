@@ -197,6 +197,37 @@ describe.only("mint with seed feature", () => {
       )) as SingleEditionMintable;
     });
 
+    it("creates a set of editions", async () => {
+      const [s1, s2, s3] = await ethers.getSigners();
+
+      await minterContract.mintEditions(
+        [
+          await s1.getAddress(),
+          await s2.getAddress(),
+          await s3.getAddress(),
+        ],
+      );
+      expect(await minterContract.ownerOf(1)).to.equal(await s1.getAddress());
+      expect(await minterContract.ownerOf(2)).to.equal(await s2.getAddress());
+      expect(await minterContract.ownerOf(3)).to.equal(await s3.getAddress());
+
+      await minterContract.mintEditions(
+        [
+          await s1.getAddress(),
+          await s2.getAddress(),
+          await s3.getAddress(),
+          await s2.getAddress(),
+          await s3.getAddress(),
+          await s2.getAddress(),
+          await s3.getAddress(),
+        ]
+      );
+
+      await expect(
+        minterContract.mintEditions([signerAddress])
+      ).to.be.reverted;
+    });
+
     it("creates a set of editions with specific seeds", async () => {
       const [s1, s2, s3] = await ethers.getSigners();
 

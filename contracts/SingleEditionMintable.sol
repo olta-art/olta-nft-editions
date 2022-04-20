@@ -332,7 +332,7 @@ contract SingleEditionMintable is
         @dev  checks to see if seed is in valid range
     */
     function _isSeedInRange(uint256 seed) private view returns (bool) {
-        return ((seed > 0) && (seed < editionSize + 1));
+        return ((seed > 0) && (seed <= editionSize));
     }
 
     /**
@@ -343,7 +343,7 @@ contract SingleEditionMintable is
         if(_lastUsedSeed == 0) return 1;
 
         uint256 next;
-        for (uint256 i = _lastUsedSeed; i < editionSize; i++) {
+        for (uint256 i = _lastUsedSeed; i <= editionSize; i++) {
             if(seedsUsed[i] == false){
                 next = i;
                 break;
