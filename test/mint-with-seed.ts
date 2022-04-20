@@ -5,7 +5,6 @@ import { expect } from "chai";
 import "@nomiclabs/hardhat-ethers";
 import { ethers, deployments } from "hardhat";
 import parseDataURI from "data-urls";
-
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
   SingleEditionMintableCreator,
@@ -14,6 +13,8 @@ import {
 import { BigNumberish } from "ethers";
 
 type Label = [BigNumberish, BigNumberish, BigNumberish]
+
+const defaultAnimationURl = "https://arweave.net/<tx-hash-length-000000000000000000000>"
 
 const defaultVersion = () => {
   return {
@@ -25,7 +26,7 @@ const defaultVersion = () => {
       },
       // animation
       {
-        url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+        url: defaultAnimationURl,
         sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
       },
     ],
@@ -33,7 +34,7 @@ const defaultVersion = () => {
   }
 }
 
-const toMintData = (to: string, id: BigNumberish) => ({to, id})
+// Helpers
 
 const fetchMetadata = async (tokenId: number, contract: SingleEditionMintable) => {
   const tokenURI = await contract.tokenURI(tokenId);
@@ -45,6 +46,19 @@ const fetchMetadata = async (tokenId: number, contract: SingleEditionMintable) =
   // parse metadata body
   const uriData = Buffer.from(parsedTokenURI.body).toString("utf-8");
   return JSON.parse(uriData);
+}
+
+const getAnimationUrl = async (contract: SingleEditionMintable, id: number) => {
+  const metadata = await fetchMetadata(id, contract)
+  return metadata.animation_url
+}
+
+const expectedUrl = (contract: SingleEditionMintable, id: number, seed: number) => {
+  return defaultAnimationURl
+    + "?"
+    + `id=${id}`
+    + `&address=${contract.address.toLowerCase()}`
+    + `&seed=${seed}`
 }
 
 describe.only("mint with seed feature", () => {
@@ -69,17 +83,15 @@ describe.only("mint with seed feature", () => {
     signerAddress = await signer.getAddress();
   });
 
-  describe("with a edition", () => {
-    let signer1: SignerWithAddress;
+  describe("# mintEdition", () => {
     let minterContract: SingleEditionMintable;
+
     beforeEach(async () => {
-      signer1 = (await ethers.getSigners())[1];
       await dynamicSketch.createEdition(
         "Testing Token",
         "TEST",
         "This is a testing token for all",
         defaultVersion(),
-        // 1% royalty since BPS
         10,
         10
       );
@@ -93,100 +105,60 @@ describe.only("mint with seed feature", () => {
 
     it("creates a new edition", async () => {
       // Mint first edition
-      await expect(minterContract["mintEdition(address)"](signerAddress))
-        .to.emit(minterContract, "Transfer")
-        .withArgs(
-          "0x0000000000000000000000000000000000000000",
-          signerAddress,
-          1
-        );
+      await expect(
+        minterContract["mintEdition(address)"](signerAddress)
+      ).to.emit(minterContract, "Transfer")
     });
 
     it("creates new edition with seed", async () => {
-      const seed = 5
-      await expect(minterContract["mintEdition(address,uint256)"](signerAddress, seed)
+      const seed = 1
+      await expect(
+        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
       ).to.emit(minterContract, "Transfer")
-        .withArgs(
-          "0x0000000000000000000000000000000000000000",
-          signerAddress,
-          1
-        );
     });
 
     it("auto assigns next available seed", async () => {
-      // TODO: read metadata and check seed number
+
       const seed = 2
-
-      // with seed 2
-      await expect(minterContract["mintEdition(address,uint256)"](signerAddress, seed)
+      await expect(
+        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
       ).to.emit(minterContract, "Transfer")
-        .withArgs(
-          "0x0000000000000000000000000000000000000000",
-          signerAddress,
-          1
-        );
-
-      const metadata1 = await fetchMetadata(1, minterContract)
 
       expect(
-        metadata1.animation_url
+        await getAnimationUrl(minterContract, 1)
       ).to.equal(
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
-        + `&address=${minterContract.address.toLowerCase()}`
-        + `&seed=2`
+        expectedUrl(minterContract, 1, seed)
       );
 
-      // without seed - seed = 1
+      // should auto assign seed 1
       await expect(minterContract["mintEdition(address)"](signerAddress)
       ).to.emit(minterContract, "Transfer")
-        .withArgs(
-          "0x0000000000000000000000000000000000000000",
-          signerAddress,
-          2
-        );
-
-      const metadata2 = await fetchMetadata(2, minterContract)
 
       expect(
-        metadata2.animation_url
+        await getAnimationUrl(minterContract, 2)
       ).to.equal(
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=2"
-        + `&address=${minterContract.address.toLowerCase()}`
-        + `&seed=1`
+        expectedUrl(minterContract, 2, 1)
       );
 
-      // without seed - seed = 3
-      // seed should skip 2 becuase already used
+      // should skip seed 2 and auto assign seed 3
       await expect(minterContract["mintEdition(address)"](signerAddress)
       ).to.emit(minterContract, "Transfer")
-        .withArgs(
-          "0x0000000000000000000000000000000000000000",
-          signerAddress,
-          3
-         );
-
-      const metadata3 = await fetchMetadata(3, minterContract)
 
       expect(
-        metadata3.animation_url
+        await getAnimationUrl(minterContract, 3)
       ).to.equal(
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=3"
-        + `&address=${minterContract.address.toLowerCase()}`
-        + `&seed=3`
-      );
+        expectedUrl(minterContract, 3, 3)
+      )
     });
 
     it("reverts if seed already used", async () => {
-      // Mint first edition - seed = 1
-      await expect(minterContract["mintEdition(address)"](signerAddress))
-        .to.emit(minterContract, "Transfer")
-        .withArgs(
-          "0x0000000000000000000000000000000000000000",
-          signerAddress,
-          1
-        );
+      const seed = 1
+      await expect(
+        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
+      ).to.emit(minterContract, "Transfer")
 
-      await expect(minterContract["mintEdition(address,uint256)"](signerAddress, 1)
+      await expect(
+        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
       ).to.be.revertedWith("Seed already used")
     });
 
@@ -198,6 +170,29 @@ describe.only("mint with seed feature", () => {
       await expect(
          minterContract["mintEdition(address,uint256)"](signerAddress, 11)
       ).to.be.revertedWith("Seed out of range")
+    });
+
+  });
+
+  describe("# mintEditions", () => {
+
+    let minterContract: SingleEditionMintable;
+
+    beforeEach(async () => {
+      await dynamicSketch.createEdition(
+        "Testing Token",
+        "TEST",
+        "This is a testing token for all",
+        defaultVersion(),
+        10,
+        10
+      );
+
+      const editionResult = await dynamicSketch.getEditionAtId(0);
+      minterContract = (await ethers.getContractAt(
+        "SingleEditionMintable",
+        editionResult
+      )) as SingleEditionMintable;
     });
 
     it("creates a set of editions with specific seeds", async () => {
@@ -230,10 +225,11 @@ describe.only("mint with seed feature", () => {
     });
   });
 
-  describe("benchmark gas", () => {
+  describe("gas optimisation", () => {
     let signer: SignerWithAddress;
     let signerAddress: string;
     let minterContract: SingleEditionMintable;
+
     beforeEach(async () => {
       signer = (await ethers.getSigners())[1];
       signerAddress = await signer.getAddress()
@@ -242,7 +238,7 @@ describe.only("mint with seed feature", () => {
         "TEST",
         "This is a testing token for all",
         defaultVersion(),
-        1000,
+        1000, // large number of editions
         10
       );
 
@@ -254,70 +250,60 @@ describe.only("mint with seed feature", () => {
     })
 
     it("auto allocates next seed and with cache", async () => {
-      // create large group of used seeds between 1 and 99
+      // create large group of used seeds between 2 and 99
       const generatedAddresses: string[] = []
       const generatedSeeds: number[] = []
       for (let i = 2; i < 100; i++) {
         generatedAddresses.push(signerAddress)
         generatedSeeds.push(i)
       }
-
+      // mint generated seeds
       await minterContract["mintEditions(address[],uint256[])"](
         generatedAddresses,
         generatedSeeds
       )
 
-      // recorded gas usage 131738
-      let tx =  await minterContract["mintEdition(address)"](signerAddress)
-      let reciept = await tx.wait()
-      const seed1GasPrice = reciept.gasUsed
+      const mintEdition = async () => {
+        const tx =  await minterContract["mintEdition(address)"](signerAddress)
+        return await tx.wait()
+      }
 
-      const metadata1 = await fetchMetadata(99, minterContract)
+      // recorded gas usage 131738
+      const seed1_GasPrice = (await mintEdition()).gasUsed
       expect(
-        metadata1.animation_url
+        await getAnimationUrl(minterContract, 99)
       ).to.equal(
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=99"
-        + `&address=${minterContract.address.toLowerCase()}`
-        + `&seed=1`
+        expectedUrl(minterContract, 99, 1)
       );
 
       // recorded gas usage 353278
-      tx =  await minterContract["mintEdition(address)"](signerAddress)
-      reciept = await tx.wait()
-      const seed100GasPrice = reciept.gasUsed
-
-      const metadata2 = await fetchMetadata(100, minterContract)
+      const seed100_GasPrice = (await mintEdition()).gasUsed
       expect(
-        metadata2.animation_url
+        await getAnimationUrl(minterContract, 100)
       ).to.equal(
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=100"
-        + `&address=${minterContract.address.toLowerCase()}`
-        + `&seed=100`
+        expectedUrl(minterContract, 100, 100)
       );
 
       // recorded gas usage 117490
-      tx =  await minterContract["mintEdition(address)"](signerAddress)
-      reciept = await tx.wait()
-      const seed101GasPrice = reciept.gasUsed
-
-      const metadata3 = await fetchMetadata(101, minterContract)
+      const seed101_GasPrice =  (await mintEdition()).gasUsed
       expect(
-        metadata3.animation_url
+        await getAnimationUrl(minterContract, 101)
       ).to.equal(
-        "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=101"
-        + `&address=${minterContract.address.toLowerCase()}`
-        + `&seed=101`
+        expectedUrl(minterContract, 101, 101)
       );
 
       console.log(`
         gas:
-        intial purchase: ${seed1GasPrice.toString()}
-        gap purchase: ${seed100GasPrice.toString()}
-        after gap purchase: ${seed101GasPrice.toString()}
+        intial purchase: ${seed1_GasPrice.toString()}
+        gap purchase: ${seed100_GasPrice.toString()}
+        after gap purchase: ${seed101_GasPrice.toString()}
       `)
 
-      expect(seed1GasPrice.lt(seed100GasPrice))
-      expect(seed101GasPrice.lt(seed100GasPrice))
+      // should be higher becuase of for loop to find next available seed
+      expect(seed100_GasPrice.gt(seed1_GasPrice))
+
+      // should be less than becuase of cached last used seed
+      expect(seed101_GasPrice.lt(seed100_GasPrice))
     })
   })
 });
