@@ -225,6 +225,44 @@ describe.only("mint with seed feature", () => {
     });
   });
 
+  describe("# purchase", () => {
+    let minterContract: SingleEditionMintable;
+    let oneEth = ethers.utils.parseEther("1")
+
+    beforeEach(async () => {
+      await dynamicSketch.createEdition(
+        "Testing Token",
+        "TEST",
+        "This is a testing token for all",
+        defaultVersion(),
+        10,
+        10
+      );
+
+      const editionResult = await dynamicSketch.getEditionAtId(0);
+      minterContract = (await ethers.getContractAt(
+        "SingleEditionMintable",
+        editionResult
+      )) as SingleEditionMintable;
+
+      // set sale price to 1 ETH
+      await minterContract.setSalePrice(oneEth)
+    });
+
+    it("purchases new edition", async () => {
+      await expect(
+         minterContract["purchase()"]({value: oneEth})
+      ).to.emit(minterContract, "EditionSold")
+    });
+
+    it("purchases new edition with seed", async () => {
+      const seed = 2
+      await expect(
+        minterContract["purchase(uint256)"](seed, {value: oneEth})
+     ).to.emit(minterContract, "EditionSold")
+    });
+  })
+
   describe("gas optimisation", () => {
     let signer: SignerWithAddress;
     let signerAddress: string;

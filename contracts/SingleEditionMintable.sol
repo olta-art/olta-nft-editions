@@ -149,6 +149,21 @@ contract SingleEditionMintable is
     }
 
     /**
+      @dev This allows the user to purchase a edition with specific seed
+           at the given price in the contract.
+     */
+    function purchase(uint256 seed) external payable returns (uint256) {
+        require(salePrice > 0, "Not for sale");
+        require(msg.value == salePrice, "Wrong price");
+        address[] memory toMint = new address[](1);
+        toMint[0] = msg.sender;
+        uint256[] memory toMintSeed = new uint256[](1);
+        toMintSeed[0] = seed;
+        emit EditionSold(salePrice, msg.sender);
+        return _mintEditions(toMint, toMintSeed);
+    }
+
+    /**
       @param _salePrice if sale price is 0 sale is stopped, otherwise that amount 
                        of ETH is needed to start the sale.
       @dev This sets a simple ETH sales price
