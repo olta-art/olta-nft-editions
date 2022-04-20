@@ -169,7 +169,7 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         'image": "',
                         media.imageUrl,
                         "?id=",
-                        numberToString(tokenOfEdition),
+                        numberToString(tokenSeed),
                         '", "animation_url": "',
                         media.animationUrl,
                         "?id=",
@@ -192,7 +192,7 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         'image": "',
                         media.imageUrl,
                         "?id=", // if just url "/id" this will work with arweave pathmanifests
-                        numberToString(tokenOfEdition),
+                        numberToString(tokenSeed),
                         '", "',
                         'media_version": "',
                         uintArray3ToString(media.label),
