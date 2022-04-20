@@ -19,7 +19,7 @@ import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Cou
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
 import {SharedNFTLogic, MediaData} from "./SharedNFTLogic.sol";
-import {IEditionSingleMintable} from "./IEditionSingleMintable.sol";
+import {IEditionSingleMintable, MintData} from "./IEditionSingleMintable.sol";
 import {Versions} from "./Versions.sol";
 
 /**
@@ -152,19 +152,17 @@ contract SingleEditionMintable is
       @dev This allows the user to purchase a edition with specific seed
            at the given price in the contract.
      */
-    function purchase(uint256 seed) external payable returns (uint256) {
+    function purchaseWithSeed(uint256 seed) external payable returns (uint256) {
         require(salePrice > 0, "Not for sale");
         require(msg.value == salePrice, "Wrong price");
-        address[] memory toMint = new address[](1);
-        toMint[0] = msg.sender;
-        uint256[] memory toMintSeed = new uint256[](1);
-        toMintSeed[0] = seed;
+        MintData[] memory toMint = new MintData[](1);
+        toMint[0] = MintData(msg.sender, seed);
         emit EditionSold(salePrice, msg.sender);
-        return _mintEditions(toMint, toMintSeed);
+        return _mintEditionsWithSeed(toMint);
     }
 
     /**
-      @param _salePrice if sale price is 0 sale is stopped, otherwise that amount 
+      @param _salePrice if sale price is 0 sale is stopped, otherwise that amount
                        of ETH is needed to start the sale.
       @dev This sets a simple ETH sales price
            Setting a sales price allows users to mint the edition until it sells out.
@@ -213,13 +211,11 @@ contract SingleEditionMintable is
       @param seed uint256 to seed newly minted edition with
       @dev This mints one edition to the given address by an allowed minter on the edition instance.
      */
-    function mintEdition(address to, uint256 seed) external override returns (uint256) {
+    function mintEditionWithSeed(address to, uint256 seed) external override returns (uint256) {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
-        address[] memory toMint = new address[](1);
-        toMint[0] = to;
-        uint256[] memory toMintSeed = new uint256[](1);
-        toMintSeed[0] = seed;
-        return _mintEditions(toMint, toMintSeed);
+        MintData[] memory toMint = new MintData[](1);
+        toMint[0] = MintData(to, seed);
+        return _mintEditionsWithSeed(toMint);
     }
 
     /**
@@ -236,17 +232,16 @@ contract SingleEditionMintable is
     }
 
     /**
-      @param recipients list of addresses to send the newly minted editions to
-      @dev This mints multiple editions to the given list of addresses.
+      @param recipients list of addresses and seeds to send the newly minted editions to
+      @dev This mints multiple editions to the given list of addresses and seeds
      */
-    function mintEditions(address[] memory recipients, uint256[] memory seeds)
+    function mintEditionsWithSeed(MintData[] memory recipients)
         external
         override
         returns (uint256)
     {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
-        require(recipients.length == seeds.length, "Recipients and seeds must be same length");
-        return _mintEditions(recipients, seeds);
+        return _mintEditionsWithSeed(recipients);
     }
 
     /**
@@ -335,7 +330,7 @@ contract SingleEditionMintable is
     }
 
     /**
-      @dev Private function to find the next availble un-used seed
+      @dev Private function to find the next availble un-used seed closest to zero
      */
     function _findNextSeed() private view returns (uint256) {
         if(_lastUsedSeed == 0) return 1;
@@ -351,6 +346,36 @@ contract SingleEditionMintable is
     }
 
     /**
+        @param tokenId Token ID for the seed to be allocated to
+        @dev  uses the next un-used seed
+    */
+    function _useNextSeed(uint256 tokenId) internal returns (uint256) {
+        uint256 seed = _findNextSeed();
+
+        _useSeed(tokenId, seed);
+
+        // update last used
+        _lastUsedSeed = seed;
+
+        return seed;
+    }
+
+    /**
+        @param tokenId Token ID for the seed to be allocated to
+        @param seed Seed to be used
+    */
+    function _useSeed(uint256 tokenId, uint256 seed) internal {
+        // check if seed has been used
+        require(seedsUsed[seed] == false, "Seed already used");
+        // check if seed is out of range
+        require(_isSeedInRange(seed), "Seed out of range");
+
+        // allocate seed to id
+        seedsUsed[seed] = true;
+        seedOfTokens[tokenId] = seed;
+    }
+
+    /**
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
      */
@@ -362,13 +387,7 @@ contract SingleEditionMintable is
         uint256 endAt = startAt + recipients.length - 1;
         require(editionSize == 0 || endAt <= editionSize, "Sold out");
         while (atEditionId.current() <= endAt) {
-            // auto allocate next seed
-            uint256 next = _findNextSeed();
-
-            // allocate seed to id
-            seedsUsed[next] = true;
-            seedOfTokens[atEditionId.current()] = next;
-            _lastUsedSeed = next;
+            _useNextSeed(atEditionId.current());
 
             _mint(
                 recipients[atEditionId.current() - startAt],
@@ -383,7 +402,7 @@ contract SingleEditionMintable is
       @dev Private function to mint als without any access checks.
            Called by the public edition minting functions.
      */
-    function _mintEditions(address[] memory recipients, uint256[] memory seeds)
+    function _mintEditionsWithSeed(MintData[] memory recipients)
         internal
         returns (uint256)
     {
@@ -393,15 +412,12 @@ contract SingleEditionMintable is
 
         uint256 nextSeed = _findNextSeed();
         while (atEditionId.current() <= endAt) {
-            // check if seed has been used
-            require(seedsUsed[seeds[atEditionId.current() - startAt]] == false, "Seed already used");
-            // check if seed is out of range
-            require(_isSeedInRange(seeds[atEditionId.current() - startAt]), "Seed out of range");
+            _useSeed(
+                atEditionId.current(),
+                recipients[atEditionId.current() - startAt].seed
+            );
 
-            // allocate seed to id
-            seedsUsed[seeds[atEditionId.current() - startAt]] = true;
-            seedOfTokens[atEditionId.current()] = seeds[atEditionId.current() - startAt];
-            if(nextSeed == seeds[atEditionId.current() - startAt]){
+            if(nextSeed == recipients[atEditionId.current() - startAt].seed){
                 // cache last used seed
                 _lastUsedSeed = nextSeed;
                 // update next seed
@@ -409,7 +425,7 @@ contract SingleEditionMintable is
             }
 
             _mint(
-                recipients[atEditionId.current() - startAt],
+                recipients[atEditionId.current() - startAt].to,
                 atEditionId.current()
             );
             atEditionId.increment();

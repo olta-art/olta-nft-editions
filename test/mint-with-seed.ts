@@ -61,6 +61,8 @@ const expectedUrl = (contract: SingleEditionMintable, id: number, seed: number) 
     + `&seed=${seed}`
 }
 
+const createMintData = (to: string, seed: number) => ({to, seed})
+
 describe.only("mint with seed feature", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
@@ -106,14 +108,14 @@ describe.only("mint with seed feature", () => {
     it("creates a new edition", async () => {
       // Mint first edition
       await expect(
-        minterContract["mintEdition(address)"](signerAddress)
+        minterContract.mintEdition(signerAddress)
       ).to.emit(minterContract, "Transfer")
     });
 
     it("creates new edition with seed", async () => {
       const seed = 1
       await expect(
-        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
+        minterContract.mintEditionWithSeed(signerAddress, seed)
       ).to.emit(minterContract, "Transfer")
     });
 
@@ -121,7 +123,7 @@ describe.only("mint with seed feature", () => {
 
       const seed = 2
       await expect(
-        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
+        minterContract.mintEditionWithSeed(signerAddress, seed)
       ).to.emit(minterContract, "Transfer")
 
       expect(
@@ -131,7 +133,7 @@ describe.only("mint with seed feature", () => {
       );
 
       // should auto assign seed 1
-      await expect(minterContract["mintEdition(address)"](signerAddress)
+      await expect(minterContract.mintEdition(signerAddress)
       ).to.emit(minterContract, "Transfer")
 
       expect(
@@ -141,7 +143,7 @@ describe.only("mint with seed feature", () => {
       );
 
       // should skip seed 2 and auto assign seed 3
-      await expect(minterContract["mintEdition(address)"](signerAddress)
+      await expect(minterContract.mintEdition(signerAddress)
       ).to.emit(minterContract, "Transfer")
 
       expect(
@@ -154,21 +156,21 @@ describe.only("mint with seed feature", () => {
     it("reverts if seed already used", async () => {
       const seed = 1
       await expect(
-        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
+        minterContract.mintEditionWithSeed(signerAddress, seed)
       ).to.emit(minterContract, "Transfer")
 
       await expect(
-        minterContract["mintEdition(address,uint256)"](signerAddress, seed)
+        minterContract.mintEditionWithSeed(signerAddress, seed)
       ).to.be.revertedWith("Seed already used")
     });
 
     it("reverts if seed out of range", async () => {
       await expect(
-         minterContract["mintEdition(address,uint256)"](signerAddress, 0)
+         minterContract.mintEditionWithSeed(signerAddress, 0)
       ).to.be.revertedWith("Seed out of range")
 
       await expect(
-         minterContract["mintEdition(address,uint256)"](signerAddress, 11)
+         minterContract.mintEditionWithSeed(signerAddress, 11)
       ).to.be.revertedWith("Seed out of range")
     });
 
@@ -197,31 +199,33 @@ describe.only("mint with seed feature", () => {
 
     it("creates a set of editions with specific seeds", async () => {
       const [s1, s2, s3] = await ethers.getSigners();
-      await minterContract["mintEditions(address[],uint256[])"](
+
+      await minterContract.mintEditionsWithSeed(
         [
-        await s1.getAddress(),
-        await s2.getAddress(),
-        await s3.getAddress(),
+          createMintData(await s1.getAddress(), 10),
+          createMintData(await s2.getAddress(), 5),
+          createMintData(await s3.getAddress(), 1),
         ],
-        // specific seed array
-        [10, 5, 1]
       );
       expect(await minterContract.ownerOf(1)).to.equal(await s1.getAddress());
       expect(await minterContract.ownerOf(2)).to.equal(await s2.getAddress());
       expect(await minterContract.ownerOf(3)).to.equal(await s3.getAddress());
 
-      await minterContract["mintEditions(address[],uint256[])"]([
-        await s1.getAddress(),
-        await s2.getAddress(),
-        await s3.getAddress(),
-        await s2.getAddress(),
-        await s3.getAddress(),
-        await s2.getAddress(),
-        await s3.getAddress(),
-      ],
-      [2,4,3,9,8,7,6]);
+      await minterContract.mintEditionsWithSeed(
+        [
+          createMintData(await s1.getAddress(), 2),
+          createMintData(await s2.getAddress(), 4),
+          createMintData(await s3.getAddress(), 3),
+          createMintData(await s2.getAddress(), 9),
+          createMintData(await s3.getAddress(), 8),
+          createMintData(await s2.getAddress(), 7),
+          createMintData(await s3.getAddress(), 6),
+        ]
+      );
 
-      await expect(minterContract["mintEditions(address[],uint256[])"]([signerAddress],[11])).to.be.reverted;
+      await expect(
+        minterContract.mintEditionsWithSeed([createMintData(signerAddress, 11)])
+      ).to.be.reverted;
     });
   });
 
@@ -251,14 +255,14 @@ describe.only("mint with seed feature", () => {
 
     it("purchases new edition", async () => {
       await expect(
-         minterContract["purchase()"]({value: oneEth})
+         minterContract.purchase({value: oneEth})
       ).to.emit(minterContract, "EditionSold")
     });
 
     it("purchases new edition with seed", async () => {
       const seed = 2
       await expect(
-        minterContract["purchase(uint256)"](seed, {value: oneEth})
+        minterContract.purchaseWithSeed(seed, {value: oneEth})
      ).to.emit(minterContract, "EditionSold")
     });
   })
@@ -289,20 +293,19 @@ describe.only("mint with seed feature", () => {
 
     it("auto allocates next seed and with cache", async () => {
       // create large group of used seeds between 2 and 99
-      const generatedAddresses: string[] = []
-      const generatedSeeds: number[] = []
+      const generatedRecipeints = []
       for (let i = 2; i < 100; i++) {
-        generatedAddresses.push(signerAddress)
-        generatedSeeds.push(i)
+        generatedRecipeints.push(
+          createMintData(signerAddress, i)
+        )
       }
       // mint generated seeds
-      await minterContract["mintEditions(address[],uint256[])"](
-        generatedAddresses,
-        generatedSeeds
+      await minterContract.mintEditionsWithSeed(
+        generatedRecipeints
       )
 
       const mintEdition = async () => {
-        const tx =  await minterContract["mintEdition(address)"](signerAddress)
+        const tx =  await minterContract.mintEdition(signerAddress)
         return await tx.wait()
       }
 
