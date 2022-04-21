@@ -25,6 +25,11 @@ const defaultVersion = () => {
         url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
         sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
       },
+      // patch notes
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
     ],
     label: [0,0,1] as Label
   }
@@ -79,6 +84,10 @@ describe("SingleEditionMintable", () => {
       "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy"
     );
     expect(editionUris[3]).to.be.equal(
+      "0x0000000000000000000000000000000000000000000000000000000000000000"
+    );
+    expect(editionUris[4]).to.be.equal("");
+    expect(editionUris[5]).to.be.equal(
       "0x0000000000000000000000000000000000000000000000000000000000000000"
     );
     expect(await minterContract.editionSize()).to.be.equal(10);
@@ -142,6 +151,7 @@ describe("SingleEditionMintable", () => {
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
             + `&address=${minterContract.address.toLowerCase()}`,
+          patch_notes_url: "",
           media_version: "0.0.1",
           properties: { number: 1, name: "Testing Token" },
         })
@@ -217,6 +227,7 @@ describe("SingleEditionMintable", () => {
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=1"
             + `&address=${minterContract.address.toLowerCase()}`,
+          patch_notes_url: "",
           media_version: "0.0.1",
           properties: { number: 1, name: "Testing Token" },
         })
@@ -251,6 +262,10 @@ describe("SingleEditionMintable", () => {
               },
               {
                 url: "animation",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+              },
+              {
+                url: "patch-notes",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
               }
             ],
@@ -402,6 +417,7 @@ describe("SingleEditionMintable", () => {
           animation_url:
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy?id=10"
             + `&address=${minterContract.address.toLowerCase()}`,
+          patch_notes_url: "",
           media_version: "0.0.1",
           properties: { number: 10, name: "Testing Token" },
         })
@@ -427,6 +443,10 @@ describe("SingleEditionMintable", () => {
               {
                 url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
               },
               {
                 url: "",
@@ -466,7 +486,11 @@ describe("SingleEditionMintable", () => {
                   {
                     url: "animationUrl",
                     sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
-                  }
+                  },
+                  {
+                    url: "patchNotesUrl",
+                    sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                  },
                 ],
                 label: [0,0,2]
               },
@@ -479,6 +503,8 @@ describe("SingleEditionMintable", () => {
               'imageUrl',
               '0x0000000000000000000000000000000000000000000000000000000000000001',
               'animationUrl',
+              '0x0000000000000000000000000000000000000000000000000000000000000001',
+              'patchNotesUrl',
               '0x0000000000000000000000000000000000000000000000000000000000000001'
             ]
           )
@@ -539,7 +565,7 @@ describe("SingleEditionMintable", () => {
           await expect(
             minterContract.updateVersionURL(
               [0,0,1],
-              2,
+              3,
               "updatedImageURL"
             )
           ).to.be.revertedWith("#Versions: The url does not exist on that version")
@@ -566,7 +592,9 @@ describe("SingleEditionMintable", () => {
             "",
             "0x0000000000000000000000000000000000000000000000000000000000000000",
             "updatedAnimationURL",
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
           ])
 
           // Update image URL
@@ -588,7 +616,9 @@ describe("SingleEditionMintable", () => {
             "updatedImageURL",
             "0x0000000000000000000000000000000000000000000000000000000000000000",
             "updatedAnimationURL",
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
           ])
         });
       });
@@ -612,7 +642,11 @@ describe("SingleEditionMintable", () => {
                 {
                   url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                   sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-                }
+                },
+                {
+                  url: "",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                },
               ],
               label: [0,0,2]
             },
@@ -625,7 +659,9 @@ describe("SingleEditionMintable", () => {
             "",
             "0x0000000000000000000000000000000000000000000000000000000000000000",
             "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
           ])
           // version 0.0.2
           expect(
@@ -634,7 +670,9 @@ describe("SingleEditionMintable", () => {
             "",
             "0x0000000000000000000000000000000000000000000000000000000000000000",
             "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
-            "0x0000000000000000000000000000000000000000000000000000000000000001"
+            "0x0000000000000000000000000000000000000000000000000000000000000001",
+            "",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
           ])
 
         })
@@ -651,7 +689,11 @@ describe("SingleEditionMintable", () => {
               {
                 url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                 sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-              }
+              },
+              {
+                url: "",
+                sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001",
+              },
             ],
             label: [0,0,2]
           }
@@ -669,7 +711,11 @@ describe("SingleEditionMintable", () => {
                 [
                   "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
                   "0x0000000000000000000000000000000000000000000000000000000000000000"
-                ]
+                ],
+                [
+                  "",
+                  "0x0000000000000000000000000000000000000000000000000000000000000000"
+                ],
               ],
               [0, 0, 1]
             ],
@@ -682,7 +728,11 @@ describe("SingleEditionMintable", () => {
                 [
                   "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                   "0x0000000000000000000000000000000000000000000000000000000000000001"
-                ]
+                ],
+                [
+                  "",
+                  "0x0000000000000000000000000000000000000000000000000000000000000001"
+                ],
               ],
               [0, 0, 2]
             ]
@@ -724,7 +774,11 @@ describe("SingleEditionMintable", () => {
                 {
                   url: "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k",
                   sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-                }
+                },
+                {
+                  url: "",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+                },
               ],
               label: [0,0,2]
             }
@@ -748,6 +802,7 @@ describe("SingleEditionMintable", () => {
             animation_url:
               "https://arweave.net/fnfNerUHj64h-J2yU9d-rZ6ZBAQRhrWfkw_fgiKyl2k?id=1"
               + `&address=${minterContract.address.toLowerCase()}`,
+            patch_notes_url: "",
             media_version: "0.0.2",
             properties: { number: 1, name: "Testing Token" },
           })

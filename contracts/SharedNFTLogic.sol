@@ -10,6 +10,7 @@ import {Versions} from "./Versions.sol";
 struct MediaData{
     string imageUrl;
     string animationUrl;
+    string patchNotesUrl;
     uint8[3] label;
 }
 
@@ -173,8 +174,9 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         numberToString(tokenOfEdition),
                         "&address=",
                         addressToString(tokenAddress),
-                        '", "',
-                        'media_version": "',
+                        '", "patch_notes_url": "',
+                        media.patchNotesUrl,
+                        '", "media_version": "',
                         uintArray3ToString(media.label),
                         '", "'
                     )
@@ -188,8 +190,9 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         media.imageUrl,
                         "?id=", // if just url "/id" this will work with arweave pathmanifests
                         numberToString(tokenOfEdition),
-                        '", "',
-                        'media_version": "',
+                        '", "patch_notes_url": "',
+                        media.patchNotesUrl,
+                        '", "media_version": "',
                         uintArray3ToString(media.label),
                         '", "'
                     )
@@ -205,8 +208,9 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         numberToString(tokenOfEdition),
                         "&address=",
                         addressToString(tokenAddress),
-                        '", "',
-                        'media_version": "',
+                        '", "patch_notes_url": "',
+                        media.patchNotesUrl,
+                        '", "media_version": "',
                         uintArray3ToString(media.label),
                         '", "'
                     )
