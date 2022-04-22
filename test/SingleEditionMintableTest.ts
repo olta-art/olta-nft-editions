@@ -101,6 +101,7 @@ describe("SingleEditionMintable", () => {
       );
 
       const editionResult = await dynamicSketch.getEditionAtId(0);
+      console.log(editionResult)
       minterContract = (await ethers.getContractAt(
         "SingleEditionMintable",
         editionResult
