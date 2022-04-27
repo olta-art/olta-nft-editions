@@ -10,9 +10,12 @@ import {
   SingleEditionMintableCreator,
   SeededSingleEditionMintable,
 } from "../typechain";
-import { BigNumberish } from "ethers";
 
-type Label = [BigNumberish, BigNumberish, BigNumberish]
+import {
+  editionData,
+  Implementation,
+  Label
+} from "./utils"
 
 const defaultAnimationURl = "https://arweave.net/<tx-hash-length-000000000000000000000>"
 
@@ -63,7 +66,7 @@ const expectedUrl = (contract: SeededSingleEditionMintable, id: number, seed: nu
 
 const createMintData = (to: string, seed: number) => ({to, seed})
 
-describe("mint with seed feature", () => {
+describe.only("mint with seed feature", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
   let dynamicSketch: SingleEditionMintableCreator;
@@ -88,16 +91,19 @@ describe("mint with seed feature", () => {
     let minterContract: SeededSingleEditionMintable;
 
     beforeEach(async () => {
-      await dynamicSketch.createSeededEdition(
-        "Testing Token",
-        "TEST",
-        "This is a testing token for all",
-        defaultVersion(),
-        10,
-        10
+      await dynamicSketch.createEdition(
+        editionData(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          10,
+          10
+        ),
+        Implementation.seededEditions
       );
 
-      const editionResult = await dynamicSketch.getSeededEditionAtId(0);
+      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
       minterContract = (await ethers.getContractAt(
         "SeededSingleEditionMintable",
         editionResult
@@ -139,16 +145,19 @@ describe("mint with seed feature", () => {
     let minterContract: SeededSingleEditionMintable;
 
     beforeEach(async () => {
-      await dynamicSketch.createSeededEdition(
-        "Testing Token",
-        "TEST",
-        "This is a testing token for all",
-        defaultVersion(),
-        10,
-        10
+      await dynamicSketch.createEdition(
+        editionData(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          10,
+          10
+        ),
+        Implementation.seededEditions
       );
 
-      const editionResult = await dynamicSketch.getSeededEditionAtId(0);
+      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
       minterContract = (await ethers.getContractAt(
         "SeededSingleEditionMintable",
         editionResult
@@ -193,16 +202,19 @@ describe("mint with seed feature", () => {
     let oneEth = ethers.utils.parseEther("1")
 
     beforeEach(async () => {
-      await dynamicSketch.createSeededEdition(
-        "Testing Token",
-        "TEST",
-        "This is a testing token for all",
-        defaultVersion(),
-        10,
-        10
+      await dynamicSketch.createEdition(
+        editionData(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          10,
+          10
+        ),
+        Implementation.seededEditions
       );
 
-      const editionResult = await dynamicSketch.getSeededEditionAtId(0);
+      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
       minterContract = (await ethers.getContractAt(
         "SeededSingleEditionMintable",
         editionResult

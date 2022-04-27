@@ -8,9 +8,12 @@ import {
   SingleEditionMintableCreator,
   SingleEditionMintable,
 } from "../typechain";
-import { BigNumberish } from "ethers";
 
-type Label = [BigNumberish, BigNumberish, BigNumberish]
+import {
+  editionData,
+  Implementation,
+  Label
+} from "./utils"
 
 const defaultVersion = () => {
   return {
@@ -54,16 +57,19 @@ describe("SingleEditionMintable", () => {
 
   it("makes a new edition", async () => {
     await dynamicSketch.createEdition(
-      "Testing Token",
-      "TEST",
-      "This is a testing token for all",
-      defaultVersion(),
-      // 1% royalty since BPS
-      10,
-      10
+      editionData(
+        "Testing Token",
+        "TEST",
+        "This is a testing token for all",
+        defaultVersion(),
+        // 1% royalty since BPS
+        10,
+        10
+      ),
+      Implementation.editions
     );
 
-    const editionResult = await dynamicSketch.getEditionAtId(0);
+    const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.editions);
     const minterContract = (await ethers.getContractAt(
       "SingleEditionMintable",
       editionResult
@@ -91,17 +97,19 @@ describe("SingleEditionMintable", () => {
     beforeEach(async () => {
       signer1 = (await ethers.getSigners())[1];
       await dynamicSketch.createEdition(
-        "Testing Token",
-        "TEST",
-        "This is a testing token for all",
-        defaultVersion(),
-        // 1% royalty since BPS
-        10,
-        10
+        editionData(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          // 1% royalty since BPS
+          10,
+          10
+        ),
+        Implementation.editions
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(0);
-      console.log(editionResult)
+      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.editions);
       minterContract = (await ethers.getContractAt(
         "SingleEditionMintable",
         editionResult
@@ -151,16 +159,19 @@ describe("SingleEditionMintable", () => {
     it("creates an unbounded edition", async () => {
       // no limit for edition size
       await dynamicSketch.createEdition(
-        "Testing Token",
-        "TEST",
-        "This is a testing token for all",
-        defaultVersion(),
-        // 1% royalty since BPS
-        0,
-        0
+        editionData(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          // 1% royalty since BPS
+          0,
+          0
+        ),
+        Implementation.editions
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(1);
+      const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
       minterContract = (await ethers.getContractAt(
         "SingleEditionMintable",
         editionResult
@@ -310,16 +321,19 @@ describe("SingleEditionMintable", () => {
       });
       it("sets the correct royalty amount", async () => {
         await dynamicSketch.createEdition(
-          "Testing Token",
-          "TEST",
-          "This is a testing token for all",
-          defaultVersion(),
-          // 2% royalty since BPS
-          200,
-          200
+          editionData(
+            "Testing Token",
+            "TEST",
+            "This is a testing token for all",
+            defaultVersion(),
+            // 2% royalty since BPS
+            200,
+            200
+          ),
+          Implementation.editions
         );
     
-        const editionResult = await dynamicSketch.getEditionAtId(1);
+        const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
         const minterContractNew = (await ethers.getContractAt(
           "SingleEditionMintable",
           editionResult
@@ -334,15 +348,19 @@ describe("SingleEditionMintable", () => {
     it("mints a large batch", async () => {
       // no limit for edition size
       await dynamicSketch.createEdition(
-        "Testing Token",
-        "TEST",
-        "This is a testing token for all",
-        defaultVersion(),
-        0,
-        0
+        editionData(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          // 1% royalty since BPS
+          0,
+          0
+        ),
+        Implementation.editions
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(1);
+      const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
       minterContract = (await ethers.getContractAt(
         "SingleEditionMintable",
         editionResult
@@ -692,15 +710,18 @@ describe("SingleEditionMintable", () => {
       });
       it("emits version added event on creation", async () => {
         await dynamicSketch.createEdition(
-          "Testing Token",
-          "TEST",
-          "This is a testing token for all",
-          defaultVersion(),
-          // 1% royalty since BPS
-          10,
-          10
+          editionData(
+            "Testing Token",
+            "TEST",
+            "This is a testing token for all",
+            defaultVersion(),
+            // 1% royalty since BPS
+            10,
+            10
+          ),
+          Implementation.editions
         )
-        const editionResult = await dynamicSketch.getEditionAtId(1);
+        const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
         const newMinterContract = (await ethers.getContractAt(
           "SingleEditionMintable",
           editionResult
