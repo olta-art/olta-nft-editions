@@ -47,7 +47,7 @@ contract SingleEditionMintableCreator {
     /// @param _implementations Array of addresse for implementations of SingleEditionMintable like contracts to clone
     constructor(address[] memory _implementations) {
         implementations[uint8(Implementation.editions)] = _implementations[uint8(Implementation.editions)];
-        implementations[uint8(Implementation.seededEditions)] = _implementations[uint8(Implementation.editions)];
+        implementations[uint8(Implementation.seededEditions)] = _implementations[uint8(Implementation.seededEditions)];
     }
 
     /// Creates a new edition contract as a factory with a deterministic address
