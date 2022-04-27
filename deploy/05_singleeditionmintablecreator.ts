@@ -7,7 +7,7 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
 
   await deploy("SingleEditionMintableCreator", {
     from: deployer,
-    args: [mintableAddress, seededMintableAddress],
+    args: [[mintableAddress, seededMintableAddress]],
     log: true,
   });
 };
