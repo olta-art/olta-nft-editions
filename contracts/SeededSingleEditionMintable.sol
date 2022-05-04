@@ -53,8 +53,6 @@ contract SeededSingleEditionMintable is
     string public description;
 
     // Media Urls
-    // animation_url and image_url metadata
-    // TODO: swap these around and test they match
     enum URLS  {
         Image,
         Animation
@@ -72,11 +70,9 @@ contract SeededSingleEditionMintable is
     mapping(address => bool) allowedMinters;
 
     // Mapping from seed to bool
-    mapping(uint256 => bool) seedsUsed;
+    mapping(uint256 => bool) public seedsUsed;
     // Mapping from tokenId to seed
-    mapping(uint256 => uint256) seedOfTokens;
-    // the last used seed closest to zero
-    uint256 private _lastUsedSeed;
+    mapping(uint256 => uint256) public seedOfTokens;
 
     // Price for sale
     uint256 public salePrice;
