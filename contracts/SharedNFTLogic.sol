@@ -92,6 +92,39 @@ contract SharedNFTLogic is IPublicSharedMetadata {
         return encodeMetadataJSON(json);
     }
 
+    /// Generate edition metadata from storage information as base64-json blob
+    /// Combines the media data and metadata
+    /// @param name Name of NFT in metadata
+    /// @param description Description of NFT in metadata
+    /// @param media The image Url, animation Url and version label of the media to be rendered
+    /// @param tokenOfEdition Token ID for specific token
+    /// @param editionSize Size of entire edition to show
+    /// @param tokenAddress Address of the NFT
+    function createMetadataEdition(
+        string memory name,
+        string memory description,
+        MediaData memory media,
+        uint256 tokenOfEdition,
+        uint256 editionSize,
+        address tokenAddress,
+        uint256 tokenSeed
+    ) external pure returns (string memory) {
+        string memory _tokenMediaData = tokenMediaData(
+            media,
+            tokenOfEdition,
+            tokenAddress,
+            tokenSeed
+        );
+        bytes memory json = createMetadataJSON(
+            name,
+            description,
+            _tokenMediaData,
+            tokenOfEdition,
+            editionSize
+        );
+        return encodeMetadataJSON(json);
+    }
+
     /// Function to create the metadata json string for the nft edition
     /// @param name Name of NFT in metadata
     /// @param description Description of NFT in metadata
@@ -205,6 +238,78 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                         numberToString(tokenOfEdition),
                         "&address=",
                         addressToString(tokenAddress),
+                        '", "',
+                        'media_version": "',
+                        uintArray3ToString(media.label),
+                        '", "'
+                    )
+                );
+        }
+
+        return "";
+    }
+
+    /// Generates edition metadata from storage information as base64-json blob
+    /// Combines the media data and metadata
+    /// @param media urls of image and animation media with version label
+    function tokenMediaData(
+        MediaData memory media,
+        uint256 tokenOfEdition,
+        address tokenAddress,
+        uint256 tokenSeed
+    ) public pure returns (string memory) {
+        bool hasImage = bytes(media.imageUrl).length > 0;
+        bool hasAnimation = bytes(media.animationUrl).length > 0;
+        if (hasImage && hasAnimation) {
+            return
+                string(
+                    abi.encodePacked(
+                        'image": "',
+                        media.imageUrl,
+                        "?seed=",
+                        numberToString(tokenSeed),
+                        '", "animation_url": "',
+                        media.animationUrl,
+                        "?id=",
+                        numberToString(tokenOfEdition),
+                        "&address=",
+                        addressToString(tokenAddress),
+                        "&seed=",
+                        numberToString(tokenSeed),
+                        '", "',
+                        'media_version": "',
+                        uintArray3ToString(media.label),
+                        '", "'
+                    )
+                );
+        }
+        if (hasImage) {
+            return
+                string(
+                    abi.encodePacked(
+                        'image": "',
+                        media.imageUrl,
+                        "?seed=", // if just url "/id" this will work with arweave pathmanifests
+                        numberToString(tokenSeed),
+                        '", "',
+                        'media_version": "',
+                        uintArray3ToString(media.label),
+                        '", "'
+                    )
+                );
+        }
+        if (hasAnimation) {
+            return
+                string(
+                    abi.encodePacked(
+                        'animation_url": "',
+                        media.animationUrl,
+                        "?id=",
+                        numberToString(tokenOfEdition),
+                        "&address=",
+                        addressToString(tokenAddress),
+                        "&seed=",
+                        numberToString(tokenSeed),
                         '", "',
                         'media_version": "',
                         uintArray3ToString(media.label),

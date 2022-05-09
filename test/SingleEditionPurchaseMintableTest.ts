@@ -9,6 +9,12 @@ import {
   SingleEditionMintable,
 } from "../typechain";
 
+import {
+  editionData,
+  Implementation,
+  Label
+} from "./utils"
+
 describe("SingleEditionMintable", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
@@ -33,27 +39,30 @@ describe("SingleEditionMintable", () => {
 
   it("purchases a edition", async () => {
     await dynamicSketch.createEdition(
-      "Testing Token",
-      "TEST",
-      "This is a testing token for all",
-      {
-        urls: [
-          {
-            url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
-          },
-          {
-            url: "",
-            sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
-          }
-        ],
-        label: [0,0,1]
-      },
-      10,
-      10
+      editionData(
+        "Testing Token",
+        "TEST",
+        "This is a testing token for all",
+        {
+          urls: [
+            {
+              url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
+              sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+            },
+            {
+              url: "",
+              sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            }
+          ],
+          label: [0,0,1]
+        },
+        10,
+        10
+      ),
+      Implementation.editions
     );
 
-    const editionResult = await dynamicSketch.getEditionAtId(0);
+    const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.editions);
     const minterContract = (await ethers.getContractAt(
       "SingleEditionMintable",
       editionResult
