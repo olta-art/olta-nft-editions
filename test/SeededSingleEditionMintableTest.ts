@@ -66,7 +66,7 @@ const expectedUrl = (contract: SeededSingleEditionMintable, id: number, seed: nu
 
 const createMintData = (to: string, seed: number) => ({to, seed})
 
-describe.only("mint with seed feature", () => {
+describe("mint with seed feature", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
   let dynamicSketch: SingleEditionMintableCreator;
