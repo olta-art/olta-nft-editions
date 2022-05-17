@@ -45,8 +45,24 @@ contract SeededSingleEditionMintable is
     using Versions for Versions.Set;
     event PriceChanged(uint256 amount);
     event EditionSold(uint256 price, address owner);
+
+    /**
+     @param label the semantic version label that the url is being updated
+     @param index the url index 0 = image, 1 = animation
+     @param url the url to be updated to
+    */
     event VersionURLUpdated(uint8[3] label, uint8 index, string url);
+
+    /**
+     @param label the semantic version label added
+    */
     event VersionAdded(uint8[3] label);
+
+    /**
+     @param owner the address of the owner of the editions contract
+     @param minter the address of the approved minter
+     @param approved a boolean indicating the approval status
+    */
     event ApprovedMinter(address indexed owner, address indexed minter, bool approved);
 
     // metadata
@@ -134,6 +150,7 @@ contract SeededSingleEditionMintable is
     /**
       @dev This allows the user to purchase a edition edition
            at the given price in the contract.
+      @param seed the chosen seed number
      */
     function purchase(uint256 seed) external payable returns (uint256) {
         require(salePrice > 0, "Not for sale");
@@ -180,6 +197,7 @@ contract SeededSingleEditionMintable is
 
     /**
       @param to address to send the newly minted edition to
+      @param seed number of the chosen seed
       @dev This mints one edition to the given address by an allowed minter on the edition instance.
      */
     function mintEdition(address to, uint256 seed) external override returns (uint256) {
@@ -264,7 +282,10 @@ contract SeededSingleEditionMintable is
         return versions.getAllVersions();
     }
 
-    /// Returns the number of editions allowed to mint (max_uint256 when open edition)
+    /**
+     @dev returns the number of editions allowed to mint (max_uint256 when open edition)
+     @return allowedToMint the number of editions allowed to mint
+    */
     function numberCanMint() public view override returns (uint256) {
         // Return max int if open edition
         if (editionSize == 0) {
@@ -275,8 +296,8 @@ contract SeededSingleEditionMintable is
     }
 
     /**
+        @dev burns token id if owner or approved owner
         @param tokenId Token ID to burn
-        User burn function for token id
      */
     function burn(uint256 tokenId) public {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "Not approved");
@@ -284,14 +305,16 @@ contract SeededSingleEditionMintable is
     }
 
     /**
+        @dev checks if seed is in valid range, between 1 and editionSize
         @param seed uint256 of the seed
-        @dev  checks to see if seed is in valid range
+        @return isInRange boolean representing if the seed is in the valid range
     */
     function _isSeedInRange(uint256 seed) private view returns (bool) {
         return ((seed > 0) && (seed <= editionSize));
     }
 
     /**
+        @dev internal function that allocates seed number to nft id
         @param tokenId Token ID for the seed to be allocated to
         @param seed Seed to be used
     */
@@ -335,9 +358,11 @@ contract SeededSingleEditionMintable is
     }
 
     /**
-      @dev Get URIs for edition NFT
-            Will get URIs from the last version added
-      @return imageUrl, imageHash, animationUrl, animationHash
+      @dev Get URIs for edition NFT, will retrieve URIs from the last added version
+      @return imageUrl The url of the image
+      @return imageHash  A sha-256 hash of the content on the imageUrl, will be zero address if url blank
+      @return animationUrl The url of the animation
+      @return animationHash A sha-256 hash of the content on the animationUrl, will be zero address if url blank
      */
     function getURIs()
         public
@@ -362,7 +387,10 @@ contract SeededSingleEditionMintable is
       @dev Get URIs for edition NFT of a version
            Will get URIs from the last version added
       @param label The label of the version
-      @return imageUrl, imageHash, animationUrl, animationHash
+      @return imageUrl
+      @return imageHash
+      @return animationUrl
+      @return animationHash
      */
     function getURIsOfVersion(
         uint8[3] memory label
@@ -402,10 +430,9 @@ contract SeededSingleEditionMintable is
     }
 
     /**
-        @dev Get URI for given token id
-             Will get URIs from the last version added
+        @dev Get URI for given token id, will retrieve URIs from the last added version
         @param tokenId token id to get uri for
-        @return base64-encoded json metadata object
+        @return metadata base64-encoded json metadata object
     */
     function tokenURI(uint256 tokenId)
         public
@@ -432,10 +459,10 @@ contract SeededSingleEditionMintable is
     }
 
     /**
-        @dev Get URI for given token id of version
+        @dev Get URI for given token id of given version
         @param tokenId token id to get uri for
         @param label the label of the version
-        @return base64-encoded json metadata object
+        @return metadata base64-encoded json metadata object
     */
     function tokenURIOfVersion(
         uint256 tokenId,
