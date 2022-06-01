@@ -3,29 +3,19 @@
 pragma solidity 0.8.6;
 
 import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
-
-/// Versioning for NFT metadata
-
 /*
-    [WIP] don't use in production, just yet
-
-    TODO:
-
-    [x] needs to store a history of versions {}
-    [x] needs to be able to add version (external write creatorOnly)
-    [x] needs to retrieve all versions (public pure read)
-    [x] needs to retrieve latest version (public pure read) -> so animationURL can be dynamiclly updated
-    [ ] do we need a delete? - what if we flag versions instead?
-    [x] store any number of urls
-
-    [ ] do we need patch notes?
-
-    Is now a libary in the hope of reducing gas for nfts
-    Include with `using Versions for Versions.Set;`
-
-    NOTE: unit8[3] labeling is used is it keeps it neat and limits storage
+    please note this is work in progress and not ready for production just yet
 */
 
+/**
+ @title A libary for versioning of NFT content and metadata
+ @dev Provides versioning for nft content and follows the semantic labeling convention.
+ Each version contains an array of content and content hash pairs as well as a version label.
+ Versions can be added and urls can be updated along with getters to retrieve specific versions and history.
+
+ Include with `using Versions for Versions.set;`
+ @author george baldwin
+ */
 library Versions {
 
     struct UrlWithHash {
@@ -33,20 +23,21 @@ library Versions {
         bytes32 sha256hash;
     }
 
-    // NOTE: store 'key' in mapping for easy access
-    // NOTE: uint8[3] enforce number only labeling - may be handy to order on contract
     struct Version {
         UrlWithHash[] urls;
         uint8[3] label;
     }
 
-    /// NOTE: can't use unit8[3] as key for mapping so will need to convert to string
-    // store labels as keys ?
     struct Set {
         string[] labels;
         mapping(string => Version) versions;
     }
 
+    /**
+     @dev creates a new version from array of url hashe pairs and a semantic label
+     @param urls An array of urls with sha-256 hash of the content on that url
+     @param label a version label in a semantic style
+     */
     function createVersion(
         UrlWithHash[] memory urls,
         uint8[3] memory label
@@ -59,6 +50,12 @@ library Versions {
         return version;
     }
 
+    /**
+     @dev adds a version to a given set by pushing the version label to an array
+        and mapping the version to a string of that label. Will revert if the label already exists.
+     @param set the set to add the version to
+     @param version the version that will be stored
+     */
     function addVersion(
         Set storage set,
         Version memory version
@@ -83,6 +80,12 @@ library Versions {
         set.versions[labelKey].label = version.label;
     }
 
+    /**
+     @dev gets a version from a given set. Will revert if the version doesn't exist.
+     @param set The set to get the version from
+     @param label The label of the requested version
+     @return version The version corrosponeding to the label
+     */
     function getVersion(
         Set storage set,
         uint8[3] memory label
@@ -99,8 +102,13 @@ library Versions {
         return version;
     }
 
-    // NOTE: only update url is possible and should result in same hash
-    // NOTE: index must be known updating url
+    /**
+     @dev updates a url of a given version in a given set
+     @param set The set containing the version of which the url will be updated
+     @param label The label of the requested version
+     @param index The index of the url
+     @param newUrl The new url to be updated to
+     */
     function updateVersionURL(
         Set storage set,
         uint8[3] memory label,
@@ -119,6 +127,11 @@ library Versions {
         set.versions[labelKey].urls[index].url = newUrl;
     }
 
+    /**
+     @dev gets all the version labels of a given set
+     @param set The set containing the versions
+     @return labels an array of labels as strings
+    */
     function getAllLabels(
         Set storage set
     )
@@ -129,6 +142,11 @@ library Versions {
         return set.labels;
     }
 
+    /**
+     @dev gets all the versions of a given set
+     @param set The set containing the versions
+     @return versions an array of versions
+    */
     function getAllVersions(
         Set storage set
     )
@@ -139,8 +157,11 @@ library Versions {
         return getVersionsFromLabels(set, set.labels);
     }
 
-    // get history of versions from array of labels
-    // returns array of versions
+    /**
+     @dev gets the versions of a given array of labels as strings, reverts if no labels are given
+     @param set The set containing the versions
+     @return versions an array of versions
+    */
     function getVersionsFromLabels(
         Set storage set,
         string[] memory _labels
@@ -159,8 +180,11 @@ library Versions {
         return versionArray;
     }
 
-    // get latest
-    // NOTE: presumes it's the last added
+    /**
+     @dev gets the last added version of a given set, reverts if no versions are in the set
+     @param set The set containing the versions
+     @return version the last added version
+    */
     function getLatestVersion(
         Set storage set
     )
@@ -177,6 +201,11 @@ library Versions {
         ];
     }
 
+    /**
+     @dev A helper function to convert a three length array of numbers into a semantic style verison label
+     @param label the label as a uint8[3] array
+     @return label the label as a string
+    */
     function uintArray3ToString (uint8[3] memory label)
         internal
         pure
