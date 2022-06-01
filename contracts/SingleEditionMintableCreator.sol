@@ -15,8 +15,20 @@ pragma solidity ^0.8.6;
 import {ClonesUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {Versions} from "./Versions.sol";
-import "./SingleEditionMintable.sol";
-import "./SeededSingleEditionMintable.sol";
+// import "./SingleEditionMintable.sol";
+// import "./SeededSingleEditionMintable.sol";
+
+interface EditionMintable {
+    function initialize(
+        address _owner,
+        string memory _name,
+        string memory _symbol,
+        string memory _description,
+        Versions.Version memory _version,
+        uint256 _editionSize,
+        uint256 _royaltyBPS
+    ) external;
+}
 
 contract SingleEditionMintableCreator {
     using CountersUpgradeable for CountersUpgradeable.Counter;
@@ -38,16 +50,19 @@ contract SingleEditionMintableCreator {
     }
 
     /// Counter for current contract id upgraded
-    CountersUpgradeable.Counter[2] private atContracts;
+    mapping(uint8 => CountersUpgradeable.Counter) private atContracts;
+    // CountersUpgradeable.Counter[] private atContracts;
 
     /// Address for implementation of SingleEditionMintable to clone
-    address[2] public implementations;
+    address[] public implementations;
 
     /// Initializes factory with address of implementations logic
     /// @param _implementations Array of addresse for implementations of SingleEditionMintable like contracts to clone
     constructor(address[] memory _implementations) {
-        implementations[uint8(Implementation.editions)] = _implementations[uint8(Implementation.editions)];
-        implementations[uint8(Implementation.seededEditions)] = _implementations[uint8(Implementation.seededEditions)];
+        implementations.push(_implementations[uint8(Implementation.editions)]);
+        atContracts[uint8(Implementation.editions)] = CountersUpgradeable.Counter(0);
+        implementations.push(_implementations[uint8(Implementation.seededEditions)]);
+        atContracts[uint8(Implementation.editions)] = CountersUpgradeable.Counter(0);
     }
 
     /// Creates a new edition contract as a factory with a deterministic address
@@ -65,30 +80,15 @@ contract SingleEditionMintableCreator {
         );
 
         // Editions
-        if (implementation == uint8(Implementation.editions)){
-            SingleEditionMintable(newContract).initialize(
-                msg.sender,
-                editionData.name,
-                editionData.symbol,
-                editionData.description,
-                editionData.version,
-                editionData.editionSize,
-                editionData.royaltyBPS
-            );
-        }
-
-        // Seeded Editions
-        if (implementation == uint8(Implementation.seededEditions)){
-            SeededSingleEditionMintable(newContract).initialize(
-                msg.sender,
-                editionData.name,
-                editionData.symbol,
-                editionData.description,
-                editionData.version,
-                editionData.editionSize,
-                editionData.royaltyBPS
-            );
-        }
+        EditionMintable(newContract).initialize(
+            msg.sender,
+            editionData.name,
+            editionData.symbol,
+            editionData.description,
+            editionData.version,
+            editionData.editionSize,
+            editionData.royaltyBPS
+        );
 
         emit CreatedEdition(newId, msg.sender, editionData.editionSize, newContract, implementation);
         // Returns the ID of the recently created minting contract
