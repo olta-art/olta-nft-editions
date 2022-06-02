@@ -43,9 +43,7 @@ contract SingleEditionMintableCreator {
     }
 
     /// Counter for current contract id upgraded
-    // TODO: test this counters work independently
     mapping(uint8 => CountersUpgradeable.Counter) private atContracts;
-    // CountersUpgradeable.Counter[] private atContracts;
 
     /// Address for implementation of SingleEditionMintable to clone
     // TODO: a mapping with implementation name may clearer?
@@ -56,7 +54,7 @@ contract SingleEditionMintableCreator {
     constructor(address[] memory _implementations) {
         for (uint8 i = 0; i < _implementations.length; i++) {
             implementations.push(_implementations[i]);
-            atContracts[i] = CountersUpgradeable.Counter(0);
+            atContracts[i] = CountersUpgradeable.Counter(1);
         }
     }
 
@@ -67,8 +65,7 @@ contract SingleEditionMintableCreator {
         EditionData memory editionData,
         uint8 implementation
     ) external returns (uint256) {
-        // TODO: add require statment to check implementation exists
-        // require(implementations[implementation] != address(0), "EditionMintable implementation does not exist");
+        require(implementations.length > implementation, "implementation does not exist");
 
         uint256 newId = atContracts[implementation].current();
         address newContract = ClonesUpgradeable.cloneDeterministic(
@@ -87,10 +84,17 @@ contract SingleEditionMintableCreator {
             editionData.royaltyBPS
         );
 
-        emit CreatedEdition(newId, msg.sender, editionData.editionSize, newContract, implementation);
-        // Returns the ID of the recently created minting contract
-        // Also increments for the next contract creation call
+        emit CreatedEdition(
+            newId,
+            msg.sender,
+            editionData.editionSize,
+            newContract,
+            implementation
+        );
+
+        // increment for the next contract creation call
         atContracts[implementation].increment();
+
         return newId;
     }
 
