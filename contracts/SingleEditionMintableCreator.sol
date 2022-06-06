@@ -42,6 +42,13 @@ contract SingleEditionMintableCreator {
         uint256 royaltyBPS; /// BPS amount of royalty
     }
 
+    modifier onlyOwner {
+        require(msg.sender == owner, "Only owner can call this function.");
+        _;
+    }
+
+    address public owner;
+
     /// Counter for current contract id upgraded
     mapping(uint8 => CountersUpgradeable.Counter) private atContracts;
 
@@ -52,9 +59,10 @@ contract SingleEditionMintableCreator {
     /// Initializes factory with address of implementations logic
     /// @param _implementations Array of addresse for implementations of SingleEditionMintable like contracts to clone
     constructor(address[] memory _implementations) {
+        owner = address(msg.sender);
         for (uint8 i = 0; i < _implementations.length; i++) {
             implementations.push(_implementations[i]);
-            atContracts[i] = CountersUpgradeable.Counter(1);
+            atContracts[i] = CountersUpgradeable.Counter(0);
         }
     }
 
@@ -114,7 +122,19 @@ contract SingleEditionMintableCreator {
             );
     }
 
-    // TODO: addImplementation(address) onlyDeployer
+    function addImplementation(address implementation)
+        external
+        onlyOwner
+        returns (uint256)
+    {
+        // initilize counter for implementation
+        atContracts[uint8(implementations.length)] = CountersUpgradeable.Counter(0);
+        // add implementation to clonable implementations
+        implementations.push(implementation);
+
+        return implementations.length;
+    }
+
     // TODO: event ImplemnetationAdded(address implementation)
 
     /// Emitted when a edition is created reserving the corresponding token IDs.
