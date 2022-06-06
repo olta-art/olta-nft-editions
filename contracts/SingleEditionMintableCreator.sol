@@ -132,10 +132,18 @@ contract SingleEditionMintableCreator {
         // add implementation to clonable implementations
         implementations.push(implementation);
 
+        emit ImplemnetationAdded(
+            implementation,
+            uint8(implementations.length - 1)
+        );
+
         return implementations.length;
     }
 
-    // TODO: event ImplemnetationAdded(address implementation)
+    event ImplemnetationAdded(
+        address indexed implementationContractAddress,
+        uint8 implementation
+    );
 
     /// Emitted when a edition is created reserving the corresponding token IDs.
     /// @param editionId ID of newly created edition
