@@ -44,7 +44,7 @@ const defualtEditionData = editionData(
   10
 )
 
-describe.only("SingleEditionMintable", () => {
+describe("SingleEditionMintableCreator", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
   let creatorContract: SingleEditionMintableCreator;
@@ -70,7 +70,7 @@ describe.only("SingleEditionMintable", () => {
         defualtEditionData,
         Implementation.editions
       )
-      const editionConractAddress01 = await creatorContract.getEditionAtId(1, Implementation.editions)
+      const editionConractAddress01 = await creatorContract.getEditionAtId(0, Implementation.editions)
       const editionsContract01 = (await ethers.getContractAt(
         "SingleEditionMintable",
         editionConractAddress01
@@ -87,9 +87,9 @@ describe.only("SingleEditionMintable", () => {
         defualtEditionData,
         Implementation.seededEditions
       )
-      const editionConractAddress02 = await creatorContract.getEditionAtId(1, Implementation.seededEditions)
+      const editionConractAddress02 = await creatorContract.getEditionAtId(0, Implementation.seededEditions)
       const editionsContract02 = (await ethers.getContractAt(
-        "SingleEditionMintable",
+        "SeededSingleEditionMintable",
         editionConractAddress02
       )) as SeededSingleEditionMintable;
 
@@ -108,7 +108,7 @@ describe.only("SingleEditionMintable", () => {
       )
 
       // create second edition
-      let expectedAddress = await creatorContract.getEditionAtId(2, Implementation.editions)
+      let expectedAddress = await creatorContract.getEditionAtId(1, Implementation.editions)
       await expect(
         creatorContract.createEdition(
           defualtEditionData,
@@ -118,7 +118,7 @@ describe.only("SingleEditionMintable", () => {
         creatorContract,
         "CreatedEdition"
       ).withArgs(
-          2,                // id
+          1,                // id
           signerAddress,    // creator
           10,               // edition size
           expectedAddress,
@@ -126,7 +126,7 @@ describe.only("SingleEditionMintable", () => {
         )
 
       // create first seeded edition
-      expectedAddress = await creatorContract.getEditionAtId(1, Implementation.seededEditions)
+      expectedAddress = await creatorContract.getEditionAtId(0, Implementation.seededEditions)
       await expect(
         creatorContract.createEdition(
           defualtEditionData,
@@ -136,7 +136,7 @@ describe.only("SingleEditionMintable", () => {
         creatorContract,
         "CreatedEdition"
       ).withArgs(
-          1,              // id
+          0,              // id
           signerAddress,  // creator
           10,             // edition size
           expectedAddress,
@@ -153,6 +153,61 @@ describe.only("SingleEditionMintable", () => {
     })
   })
 
-  // TODO: add implementation
+  describe("#addImplementation", () => {
+    let newImplementation: SingleEditionMintable
+
+    const deployImplementation = async (s = signer) => {
+      // deploy another singleEditionMintable contract
+      const { SharedNFTLogic } = await deployments.fixture(["SharedNFTLogic"])
+      const SingleEditionMintable = await ethers.getContractFactory("SingleEditionMintable")
+      const singleEditionMintable = await SingleEditionMintable.connect(s).deploy(SharedNFTLogic.address)
+      await singleEditionMintable.connect(s).deployed()
+
+      return singleEditionMintable as SingleEditionMintable
+    }
+
+    beforeEach(async () => {
+      newImplementation = await deployImplementation()
+    })
+
+    it("reverts if not deployer of contract", async () => {
+      const notOwner = (await ethers.getSigners())[1]
+      await expect(
+        creatorContract.connect(notOwner).addImplementation(newImplementation.address)
+      ).to.be.revertedWith("Only owner can call this function.")
+    })
+
+    it("adds an implementation", async () => {
+      await creatorContract.addImplementation(newImplementation.address)
+      expect(
+        await creatorContract.implementations(2)
+      ).to.be.equal(newImplementation.address)
+    })
+
+    it("adds multiple implementations", async () => {
+      const notOwner = (await ethers.getSigners())[1]
+
+      // deploy different implementation at different address
+      const anotherNewImplementation = await deployImplementation(notOwner)
+      expect(
+        newImplementation.address
+      ).to.not.equal(
+        anotherNewImplementation.address
+      )
+
+      // add 3rd implementation
+      await creatorContract.addImplementation(newImplementation.address)
+      expect(
+        await creatorContract.implementations(2)
+      ).to.be.equal(newImplementation.address)
+
+      // add 4th implementation
+      await creatorContract.addImplementation(anotherNewImplementation.address)
+      expect(
+        await creatorContract.implementations(3)
+      ).to.be.equal(anotherNewImplementation.address)
+    })
+
+  })
 
 })
