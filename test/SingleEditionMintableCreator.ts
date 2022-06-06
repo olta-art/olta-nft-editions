@@ -208,6 +208,18 @@ describe("SingleEditionMintableCreator", () => {
       ).to.be.equal(anotherNewImplementation.address)
     })
 
+    it("emits ImplemnetationAdded event", async () => {
+      await expect(
+        creatorContract.addImplementation(newImplementation.address)
+      ).to.emit(
+        creatorContract,
+        "ImplemnetationAdded"
+      ).withArgs(
+        newImplementation.address,
+        2
+      )
+    })
+
   })
 
 })
