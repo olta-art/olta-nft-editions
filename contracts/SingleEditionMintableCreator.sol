@@ -15,16 +15,21 @@ pragma solidity ^0.8.6;
 import {ClonesUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {Versions} from "./Versions.sol";
-import "./SingleEditionMintable.sol";
-import "./SeededSingleEditionMintable.sol";
+
+interface EditionMintable {
+    function initialize(
+        address _owner,
+        string memory _name,
+        string memory _symbol,
+        string memory _description,
+        Versions.Version memory _version,
+        uint256 _editionSize,
+        uint256 _royaltyBPS
+    ) external;
+}
 
 contract SingleEditionMintableCreator {
     using CountersUpgradeable for CountersUpgradeable.Counter;
-
-    enum Implementation {
-        editions,
-        seededEditions
-    }
 
     /// Important: None of these fields can be changed after calling
     /// urls can be updated and upgraded via the versions interface
@@ -37,27 +42,39 @@ contract SingleEditionMintableCreator {
         uint256 royaltyBPS; /// BPS amount of royalty
     }
 
+    modifier onlyOwner {
+        require(msg.sender == owner, "Only owner can call this function.");
+        _;
+    }
+
+    address public owner;
+
     /// Counter for current contract id upgraded
-    CountersUpgradeable.Counter[2] private atContracts;
+    mapping(uint8 => CountersUpgradeable.Counter) private atContracts;
 
     /// Address for implementation of SingleEditionMintable to clone
-    address[2] public implementations;
+    // TODO: a mapping with implementation name may clearer?
+    address[] public implementations;
 
     /// Initializes factory with address of implementations logic
     /// @param _implementations Array of addresse for implementations of SingleEditionMintable like contracts to clone
     constructor(address[] memory _implementations) {
-        implementations[uint8(Implementation.editions)] = _implementations[uint8(Implementation.editions)];
-        implementations[uint8(Implementation.seededEditions)] = _implementations[uint8(Implementation.seededEditions)];
+        owner = address(msg.sender);
+        for (uint8 i = 0; i < _implementations.length; i++) {
+            implementations.push(_implementations[i]);
+            atContracts[i] = CountersUpgradeable.Counter(0);
+        }
     }
 
     /// Creates a new edition contract as a factory with a deterministic address
     /// @param editionData EditionData of the edition contract
     /// @param implementation Implementation of the edition contract
-
     function createEdition(
         EditionData memory editionData,
         uint8 implementation
     ) external returns (uint256) {
+        require(implementations.length > implementation, "implementation does not exist");
+
         uint256 newId = atContracts[implementation].current();
         address newContract = ClonesUpgradeable.cloneDeterministic(
             implementations[implementation],
@@ -65,35 +82,27 @@ contract SingleEditionMintableCreator {
         );
 
         // Editions
-        if (implementation == uint8(Implementation.editions)){
-            SingleEditionMintable(newContract).initialize(
-                msg.sender,
-                editionData.name,
-                editionData.symbol,
-                editionData.description,
-                editionData.version,
-                editionData.editionSize,
-                editionData.royaltyBPS
-            );
-        }
+        EditionMintable(newContract).initialize(
+            msg.sender,
+            editionData.name,
+            editionData.symbol,
+            editionData.description,
+            editionData.version,
+            editionData.editionSize,
+            editionData.royaltyBPS
+        );
 
-        // Seeded Editions
-        if (implementation == uint8(Implementation.seededEditions)){
-            SeededSingleEditionMintable(newContract).initialize(
-                msg.sender,
-                editionData.name,
-                editionData.symbol,
-                editionData.description,
-                editionData.version,
-                editionData.editionSize,
-                editionData.royaltyBPS
-            );
-        }
+        emit CreatedEdition(
+            newId,
+            msg.sender,
+            editionData.editionSize,
+            newContract,
+            implementation
+        );
 
-        emit CreatedEdition(newId, msg.sender, editionData.editionSize, newContract, implementation);
-        // Returns the ID of the recently created minting contract
-        // Also increments for the next contract creation call
+        // increment for the next contract creation call
         atContracts[implementation].increment();
+
         return newId;
     }
 
@@ -112,6 +121,29 @@ contract SingleEditionMintableCreator {
                 address(this)
             );
     }
+
+    function addImplementation(address implementation)
+        external
+        onlyOwner
+        returns (uint256)
+    {
+        // initilize counter for implementation
+        atContracts[uint8(implementations.length)] = CountersUpgradeable.Counter(0);
+        // add implementation to clonable implementations
+        implementations.push(implementation);
+
+        emit ImplemnetationAdded(
+            implementation,
+            uint8(implementations.length - 1)
+        );
+
+        return implementations.length;
+    }
+
+    event ImplemnetationAdded(
+        address indexed implementationContractAddress,
+        uint8 implementation
+    );
 
     /// Emitted when a edition is created reserving the corresponding token IDs.
     /// @param editionId ID of newly created edition
