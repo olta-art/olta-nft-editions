@@ -32,6 +32,11 @@ const defaultVersion = () => {
         url: defaultAnimationURl,
         sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
       },
+      // patch notes
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
     ],
     label: [0,0,1] as Label
   }
@@ -66,7 +71,7 @@ const expectedUrl = (contract: SeededSingleEditionMintable, id: number, seed: nu
 
 const createMintData = (to: string, seed: number) => ({to, seed})
 
-describe("mint with seed feature", () => {
+describe("SeededSingleEditionMintable", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
   let dynamicSketch: SingleEditionMintableCreator;
@@ -87,7 +92,7 @@ describe("mint with seed feature", () => {
     signerAddress = await signer.getAddress();
   });
 
-  describe("# mintEdition", () => {
+  describe("#mintEdition", () => {
     let minterContract: SeededSingleEditionMintable;
 
     beforeEach(async () => {
@@ -140,7 +145,7 @@ describe("mint with seed feature", () => {
 
   });
 
-  describe("# mintEditions", () => {
+  describe("#mintEditions", () => {
 
     let minterContract: SeededSingleEditionMintable;
 
@@ -197,7 +202,7 @@ describe("mint with seed feature", () => {
     });
   });
 
-  describe("# purchase", () => {
+  describe("#purchase", () => {
     let minterContract: SeededSingleEditionMintable;
     let oneEth = ethers.utils.parseEther("1")
 
