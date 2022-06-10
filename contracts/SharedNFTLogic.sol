@@ -10,6 +10,7 @@ import {Versions} from "./Versions.sol";
 struct MediaData{
     string imageUrl;
     string animationUrl;
+    string patchNotesUrl;
     uint8[3] label;
 }
 
@@ -206,7 +207,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                             tokenAddress
                         ),
                         version(
-                            media.label
+                            media.label,
+                            media.patchNotesUrl
                         )
                     )
                 );
@@ -220,7 +222,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                             tokenOfEdition
                         ),
                         version(
-                            media.label
+                            media.label,
+                            media.patchNotesUrl
                         )
                     )
                 );
@@ -235,7 +238,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                             tokenAddress
                         ),
                         version(
-                            media.label
+                            media.label,
+                            media.patchNotesUrl
                         )
                     )
                 );
@@ -270,7 +274,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                             tokenSeed
                         ),
                         version(
-                            media.label
+                            media.label,
+                            media.patchNotesUrl
                         )
                     )
                 );
@@ -284,7 +289,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                             tokenSeed
                         ),
                         version(
-                            media.label
+                            media.label,
+                            media.patchNotesUrl
                         )
                     )
                 );
@@ -300,7 +306,8 @@ contract SharedNFTLogic is IPublicSharedMetadata {
                             tokenSeed
                         ),
                         version(
-                            media.label
+                            media.label,
+                            media.patchNotesUrl
                         )
                     )
                 );
@@ -310,12 +317,16 @@ contract SharedNFTLogic is IPublicSharedMetadata {
     }
 
     function version(
-        uint8[3] memory label
+        uint8[3] memory label,
+        string memory patchNotesUrl
     ) public pure returns (string memory) {
         return string (
             abi.encodePacked(
                 'media_version": "',
                 uintArray3ToString(label),
+                '", "'
+                'patch_notes": "',
+                patchNotesUrl,
                 '", "'
             )
         );
