@@ -196,20 +196,18 @@ contract SharedNFTLogic is IPublicSharedMetadata {
             return
                 string(
                     abi.encodePacked(
-                        'image": "',
-                        media.imageUrl,
-                        "?id=",
-                        numberToString(tokenOfEdition),
-                        '", "animation_url": "',
-                        media.animationUrl,
-                        "?id=",
-                        numberToString(tokenOfEdition),
-                        "&address=",
-                        addressToString(tokenAddress),
-                        '", "',
-                        'media_version": "',
-                        uintArray3ToString(media.label),
-                        '", "'
+                        imageUrl(
+                            media.imageUrl,
+                            tokenOfEdition
+                        ),
+                        animationUrl(
+                            media.animationUrl,
+                            tokenOfEdition,
+                            tokenAddress
+                        ),
+                        version(
+                            media.label
+                        )
                     )
                 );
         }
@@ -217,14 +215,13 @@ contract SharedNFTLogic is IPublicSharedMetadata {
             return
                 string(
                     abi.encodePacked(
-                        'image": "',
-                        media.imageUrl,
-                        "?id=", // if just url "/id" this will work with arweave pathmanifests
-                        numberToString(tokenOfEdition),
-                        '", "',
-                        'media_version": "',
-                        uintArray3ToString(media.label),
-                        '", "'
+                        imageUrl(
+                            media.imageUrl,
+                            tokenOfEdition
+                        ),
+                        version(
+                            media.label
+                        )
                     )
                 );
         }
@@ -232,16 +229,14 @@ contract SharedNFTLogic is IPublicSharedMetadata {
             return
                 string(
                     abi.encodePacked(
-                        'animation_url": "',
-                        media.animationUrl,
-                        "?id=",
-                        numberToString(tokenOfEdition),
-                        "&address=",
-                        addressToString(tokenAddress),
-                        '", "',
-                        'media_version": "',
-                        uintArray3ToString(media.label),
-                        '", "'
+                        animationUrl(
+                            media.animationUrl,
+                            tokenOfEdition,
+                            tokenAddress
+                        ),
+                        version(
+                            media.label
+                        )
                     )
                 );
         }
@@ -264,22 +259,19 @@ contract SharedNFTLogic is IPublicSharedMetadata {
             return
                 string(
                     abi.encodePacked(
-                        'image": "',
-                        media.imageUrl,
-                        "?seed=",
-                        numberToString(tokenSeed),
-                        '", "animation_url": "',
-                        media.animationUrl,
-                        "?id=",
-                        numberToString(tokenOfEdition),
-                        "&address=",
-                        addressToString(tokenAddress),
-                        "&seed=",
-                        numberToString(tokenSeed),
-                        '", "',
-                        'media_version": "',
-                        uintArray3ToString(media.label),
-                        '", "'
+                        imageUrl(
+                            media.imageUrl,
+                            tokenSeed
+                        ),
+                        animationUrl(
+                            media.animationUrl,
+                            tokenOfEdition,
+                            tokenAddress,
+                            tokenSeed
+                        ),
+                        version(
+                            media.label
+                        )
                     )
                 );
         }
@@ -287,14 +279,13 @@ contract SharedNFTLogic is IPublicSharedMetadata {
             return
                 string(
                     abi.encodePacked(
-                        'image": "',
-                        media.imageUrl,
-                        "?seed=", // if just url "/id" this will work with arweave pathmanifests
-                        numberToString(tokenSeed),
-                        '", "',
-                        'media_version": "',
-                        uintArray3ToString(media.label),
-                        '", "'
+                        imageUrl(
+                            media.imageUrl,
+                            tokenSeed
+                        ),
+                        version(
+                            media.label
+                        )
                     )
                 );
         }
@@ -302,22 +293,85 @@ contract SharedNFTLogic is IPublicSharedMetadata {
             return
                 string(
                     abi.encodePacked(
-                        'animation_url": "',
-                        media.animationUrl,
-                        "?id=",
-                        numberToString(tokenOfEdition),
-                        "&address=",
-                        addressToString(tokenAddress),
-                        "&seed=",
-                        numberToString(tokenSeed),
-                        '", "',
-                        'media_version": "',
-                        uintArray3ToString(media.label),
-                        '", "'
+                        animationUrl(
+                            media.animationUrl,
+                            tokenOfEdition,
+                            tokenAddress,
+                            tokenSeed
+                        ),
+                        version(
+                            media.label
+                        )
                     )
                 );
         }
 
         return "";
+    }
+
+    function version(
+        uint8[3] memory label
+    ) public pure returns (string memory) {
+        return string (
+            abi.encodePacked(
+                'media_version": "',
+                uintArray3ToString(label),
+                '", "'
+            )
+        );
+    }
+
+    function imageUrl(
+        string memory url,
+        uint256 id
+    ) public pure returns (string memory) {
+        return string (
+            abi.encodePacked(
+                'image": "',
+                url,
+                 "?id=", // if just url "/id" this will work with arweave pathmanifests
+                numberToString(id),
+                '", "'
+            )
+        );
+    }
+
+    function animationUrl(
+        string memory url,
+        uint256 tokenId,
+        address tokenAddress
+    ) public pure returns (string memory) {
+        return string (
+            abi.encodePacked(
+                'animation_url": "',
+                url,
+                "?id=",
+                numberToString(tokenId),
+                "&address=",
+                addressToString(tokenAddress),
+                '", "'
+            )
+        );
+    }
+
+    function animationUrl(
+        string memory url,
+        uint256 tokenId,
+        address tokenAddress,
+        uint256 seed
+    ) public pure returns (string memory) {
+        return string (
+            abi.encodePacked(
+                'animation_url": "',
+                url,
+                "?id=",
+                numberToString(tokenId),
+                "&address=",
+                addressToString(tokenAddress),
+                "&seed=",
+                numberToString(seed),
+                '", "'
+            )
+        );
     }
 }
