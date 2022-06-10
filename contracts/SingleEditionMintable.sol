@@ -53,11 +53,10 @@ contract SingleEditionMintable is
     string public description;
 
     // Media Urls
-    // animation_url and image_url metadata
-    // TODO: swap these around and test they match
     enum URLS  {
         Image,
-        Animation
+        Animation,
+        PatchNotes
     }
     // Versions of Media Urls
     Versions.Set private versions;
@@ -313,6 +312,8 @@ contract SingleEditionMintable is
             string memory,
             bytes32,
             string memory,
+            bytes32,
+            string memory,
             bytes32
         )
     {
@@ -321,7 +322,9 @@ contract SingleEditionMintable is
             latest.urls[uint8(URLS.Image)].url,
             latest.urls[uint8(URLS.Image)].sha256hash,
             latest.urls[uint8(URLS.Animation)].url,
-            latest.urls[uint8(URLS.Animation)].sha256hash
+            latest.urls[uint8(URLS.Animation)].sha256hash,
+            latest.urls[uint8(URLS.PatchNotes)].url,
+            latest.urls[uint8(URLS.PatchNotes)].sha256hash
         );
     }
 
@@ -340,6 +343,8 @@ contract SingleEditionMintable is
             string memory,
             bytes32,
             string memory,
+            bytes32,
+            string memory,
             bytes32
         )
     {
@@ -348,7 +353,9 @@ contract SingleEditionMintable is
             version.urls[uint8(URLS.Image)].url,
             version.urls[uint8(URLS.Image)].sha256hash,
             version.urls[uint8(URLS.Animation)].url,
-            version.urls[uint8(URLS.Animation)].sha256hash
+            version.urls[uint8(URLS.Animation)].sha256hash,
+            version.urls[uint8(URLS.PatchNotes)].url,
+            version.urls[uint8(URLS.PatchNotes)].sha256hash
         );
     }
 
@@ -389,6 +396,7 @@ contract SingleEditionMintable is
                 MediaData(
                     version.urls[uint8(URLS.Image)].url,
                     version.urls[uint8(URLS.Animation)].url,
+                    version.urls[uint8(URLS.PatchNotes)].url,
                     version.label
                 ),
                 tokenId,
@@ -421,6 +429,7 @@ contract SingleEditionMintable is
                 MediaData(
                     version.urls[uint8(URLS.Image)].url,
                     version.urls[uint8(URLS.Animation)].url,
+                    version.urls[uint8(URLS.PatchNotes)].url,
                     version.label
                 ),
                 tokenId,
