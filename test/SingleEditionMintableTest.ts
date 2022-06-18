@@ -352,6 +352,51 @@ describe("SingleEditionMintable", () => {
         );
       });
     });
+
+    describe('#setRoyaltyRecipient', () => {
+      let minterContract: SingleEditionMintable
+      beforeEach(async () => {
+        await dynamicSketch.createEdition(
+          editionData(
+            "Testing Token",
+            "TEST",
+            "This is a testing token for all",
+            defaultVersion(),
+            10,
+            1000 // 10%
+          ),
+          Implementation.editions
+        );
+
+        const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+        minterContract = (await ethers.getContractAt(
+          "SingleEditionMintable",
+          editionResult
+        )) as SingleEditionMintable;
+      });
+      it("should set new royalty recipient", async () => {
+        const walletOrContract = (await ethers.getSigners())[3]
+        const walletOrContractAddress = await walletOrContract.getAddress()
+
+        expect(
+          await minterContract.setRoyaltyFundsRecipient(walletOrContractAddress)
+        ).to.emit(
+          minterContract, "RoyaltyFundsRecipientChanged"
+        ).withArgs(
+          walletOrContractAddress
+        )
+
+        // display correct royalty info
+        expect(
+          await minterContract.royaltyInfo(100, ethers.utils.parseEther("1.0"))
+        ).to.deep.equal(
+          [
+            walletOrContractAddress,
+            ethers.utils.parseEther("0.1")
+          ]
+        )
+      })
+    })
     it("mints a large batch", async () => {
       // no limit for edition size
       await dynamicSketch.createEdition(
