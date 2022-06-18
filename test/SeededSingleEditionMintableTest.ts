@@ -203,7 +203,7 @@ describe("SeededSingleEditionMintable", () => {
   });
 
   describe("#purchase", () => {
-    let minterContract: SeededSingleEditionMintable;
+    let minterContract: SeededSingleEditionMintable
     let oneEth = ethers.utils.parseEther("1")
 
     beforeEach(async () => {
@@ -235,5 +235,50 @@ describe("SeededSingleEditionMintable", () => {
         minterContract.purchase(seed, {value: oneEth})
      ).to.emit(minterContract, "EditionSold")
     });
+  })
+
+  describe('#setRoyaltyRecipient', () => {
+    let minterContract: SeededSingleEditionMintable
+    beforeEach(async () => {
+      await dynamicSketch.createEdition(
+        editionData(
+          "Testing Token",
+          "TEST",
+          "This is a testing token for all",
+          defaultVersion(),
+          10,
+          1000 // 10%
+        ),
+        Implementation.seededEditions
+      );
+
+      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
+      minterContract = (await ethers.getContractAt(
+        "SeededSingleEditionMintable",
+        editionResult
+      )) as SeededSingleEditionMintable;
+    });
+    it("should set new royalty recipient", async () => {
+      const walletOrContract = (await ethers.getSigners())[3]
+      const walletOrContractAddress = await walletOrContract.getAddress()
+
+      expect(
+        await minterContract.setRoyaltyFundsRecipient(walletOrContractAddress)
+      ).to.emit(
+        minterContract, "RoyaltyFundsRecipientChanged"
+      ).withArgs(
+        walletOrContractAddress
+      )
+
+      // display correct royalty info
+      expect(
+        await minterContract.royaltyInfo(100, ethers.utils.parseEther("1.0"))
+      ).to.deep.equal(
+        [
+          walletOrContractAddress,
+          ethers.utils.parseEther("0.1")
+        ]
+      )
+    })
   })
 });
