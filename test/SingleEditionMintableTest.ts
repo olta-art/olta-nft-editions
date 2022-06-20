@@ -315,7 +315,7 @@ describe("SingleEditionMintable", () => {
       expect(await minterContract.supportsInterface("0x80ac58cd")).to.be.true;
     });
     describe("royalty 2981", () => {
-      it("follows royalty payout for owner", async () => {
+      it("follows royalty payout for owner recpient", async () => {
         await minterContract.mintEdition(signerAddress);
         // allows royalty payout info to be updated
         expect((await minterContract.royaltyInfo(1, 100))[0]).to.be.equal(
@@ -323,7 +323,7 @@ describe("SingleEditionMintable", () => {
         );
         await minterContract.transferOwnership(await signer1.getAddress());
         expect((await minterContract.royaltyInfo(1, 100))[0]).to.be.equal(
-          await signer1.getAddress()
+          signerAddress // original owner
         );
       });
       it("sets the correct royalty amount", async () => {
