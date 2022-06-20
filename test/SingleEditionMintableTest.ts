@@ -315,7 +315,7 @@ describe("SingleEditionMintable", () => {
       expect(await minterContract.supportsInterface("0x80ac58cd")).to.be.true;
     });
     describe("royalty 2981", () => {
-      it("follows royalty payout for owner", async () => {
+      it("follows royalty payout for owner recpient", async () => {
         await minterContract.mintEdition(signerAddress);
         // allows royalty payout info to be updated
         expect((await minterContract.royaltyInfo(1, 100))[0]).to.be.equal(
@@ -323,7 +323,7 @@ describe("SingleEditionMintable", () => {
         );
         await minterContract.transferOwnership(await signer1.getAddress());
         expect((await minterContract.royaltyInfo(1, 100))[0]).to.be.equal(
-          await signer1.getAddress()
+          signerAddress // original owner
         );
       });
       it("sets the correct royalty amount", async () => {
@@ -352,6 +352,51 @@ describe("SingleEditionMintable", () => {
         );
       });
     });
+
+    describe('#setRoyaltyRecipient', () => {
+      let minterContract: SingleEditionMintable
+      beforeEach(async () => {
+        await dynamicSketch.createEdition(
+          editionData(
+            "Testing Token",
+            "TEST",
+            "This is a testing token for all",
+            defaultVersion(),
+            10,
+            1000 // 10%
+          ),
+          Implementation.editions
+        );
+
+        const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+        minterContract = (await ethers.getContractAt(
+          "SingleEditionMintable",
+          editionResult
+        )) as SingleEditionMintable;
+      });
+      it("should set new royalty recipient", async () => {
+        const walletOrContract = (await ethers.getSigners())[3]
+        const walletOrContractAddress = await walletOrContract.getAddress()
+
+        expect(
+          await minterContract.setRoyaltyFundsRecipient(walletOrContractAddress)
+        ).to.emit(
+          minterContract, "RoyaltyFundsRecipientChanged"
+        ).withArgs(
+          walletOrContractAddress
+        )
+
+        // display correct royalty info
+        expect(
+          await minterContract.royaltyInfo(100, ethers.utils.parseEther("1.0"))
+        ).to.deep.equal(
+          [
+            walletOrContractAddress,
+            ethers.utils.parseEther("0.1")
+          ]
+        )
+      })
+    })
     it("mints a large batch", async () => {
       // no limit for edition size
       await dynamicSketch.createEdition(

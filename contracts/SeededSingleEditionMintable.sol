@@ -65,6 +65,8 @@ contract SeededSingleEditionMintable is
     */
     event ApprovedMinter(address indexed owner, address indexed minter, bool approved);
 
+    event RoyaltyFundsRecipientChanged(address newRecipientAddress);
+
     // metadata
     string public description;
 
@@ -97,6 +99,8 @@ contract SeededSingleEditionMintable is
     // NFT rendering logic contract
     SharedNFTLogic private immutable sharedNFTLogic;
 
+    address payable royaltyFundsRecipient;
+
     // Global constructor for factory
     constructor(SharedNFTLogic _sharedNFTLogic) {
         sharedNFTLogic = _sharedNFTLogic;
@@ -115,7 +119,8 @@ contract SeededSingleEditionMintable is
            This can be re-assigned or updated later
      */
     function initialize(
-        address _owner,
+        address payable _owner,
+        // TODO: could add royalties recipient to reduce transactions needed
         string memory _name,
         string memory _symbol,
         string memory _description,
@@ -132,6 +137,9 @@ contract SeededSingleEditionMintable is
         royaltyBPS = _royaltyBPS;
         // Set edition id start to be 1 not 0
         atEditionId.increment();
+
+        // set default royalty fund recipient
+        royaltyFundsRecipient = _owner;
 
         // Add first version
         versions.addVersion(_version);
@@ -246,6 +254,18 @@ contract SeededSingleEditionMintable is
         allowedMinters[minter] = allowed;
         emit ApprovedMinter(_msgSender(), minter, allowed);
     }
+
+    /**
+      @notice sets a different royalty funds recipient
+      @param newRecipientAddress the new address where royalties will be sent
+     */
+    function setRoyaltyFundsRecipient(address payable newRecipientAddress)
+        external
+        onlyOwner {
+        royaltyFundsRecipient = newRecipientAddress;
+        emit RoyaltyFundsRecipientChanged(newRecipientAddress);
+    }
+
 
     /**
       @dev Updates a url of specified version by the owner of the edition.
@@ -432,10 +452,10 @@ contract SeededSingleEditionMintable is
         override
         returns (address receiver, uint256 royaltyAmount)
     {
-        if (owner() == address(0x0)) {
-            return (owner(), 0);
+        if (royaltyFundsRecipient == address(0)) {
+            return (royaltyFundsRecipient, 0);
         }
-        return (owner(), (_salePrice * royaltyBPS) / 10_000);
+        return (royaltyFundsRecipient, (_salePrice * royaltyBPS) / 10_000);
     }
 
     /**
