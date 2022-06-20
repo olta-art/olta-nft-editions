@@ -113,7 +113,7 @@ contract SingleEditionMintable is
         editionSize = _editionSize;
         royaltyBPS = _royaltyBPS;
 
-        // set defualt royalty fund recipient
+        // set default royalty fund recipient
         royaltyFundsRecipient = _owner;
 
         // Set edition id start to be 1 not 0
