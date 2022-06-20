@@ -138,7 +138,7 @@ contract SeededSingleEditionMintable is
         // Set edition id start to be 1 not 0
         atEditionId.increment();
 
-        // set defualt royalty fund recipient
+        // set default royalty fund recipient
         royaltyFundsRecipient = _owner;
 
         // Add first version
