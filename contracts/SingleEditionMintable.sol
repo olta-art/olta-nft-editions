@@ -49,6 +49,7 @@ contract SingleEditionMintable is
     event VersionAdded(uint8[3] label);
     event ApprovedMinter(address indexed owner, address indexed minter, bool approved);
     event RoyaltyFundsRecipientChanged(address newRecipientAddress);
+    event EditionSizeFinalized(uint256 editionSize);
 
     // metadata
     string public description;
@@ -127,7 +128,7 @@ contract SingleEditionMintable is
 
     /// @dev returns the number of minted tokens within the edition
     function totalSupply() public view returns (uint256) {
-        return atEditionId.current() - 1;
+        return _totalSupply();
     }
     /**
         Simple eth-based sales function
@@ -203,6 +204,19 @@ contract SingleEditionMintable is
     {
         require(_isAllowedToMint(), "Needs to be an allowed minter");
         return _mintEditions(recipients);
+    }
+
+    /**
+    * @notice allows the creator to finalise the edition size to the total minted
+    * @dev if edition size was set to zero on initialization this allows the owner of the contract
+    * to set the edition size to the total supply
+    */
+    function finalizeEditionSize() external onlyOwner {
+        require(editionSize == 0, "Must be open edition");
+
+        editionSize = _totalSupply();
+
+        emit EditionSizeFinalized(editionSize);
     }
 
     /**
@@ -295,6 +309,10 @@ contract SingleEditionMintable is
     function burn(uint256 tokenId) public {
         require(_isApprovedOrOwner(_msgSender(), tokenId), "Not approved");
         _burn(tokenId);
+    }
+
+    function _totalSupply() internal view returns (uint256) {
+        return atEditionId.current() - 1;
     }
 
     /**
