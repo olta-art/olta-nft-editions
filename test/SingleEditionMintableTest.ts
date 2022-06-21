@@ -591,6 +591,55 @@ describe("SingleEditionMintable", () => {
         });
       });
 
+      describe("#finalizeEditionSize", () => {
+        it("should revert if not the creator", async () => {
+          await expect(
+            minterContract.connect(signer1).finalizeEditionSize()
+          ).to.be.revertedWith("Ownable: caller is not the owner")
+        })
+        it("should revert if not open edition", async () => {
+          await expect(
+            minterContract.finalizeEditionSize()
+          ).to.be.revertedWith("Must be open edition")
+        })
+        it("should finalize the edition size", async () => {
+          // create an open edition contract
+          await dynamicSketch.createEdition(
+            editionData(
+              "Testing Token",
+              "TEST",
+              "This is a testing token for all",
+              defaultVersion(),
+              0, // open edition
+              0
+            ),
+            Implementation.editions
+          );
+          const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+          const openEditionContract = (await ethers.getContractAt(
+            "SingleEditionMintable",
+            editionResult
+          )) as SingleEditionMintable;
+
+          // mint an nft
+          await openEditionContract.mintEdition(signerAddress)
+
+          // finalize edition size
+          await expect(
+            openEditionContract.finalizeEditionSize()
+          ).to.emit(
+            openEditionContract, "EditionSizeFinalized"
+          ).withArgs(
+            1
+          )
+
+          // try to mint another nft
+          await expect(
+            openEditionContract.mintEdition(signerAddress)
+          ).to.be.revertedWith("Sold out")
+        })
+      })
+
       describe("#updateVersionURL()", () => {
         it("reverts if not creator", async () => {
           const [_, other] = await ethers.getSigners()
