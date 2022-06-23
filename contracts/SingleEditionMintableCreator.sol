@@ -26,6 +26,10 @@ interface EditionMintable {
         uint256 _editionSize,
         uint256 _royaltyBPS
     ) external;
+
+    function isVersionValid(
+        Versions.Version memory _version
+    ) external pure returns (bool);
 }
 
 contract SingleEditionMintableCreator {
@@ -74,6 +78,11 @@ contract SingleEditionMintableCreator {
         uint8 implementation
     ) external returns (uint256) {
         require(implementations.length > implementation, "implementation does not exist");
+
+        require(
+            EditionMintable(implementations[implementation]).isVersionValid(editionData.version),
+            "version invalid"
+        );
 
         uint256 newId = atContracts[implementation].current();
         address newContract = ClonesUpgradeable.cloneDeterministic(
