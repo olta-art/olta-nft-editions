@@ -30,6 +30,11 @@ const defaultVersion = () => {
         url: "https://ipfs.io/ipfsbafybeify52a63pgcshhbtkff4nxxxp2zp5yjn2xw43jcy4knwful7ymmgy",
         sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
       },
+      // patch notes
+      {
+        url: "",
+        sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
     ],
     label: [0,0,1] as Label
   }
