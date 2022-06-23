@@ -75,7 +75,8 @@ contract SeededSingleEditionMintable is
     enum URLS  {
         Image,
         Animation,
-        PatchNotes
+        PatchNotes,
+        Last
     }
     // Versions of Media Urls
     Versions.Set private versions;
@@ -143,8 +144,7 @@ contract SeededSingleEditionMintable is
         royaltyFundsRecipient = _owner;
 
         // Add first version
-        versions.addVersion(_version);
-        emit VersionAdded(_version.label);
+        _addVersion(_version);
     }
 
 
@@ -305,6 +305,17 @@ contract SeededSingleEditionMintable is
     function addVersion(
         Versions.Version memory _version
     ) public onlyOwner {
+        _addVersion(_version);
+    }
+
+    function _addVersion(
+        Versions.Version memory _version
+    ) internal {
+        require (
+            _isVersionValid(_version),
+            "Version must contain three url hash pairs"
+        );
+
         versions.addVersion(_version);
         emit VersionAdded(_version.label);
     }
@@ -550,5 +561,21 @@ contract SeededSingleEditionMintable is
             type(ISeededEditionSingleMintable).interfaceId == interfaceId ||
             type(IERC2981Upgradeable).interfaceId == interfaceId ||
             ERC721Upgradeable.supportsInterface(interfaceId);
+    }
+
+    function isVersionValid(Versions.Version memory _version)
+        external
+        pure
+        returns (bool)
+    {
+        return _isVersionValid(_version);
+    }
+
+    function _isVersionValid(Versions.Version memory _version)
+        internal
+        pure
+        returns (bool)
+    {
+        return _version.urls.length == uint256(URLS.Last);
     }
 }
