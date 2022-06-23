@@ -18,13 +18,13 @@ import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Stri
  */
 library Versions {
 
-    struct UrlWithHash {
+    struct UrlHashPair {
         string url;
         bytes32 sha256hash;
     }
 
     struct Version {
-        UrlWithHash[] urls;
+        UrlHashPair[] urls;
         uint8[3] label;
     }
 
@@ -39,7 +39,7 @@ library Versions {
      @param label a version label in a semantic style
      */
     function createVersion(
-        UrlWithHash[] memory urls,
+        UrlHashPair[] memory urls,
         uint8[3] memory label
     )
         internal
