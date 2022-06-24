@@ -121,8 +121,7 @@ contract SingleEditionMintable is
         atEditionId.increment();
 
         // Add first version
-        versions.addVersion(_version);
-        emit VersionAdded(_version.label);
+        _addVersion(_version);
     }
 
 
@@ -280,9 +279,26 @@ contract SingleEditionMintable is
     function addVersion(
         Versions.Version memory _version
     ) public onlyOwner {
+        _addVersion(_version);
+    }
+
+    function _addVersion(
+        Versions.Version memory _version
+    ) internal {
         versions.addVersion(_version);
+
+        // ensure the dynamic array has a length of three
+        if(_version.urls.length < 3){
+            string memory labelKey = sharedNFTLogic.uintArray3ToString(_version.label);
+            for (uint256 i = _version.urls.length; i < 3; i++){
+                // add an empty urlHashPair
+                versions.versions[labelKey].urls.push();
+            }
+        }
+
         emit VersionAdded(_version.label);
     }
+
 
     function getVersionHistory()
         public
