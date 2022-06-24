@@ -565,6 +565,29 @@ describe("SingleEditionMintable", () => {
             ]
           )
         });
+        it("always adds a version with three urls and hashes", async () => {
+          minterContract.addVersion(
+            {
+              urls: [
+                {
+                  url: "only one url",
+                  sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+                }
+              ],
+              label: [0,0,2]
+            },
+          )
+          expect(await minterContract.getURIs()).to.deep.eq(
+            [
+              'only one url',
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+              '',
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+              '',
+              '0x0000000000000000000000000000000000000000000000000000000000000000'
+            ]
+          )
+        })
         it("adds large number of versions", async () => {
           const versions: Label[] = []
           // populate versions // 10 * 5 * 2 = 100
