@@ -143,8 +143,7 @@ contract SeededSingleEditionMintable is
         royaltyFundsRecipient = _owner;
 
         // Add first version
-        versions.addVersion(_version);
-        emit VersionAdded(_version.label);
+        _addVersion(_version);
     }
 
 
@@ -297,7 +296,7 @@ contract SeededSingleEditionMintable is
         emit VersionURLUpdated(_label, _urlKey, _url);
     }
 
-    /**
+        /**
       @dev Adds new version of the media updating the urls rendered in the metadata.
            The order added determins order stored, the label has no effect.
       @param _version The version to be added consisting of urls, hashes and a label
@@ -305,7 +304,23 @@ contract SeededSingleEditionMintable is
     function addVersion(
         Versions.Version memory _version
     ) public onlyOwner {
+        _addVersion(_version);
+    }
+
+    function _addVersion(
+        Versions.Version memory _version
+    ) internal {
         versions.addVersion(_version);
+
+        // ensure the dynamic array has a length of three
+        if(_version.urls.length < 3){
+            string memory labelKey = sharedNFTLogic.uintArray3ToString(_version.label);
+            for (uint256 i = _version.urls.length; i < 3; i++){
+                // add an empty urlHashPair
+                versions.versions[labelKey].urls.push();
+            }
+        }
+
         emit VersionAdded(_version.label);
     }
 
