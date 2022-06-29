@@ -5,41 +5,41 @@ import parseDataURI from "data-urls";
 
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  SingleEditionMintableCreator,
-  SingleEditionMintable,
+  ProjectCreator,
+  StandardProject,
 } from "../typechain";
 
 import {
-  editionData,
+  projectData,
   Implementation,
   Label
 } from "./utils"
 
-describe("SingleEditionMintable", () => {
+describe("StandardProject", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
-  let dynamicSketch: SingleEditionMintableCreator;
+  let dynamicSketch: ProjectCreator;
 
   beforeEach(async () => {
-    const { SingleEditionMintableCreator } = await deployments.fixture([
-      "SingleEditionMintableCreator",
-      "SingleEditionMintable",
+    const { ProjectCreator } = await deployments.fixture([
+      "ProjectCreator",
+      "StandardProject",
     ]);
     const dynamicMintableAddress = (
-      await deployments.get("SingleEditionMintable")
+      await deployments.get("StandardProject")
     ).address;
     dynamicSketch = (await ethers.getContractAt(
-      "SingleEditionMintableCreator",
-      SingleEditionMintableCreator.address
-    )) as SingleEditionMintableCreator;
+      "ProjectCreator",
+      ProjectCreator.address
+    )) as ProjectCreator;
 
     signer = (await ethers.getSigners())[0];
     signerAddress = await signer.getAddress();
   });
 
   it("purchases a edition", async () => {
-    await dynamicSketch.createEdition(
-      editionData(
+    await dynamicSketch.createProject(
+      projectData(
         "Testing Token",
         "TEST",
         "This is a testing token for all",
@@ -59,14 +59,14 @@ describe("SingleEditionMintable", () => {
         10,
         10
       ),
-      Implementation.editions
+      Implementation.standard
     );
 
-    const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.editions);
+    const editionResult = await dynamicSketch.getProjectAtId(0, Implementation.standard);
     const minterContract = (await ethers.getContractAt(
-      "SingleEditionMintable",
+      "StandardProject",
       editionResult
-    )) as SingleEditionMintable;
+    )) as StandardProject;
     expect(await minterContract.name()).to.be.equal("Testing Token");
     expect(await minterContract.symbol()).to.be.equal("TEST");
 

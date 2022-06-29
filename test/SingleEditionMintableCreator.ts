@@ -5,13 +5,13 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import parseDataURI from "data-urls";
 
 import {
-  SingleEditionMintableCreator,
-  SingleEditionMintable,
-  SeededSingleEditionMintable
+  ProjectCreator,
+  StandardProject,
+  SeededProject
 } from "../typechain";
 
 import {
-  editionData,
+  projectData,
   Implementation,
   Label
 } from "./utils"
@@ -35,7 +35,7 @@ const defaultVersion = () => {
   }
 }
 
-const defualtEditionData = editionData(
+const defualtProjectData = projectData(
   "Testing Token",
   "TEST",
   "This is a testing token for all",
@@ -44,56 +44,56 @@ const defualtEditionData = editionData(
   10
 )
 
-describe("SingleEditionMintableCreator", () => {
+describe("ProjectCreator", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
-  let creatorContract: SingleEditionMintableCreator;
+  let creatorContract: ProjectCreator;
 
   beforeEach(async () => {
-    const { SingleEditionMintableCreator } = await deployments.fixture([
-      "SingleEditionMintableCreator",
-      "SingleEditionMintable",
+    const { ProjectCreator } = await deployments.fixture([
+      "ProjectCreator",
+      "StandardProject",
     ]);
 
     creatorContract = (await ethers.getContractAt(
-      "SingleEditionMintableCreator",
-      SingleEditionMintableCreator.address
-    )) as SingleEditionMintableCreator
+      "ProjectCreator",
+      ProjectCreator.address
+    )) as ProjectCreator
 
     signer = (await ethers.getSigners())[0]
     signerAddress = await signer.getAddress()
   })
 
-  describe("#createEdition", () => {
-    it("creates new edition with singleEditionMintable implementation", async () => {
-      await creatorContract.createEdition(
-        defualtEditionData,
-        Implementation.editions
+  describe("#createProject", () => {
+    it("creates new edition with StandardProject implementation", async () => {
+      await creatorContract.createProject(
+        defualtProjectData,
+        Implementation.standard
       )
-      const editionConractAddress01 = await creatorContract.getEditionAtId(0, Implementation.editions)
+      const editionConractAddress01 = await creatorContract.getProjectAtId(0, Implementation.standard)
       const editionsContract01 = (await ethers.getContractAt(
-        "SingleEditionMintable",
+        "StandardProject",
         editionConractAddress01
-      )) as SingleEditionMintable;
+      )) as StandardProject;
 
-      // check supports SingleEditionMintable interface
+      // check supports StandardProject interface
       expect(
         await editionsContract01.supportsInterface("0x2fc51e5a")
       ).to.be.true
     })
 
-    it("creates new edition with seededSingleEditionMintable implementation", async () => {
-      await creatorContract.createEdition(
-        defualtEditionData,
-        Implementation.seededEditions
+    it("creates new edition with seededProject implementation", async () => {
+      await creatorContract.createProject(
+        defualtProjectData,
+        Implementation.seeded
       )
-      const editionConractAddress02 = await creatorContract.getEditionAtId(0, Implementation.seededEditions)
+      const editionConractAddress02 = await creatorContract.getProjectAtId(0, Implementation.seeded)
       const editionsContract02 = (await ethers.getContractAt(
-        "SeededSingleEditionMintable",
+        "SeededProject",
         editionConractAddress02
-      )) as SeededSingleEditionMintable;
+      )) as SeededProject;
 
-      // check supports SeededSingleEditionMintable interface
+      // check supports SeededProject interface
       expect(
         await editionsContract02.supportsInterface("0x26057e5e")
       ).to.be.true
@@ -102,51 +102,51 @@ describe("SingleEditionMintableCreator", () => {
     it("should increment a seperate id counter for each implementation", async () => {
 
        // create first edition
-      await creatorContract.createEdition(
-        defualtEditionData,
-        Implementation.editions
+      await creatorContract.createProject(
+        defualtProjectData,
+        Implementation.standard
       )
 
       // create second edition
-      let expectedAddress = await creatorContract.getEditionAtId(1, Implementation.editions)
+      let expectedAddress = await creatorContract.getProjectAtId(1, Implementation.standard)
       await expect(
-        creatorContract.createEdition(
-          defualtEditionData,
-          Implementation.editions
+        creatorContract.createProject(
+          defualtProjectData,
+          Implementation.standard
         )
       ).to.emit(
         creatorContract,
-        "CreatedEdition"
+        "CreatedProject"
       ).withArgs(
           1,                // id
           signerAddress,    // creator
           10,               // edition size
           expectedAddress,
-          Implementation.editions
+          Implementation.standard
         )
 
       // create first seeded edition
-      expectedAddress = await creatorContract.getEditionAtId(0, Implementation.seededEditions)
+      expectedAddress = await creatorContract.getProjectAtId(0, Implementation.seeded)
       await expect(
-        creatorContract.createEdition(
-          defualtEditionData,
-          Implementation.seededEditions
+        creatorContract.createProject(
+          defualtProjectData,
+          Implementation.seeded
         )
       ).to.emit(
         creatorContract,
-        "CreatedEdition"
+        "CreatedProject"
       ).withArgs(
           0,              // id
           signerAddress,  // creator
           10,             // edition size
           expectedAddress,
-          Implementation.seededEditions
+          Implementation.seeded
         )
     })
     it("reverts if implementation doesn't exist", async () => {
       await expect(
-        creatorContract.createEdition(
-          defualtEditionData,
+        creatorContract.createProject(
+          defualtProjectData,
           3
         )
       ).to.be.revertedWith("implementation does not exist")
@@ -154,16 +154,16 @@ describe("SingleEditionMintableCreator", () => {
   })
 
   describe("#addImplementation", () => {
-    let newImplementation: SingleEditionMintable
+    let newImplementation: StandardProject
 
     const deployImplementation = async (s = signer) => {
-      // deploy another singleEditionMintable contract
+      // deploy another Standard Project contract
       const { SharedNFTLogic } = await deployments.fixture(["SharedNFTLogic"])
-      const SingleEditionMintable = await ethers.getContractFactory("SingleEditionMintable")
-      const singleEditionMintable = await SingleEditionMintable.connect(s).deploy(SharedNFTLogic.address)
-      await singleEditionMintable.connect(s).deployed()
+      const StandardProject = await ethers.getContractFactory("StandardProject")
+      const standardProject = await StandardProject.connect(s).deploy(SharedNFTLogic.address)
+      await standardProject.connect(s).deployed()
 
-      return singleEditionMintable as SingleEditionMintable
+      return standardProject as StandardProject
     }
 
     beforeEach(async () => {

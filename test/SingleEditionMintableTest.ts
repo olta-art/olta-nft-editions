@@ -5,12 +5,12 @@ import parseDataURI from "data-urls";
 
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  SingleEditionMintableCreator,
-  SingleEditionMintable,
+  ProjectCreator,
+  StandardProject,
 } from "../typechain";
 
 import {
-  editionData,
+  projectData,
   Implementation,
   Label
 } from "./utils"
@@ -38,31 +38,31 @@ const defaultVersion = () => {
   }
 }
 
-describe("SingleEditionMintable", () => {
+describe("StandardProject", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
-  let dynamicSketch: SingleEditionMintableCreator;
+  let dynamicSketch: ProjectCreator;
 
   beforeEach(async () => {
-    const { SingleEditionMintableCreator } = await deployments.fixture([
-      "SingleEditionMintableCreator",
-      "SingleEditionMintable",
+    const { ProjectCreator } = await deployments.fixture([
+      "ProjectCreator",
+      "StandardProject",
     ]);
     const dynamicMintableAddress = (
-      await deployments.get("SingleEditionMintable")
+      await deployments.get("StandardProject")
     ).address;
     dynamicSketch = (await ethers.getContractAt(
-      "SingleEditionMintableCreator",
-      SingleEditionMintableCreator.address
-    )) as SingleEditionMintableCreator;
+      "ProjectCreator",
+      ProjectCreator.address
+    )) as ProjectCreator;
 
     signer = (await ethers.getSigners())[0];
     signerAddress = await signer.getAddress();
   });
 
   it("makes a new edition", async () => {
-    await dynamicSketch.createEdition(
-      editionData(
+    await dynamicSketch.createProject(
+      projectData(
         "Testing Token",
         "TEST",
         "This is a testing token for all",
@@ -71,14 +71,14 @@ describe("SingleEditionMintable", () => {
         10,
         10
       ),
-      Implementation.editions
+      Implementation.standard
     );
 
-    const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.editions);
+    const editionResult = await dynamicSketch.getProjectAtId(0, Implementation.standard);
     const minterContract = (await ethers.getContractAt(
-      "SingleEditionMintable",
+      "StandardProject",
       editionResult
-    )) as SingleEditionMintable;
+    )) as StandardProject;
     expect(await minterContract.name()).to.be.equal("Testing Token");
     expect(await minterContract.symbol()).to.be.equal("TEST");
     const editionUris = await minterContract.getURIs();
@@ -98,11 +98,11 @@ describe("SingleEditionMintable", () => {
   });
   describe("with a edition", () => {
     let signer1: SignerWithAddress;
-    let minterContract: SingleEditionMintable;
+    let minterContract: StandardProject;
     beforeEach(async () => {
       signer1 = (await ethers.getSigners())[1];
-      await dynamicSketch.createEdition(
-        editionData(
+      await dynamicSketch.createProject(
+        projectData(
           "Testing Token",
           "TEST",
           "This is a testing token for all",
@@ -111,14 +111,14 @@ describe("SingleEditionMintable", () => {
           10,
           10
         ),
-        Implementation.editions
+        Implementation.standard
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.editions);
+      const editionResult = await dynamicSketch.getProjectAtId(0, Implementation.standard);
       minterContract = (await ethers.getContractAt(
-        "SingleEditionMintable",
+        "StandardProject",
         editionResult
-      )) as SingleEditionMintable;
+      )) as StandardProject;
     });
     it("creates a new edition", async () => {
       expect(await signer1.getBalance()).to.eq(
@@ -164,8 +164,8 @@ describe("SingleEditionMintable", () => {
     });
     it("creates an unbounded edition", async () => {
       // no limit for edition size
-      await dynamicSketch.createEdition(
-        editionData(
+      await dynamicSketch.createProject(
+        projectData(
           "Testing Token",
           "TEST",
           "This is a testing token for all",
@@ -174,14 +174,14 @@ describe("SingleEditionMintable", () => {
           0,
           0
         ),
-        Implementation.editions
+        Implementation.standard
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+      const editionResult = await dynamicSketch.getProjectAtId(1, Implementation.standard);
       minterContract = (await ethers.getContractAt(
-        "SingleEditionMintable",
+        "StandardProject",
         editionResult
-      )) as SingleEditionMintable;
+      )) as StandardProject;
 
       expect(await minterContract.totalSupply()).to.be.equal(0);
 
@@ -327,8 +327,8 @@ describe("SingleEditionMintable", () => {
         );
       });
       it("sets the correct royalty amount", async () => {
-        await dynamicSketch.createEdition(
-          editionData(
+        await dynamicSketch.createProject(
+          projectData(
             "Testing Token",
             "TEST",
             "This is a testing token for all",
@@ -337,14 +337,14 @@ describe("SingleEditionMintable", () => {
             200,
             200
           ),
-          Implementation.editions
+          Implementation.standard
         );
 
-        const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+        const editionResult = await dynamicSketch.getProjectAtId(1, Implementation.standard);
         const minterContractNew = (await ethers.getContractAt(
-          "SingleEditionMintable",
+          "StandardProject",
           editionResult
-        )) as SingleEditionMintable;
+        )) as StandardProject;
 
         await minterContractNew.mintEdition(signerAddress);
         expect((await minterContractNew.royaltyInfo(1, ethers.utils.parseEther("1.0")))[1]).to.be.equal(
@@ -354,10 +354,10 @@ describe("SingleEditionMintable", () => {
     });
 
     describe('#setRoyaltyRecipient', () => {
-      let minterContract: SingleEditionMintable
+      let minterContract: StandardProject
       beforeEach(async () => {
-        await dynamicSketch.createEdition(
-          editionData(
+        await dynamicSketch.createProject(
+          projectData(
             "Testing Token",
             "TEST",
             "This is a testing token for all",
@@ -365,14 +365,14 @@ describe("SingleEditionMintable", () => {
             10,
             1000 // 10%
           ),
-          Implementation.editions
+          Implementation.standard
         );
 
-        const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+        const editionResult = await dynamicSketch.getProjectAtId(1, Implementation.standard);
         minterContract = (await ethers.getContractAt(
-          "SingleEditionMintable",
+          "StandardProject",
           editionResult
-        )) as SingleEditionMintable;
+        )) as StandardProject;
       });
       it("should set new royalty recipient", async () => {
         const walletOrContract = (await ethers.getSigners())[3]
@@ -399,8 +399,8 @@ describe("SingleEditionMintable", () => {
     })
     it("mints a large batch", async () => {
       // no limit for edition size
-      await dynamicSketch.createEdition(
-        editionData(
+      await dynamicSketch.createProject(
+        projectData(
           "Testing Token",
           "TEST",
           "This is a testing token for all",
@@ -409,14 +409,14 @@ describe("SingleEditionMintable", () => {
           0,
           0
         ),
-        Implementation.editions
+        Implementation.standard
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+      const editionResult = await dynamicSketch.getProjectAtId(1, Implementation.standard);
       minterContract = (await ethers.getContractAt(
-        "SingleEditionMintable",
+        "StandardProject",
         editionResult
-      )) as SingleEditionMintable;
+      )) as StandardProject;
 
       const [s1, s2, s3] = await ethers.getSigners();
       const [s1a, s2a, s3a] = [
@@ -627,8 +627,8 @@ describe("SingleEditionMintable", () => {
         })
         it("should finalize the edition size", async () => {
           // create an open edition contract
-          await dynamicSketch.createEdition(
-            editionData(
+          await dynamicSketch.createProject(
+            projectData(
               "Testing Token",
               "TEST",
               "This is a testing token for all",
@@ -636,13 +636,13 @@ describe("SingleEditionMintable", () => {
               0, // open edition
               0
             ),
-            Implementation.editions
+            Implementation.standard
           );
-          const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+          const editionResult = await dynamicSketch.getProjectAtId(1, Implementation.standard);
           const openEditionContract = (await ethers.getContractAt(
-            "SingleEditionMintable",
+            "StandardProject",
             editionResult
-          )) as SingleEditionMintable;
+          )) as StandardProject;
 
           // mint an nft
           await openEditionContract.mintEdition(signerAddress)
@@ -868,8 +868,8 @@ describe("SingleEditionMintable", () => {
         )
       });
       it("emits version added event on creation", async () => {
-        await dynamicSketch.createEdition(
-          editionData(
+        await dynamicSketch.createProject(
+          projectData(
             "Testing Token",
             "TEST",
             "This is a testing token for all",
@@ -878,13 +878,13 @@ describe("SingleEditionMintable", () => {
             10,
             10
           ),
-          Implementation.editions
+          Implementation.standard
         )
-        const editionResult = await dynamicSketch.getEditionAtId(1, Implementation.editions);
+        const editionResult = await dynamicSketch.getProjectAtId(1, Implementation.standard);
         const newMinterContract = (await ethers.getContractAt(
-          "SingleEditionMintable",
+          "StandardProject",
           editionResult
-        )) as SingleEditionMintable;
+        )) as StandardProject;
         // get VersionAddeded events from newMinterContract
         const filter = newMinterContract.filters.VersionAdded()
         const events = await newMinterContract.queryFilter(filter)

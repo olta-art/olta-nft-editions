@@ -7,12 +7,12 @@ import { ethers, deployments } from "hardhat";
 import parseDataURI from "data-urls";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  SingleEditionMintableCreator,
-  SeededSingleEditionMintable,
+  ProjectCreator,
+  SeededProject,
 } from "../typechain";
 
 import {
-  editionData,
+  projectData,
   Implementation,
   Label
 } from "./utils"
@@ -44,7 +44,7 @@ const defaultVersion = () => {
 
 // Helpers
 
-const fetchMetadata = async (tokenId: number, contract: SeededSingleEditionMintable) => {
+const fetchMetadata = async (tokenId: number, contract: SeededProject) => {
   const tokenURI = await contract.tokenURI(tokenId);
   const parsedTokenURI = parseDataURI(tokenURI);
   if (!parsedTokenURI) {
@@ -56,12 +56,12 @@ const fetchMetadata = async (tokenId: number, contract: SeededSingleEditionMinta
   return JSON.parse(uriData);
 }
 
-const getAnimationUrl = async (contract: SeededSingleEditionMintable, id: number) => {
+const getAnimationUrl = async (contract: SeededProject, id: number) => {
   const metadata = await fetchMetadata(id, contract)
   return metadata.animation_url
 }
 
-const expectedUrl = (contract: SeededSingleEditionMintable, id: number, seed: number) => {
+const expectedUrl = (contract: SeededProject, id: number, seed: number) => {
   return defaultAnimationURl
     + "?"
     + `id=${id}`
@@ -71,33 +71,33 @@ const expectedUrl = (contract: SeededSingleEditionMintable, id: number, seed: nu
 
 const createMintData = (to: string, seed: number) => ({to, seed})
 
-describe("SeededSingleEditionMintable", () => {
+describe("SeededProject", () => {
   let signer: SignerWithAddress;
   let signerAddress: string;
-  let dynamicSketch: SingleEditionMintableCreator;
+  let dynamicSketch: ProjectCreator;
 
   beforeEach(async () => {
-    const { SingleEditionMintableCreator } = await deployments.fixture([
-      "SingleEditionMintableCreator",
+    const { ProjectCreator } = await deployments.fixture([
+      "ProjectCreator",
     ]);
     const dynamicMintableAddress = (
-      await deployments.get("SeededSingleEditionMintable")
+      await deployments.get("SeededProject")
     ).address;
     dynamicSketch = (await ethers.getContractAt(
-      "SingleEditionMintableCreator",
-      SingleEditionMintableCreator.address
-    )) as SingleEditionMintableCreator;
+      "ProjectCreator",
+      ProjectCreator.address
+    )) as ProjectCreator;
 
     signer = (await ethers.getSigners())[0];
     signerAddress = await signer.getAddress();
   });
 
   describe("#mintEdition", () => {
-    let minterContract: SeededSingleEditionMintable;
+    let minterContract: SeededProject;
 
     beforeEach(async () => {
-      await dynamicSketch.createEdition(
-        editionData(
+      await dynamicSketch.createProject(
+        projectData(
           "Testing Token",
           "TEST",
           "This is a testing token for all",
@@ -105,14 +105,14 @@ describe("SeededSingleEditionMintable", () => {
           10,
           10
         ),
-        Implementation.seededEditions
+        Implementation.seeded
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
+      const editionResult = await dynamicSketch.getProjectAtId(0, Implementation.seeded);
       minterContract = (await ethers.getContractAt(
-        "SeededSingleEditionMintable",
+        "SeededProject",
         editionResult
-      )) as SeededSingleEditionMintable;
+      )) as SeededProject;
     });
 
     it("creates new edition with seed", async () => {
@@ -147,11 +147,11 @@ describe("SeededSingleEditionMintable", () => {
 
   describe("#mintEditions", () => {
 
-    let minterContract: SeededSingleEditionMintable;
+    let minterContract: SeededProject;
 
     beforeEach(async () => {
-      await dynamicSketch.createEdition(
-        editionData(
+      await dynamicSketch.createProject(
+        projectData(
           "Testing Token",
           "TEST",
           "This is a testing token for all",
@@ -159,14 +159,14 @@ describe("SeededSingleEditionMintable", () => {
           10,
           10
         ),
-        Implementation.seededEditions
+        Implementation.seeded
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
+      const editionResult = await dynamicSketch.getProjectAtId(0, Implementation.seeded);
       minterContract = (await ethers.getContractAt(
-        "SeededSingleEditionMintable",
+        "SeededProject",
         editionResult
-      )) as SeededSingleEditionMintable;
+      )) as SeededProject;
     });
 
 
@@ -203,12 +203,12 @@ describe("SeededSingleEditionMintable", () => {
   });
 
   describe("#purchase", () => {
-    let minterContract: SeededSingleEditionMintable
+    let minterContract: SeededProject
     let oneEth = ethers.utils.parseEther("1")
 
     beforeEach(async () => {
-      await dynamicSketch.createEdition(
-        editionData(
+      await dynamicSketch.createProject(
+        projectData(
           "Testing Token",
           "TEST",
           "This is a testing token for all",
@@ -216,14 +216,14 @@ describe("SeededSingleEditionMintable", () => {
           10,
           10
         ),
-        Implementation.seededEditions
+        Implementation.seeded
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
+      const editionResult = await dynamicSketch.getProjectAtId(0, Implementation.seeded);
       minterContract = (await ethers.getContractAt(
-        "SeededSingleEditionMintable",
+        "SeededProject",
         editionResult
-      )) as SeededSingleEditionMintable;
+      )) as SeededProject;
 
       // set sale price to 1 ETH
       await minterContract.setSalePrice(oneEth)
@@ -238,10 +238,10 @@ describe("SeededSingleEditionMintable", () => {
   })
 
   describe('#setRoyaltyRecipient', () => {
-    let minterContract: SeededSingleEditionMintable
+    let minterContract: SeededProject
     beforeEach(async () => {
-      await dynamicSketch.createEdition(
-        editionData(
+      await dynamicSketch.createProject(
+        projectData(
           "Testing Token",
           "TEST",
           "This is a testing token for all",
@@ -249,14 +249,14 @@ describe("SeededSingleEditionMintable", () => {
           10,
           1000 // 10%
         ),
-        Implementation.seededEditions
+        Implementation.seeded
       );
 
-      const editionResult = await dynamicSketch.getEditionAtId(0, Implementation.seededEditions);
+      const editionResult = await dynamicSketch.getProjectAtId(0, Implementation.seeded);
       minterContract = (await ethers.getContractAt(
-        "SeededSingleEditionMintable",
+        "SeededProject",
         editionResult
-      )) as SeededSingleEditionMintable;
+      )) as SeededProject;
     });
     it("should set new royalty recipient", async () => {
       const walletOrContract = (await ethers.getSigners())[3]
