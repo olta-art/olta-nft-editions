@@ -1,15 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0
-
-/**
-
-█▄░█ █▀▀ ▀█▀   █▀ █▀▀ █▀▀ █▀▄ █▀▀ █▀▄   █▀▀ █▀▄ █ ▀█▀ █ █▀█ █▄░█ █▀
-█░▀█ █▀░ ░█░   ▄█ ██▄ ██▄ █▄▀ ██▄ █▄▀   ██▄ █▄▀ █ ░█░ █ █▄█ █░▀█ ▄█
-
-▀█ █▀█ █▀█ ▄▀█   ▀▄▀   █▀█ █  ▀█▀ ▄▀█
-█▄ █▄█ █▀▄ █▀█   █░█   █▄█ █▄ ░█░ █▀█
-
- */
-
 pragma solidity ^0.8.6;
 
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
@@ -18,9 +7,9 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
-import {SharedNFTLogic, MediaData} from "./SharedNFTLogic.sol";
-import {ISeededEditionSingleMintable, MintData} from "./ISeededEditionSingleMintable.sol";
-import {Versions} from "./Versions.sol";
+import {SharedNFTLogic, MediaData} from "../SharedNFTLogic.sol";
+import {Versions} from "../Versions.sol";
+import {ISeededProject, MintData} from "./ISeeded.sol";
 
 /**
     This is a smart contract for handling dynamic contract minting.
@@ -29,15 +18,15 @@ import {Versions} from "./Versions.sol";
     changes:
         - Media urls are versioned allowing for updatable content preserving history
         - The NFT contract address is included in edition url query for easyier access to query the graph from within the NFT
-        - SupportsInterface function includes IEditionSingleMintable
+        - SupportsInterface function includes project implementation interface
 
     @dev This allows creators to mint a unique serial edition of the same media within a custom contract
     @author iain nash
     Repository: https://github.com/ourzora/nft-editions
 */
-contract SeededSingleEditionMintable is
+contract SeededProject is
     ERC721Upgradeable,
-    ISeededEditionSingleMintable,
+    ISeededProject,
     IERC2981Upgradeable,
     OwnableUpgradeable
 {
@@ -59,7 +48,7 @@ contract SeededSingleEditionMintable is
     event VersionAdded(uint8[3] label);
 
     /**
-     @param owner the address of the owner of the editions contract
+     @param owner the address of the owner of the project
      @param minter the address of the approved minter
      @param approved a boolean indicating the approval status
     */
@@ -86,7 +75,7 @@ contract SeededSingleEditionMintable is
     CountersUpgradeable.Counter private atEditionId;
     // Royalty amount in bps
     uint256 public royaltyBPS;
-    // Addresses allowed to mint edition
+    // Addresses allowed to mint editions
     mapping(address => bool) allowedMinters;
 
     // Mapping from seed to bool
@@ -108,15 +97,15 @@ contract SeededSingleEditionMintable is
     }
 
     /**
-      @param _owner User that owns and can mint the edition, gets royalty and sales payouts and can update the base url if needed.
-      @param _name Name of edition, used in the title as "$NAME NUMBER/TOTAL"
-      @param _symbol Symbol of the new token contract
-      @param _description Description of edition, used in the description field of the NFT
+      @param _owner User that owns and can mint the project, gets royalty and sales payouts and can update the base url if needed.
+      @param _name Name of project, used in the title as "$NAME NUMBER/TOTAL"
+      @param _symbol Symbol of the project
+      @param _description Description of project, used in the description field of the NFT
       @param _version Version of the media consisting of urls and hashes of animation and image content
       @param _editionSize Number of editions that can be minted in total. If 0, unlimited editions can be minted.
       @param _royaltyBPS BPS of the royalty set on the contract. Can be 0 for no royalty.
-      @dev Function to create a new edition. Can only be called by the allowed creator
-           Sets the only allowed minter to the address that creates/owns the edition.
+      @dev Function to create a new project. Can only be called by the allowed creator
+           Sets the only allowed minter to the address that creates/owns the project.
            This can be re-assigned or updated later
      */
     function initialize(
@@ -153,11 +142,11 @@ contract SeededSingleEditionMintable is
     }
     /**
         Simple eth-based sales function
-        More complex sales functions can be implemented through ISingleEditionMintable interface
+        More complex sales functions can be implemented through ISeededProject interface
      */
 
     /**
-      @dev This allows the user to purchase a edition edition
+      @dev This allows the user to purchase an edition
            at the given price in the contract.
       @param seed the chosen seed number
      */
@@ -248,7 +237,7 @@ contract SeededSingleEditionMintable is
     function owner()
         public
         view
-        override(OwnableUpgradeable, ISeededEditionSingleMintable)
+        override(OwnableUpgradeable, ISeededProject)
         returns (address)
     {
         return super.owner();
@@ -258,7 +247,7 @@ contract SeededSingleEditionMintable is
       @param minter address to set approved minting status for
       @param allowed boolean if that address is allowed to mint
       @dev Sets the approved minting status of the given address.
-           This requires that msg.sender is the owner of the given edition id.
+           This requires that msg.sender is the owner of the given project id.
            If the ZeroAddress (address(0x0)) is set as a minter,
              anyone will be allowed to mint.
            This setup is similar to setApprovalForAll in the ERC721 spec.
@@ -281,7 +270,7 @@ contract SeededSingleEditionMintable is
 
 
     /**
-      @dev Updates a url of specified version by the owner of the edition.
+      @dev Updates a url of specified version by the owner of the project.
            Only URLs can be updated (data-uris are supported), hashes cannot be updated.
       @param _label The label of the specified version
       @param _urlKey The index of the url to update 0=animation, 1=image
@@ -412,7 +401,7 @@ contract SeededSingleEditionMintable is
     }
 
     /**
-      @dev Get URIs for edition NFT, will retrieve URIs from the last added version
+      @dev Get URIs for project, will retrieve URIs from the last added version
       @return imageUrl The url of the image
       @return imageHash  A sha-256 hash of the content on the imageUrl, will be zero address if url blank
       @return animationUrl The url of the animation
@@ -562,7 +551,7 @@ contract SeededSingleEditionMintable is
         returns (bool)
     {
         return
-            type(ISeededEditionSingleMintable).interfaceId == interfaceId ||
+            type(ISeededProject).interfaceId == interfaceId ||
             type(IERC2981Upgradeable).interfaceId == interfaceId ||
             ERC721Upgradeable.supportsInterface(interfaceId);
     }

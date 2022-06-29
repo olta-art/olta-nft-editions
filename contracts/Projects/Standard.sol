@@ -1,15 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
 
-/**
-
-█▄░█ █▀▀ ▀█▀   █▀▀ █▀▄ █ ▀█▀ █ █▀█ █▄░█ █▀
-█░▀█ █▀░ ░█░   ██▄ █▄▀ █ ░█░ █ █▄█ █░▀█ ▄█
-
-▀█ █▀█ █▀█ ▄▀█   ▀▄▀   █▀█ █  ▀█▀ ▄▀█
-█▄ █▄█ █▀▄ █▀█   █░█   █▄█ █▄ ░█░ █▀█
-
- */
-
 pragma solidity ^0.8.6;
 
 import {ERC721Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
@@ -18,9 +8,10 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {AddressUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 
-import {SharedNFTLogic, MediaData} from "./SharedNFTLogic.sol";
-import {IEditionSingleMintable} from "./IEditionSingleMintable.sol";
-import {Versions} from "./Versions.sol";
+import {SharedNFTLogic, MediaData} from "../SharedNFTLogic.sol";
+import {Versions} from "../Versions.sol";
+import {IStandardProject} from "./IStandard.sol";
+
 
 /**
     This is a smart contract for handling dynamic contract minting.
@@ -29,15 +20,15 @@ import {Versions} from "./Versions.sol";
     changes:
         - Media urls are versioned allowing for updatable content preserving history
         - The NFT contract address is included in edition url query for easyier access to query the graph from within the NFT
-        - SupportsInterface function includes IEditionSingleMintable
+        - SupportsInterface function includes project implementation interface
 
     @dev This allows creators to mint a unique serial edition of the same media within a custom contract
     @author iain nash
     Repository: https://github.com/ourzora/nft-editions
 */
-contract SingleEditionMintable is
+contract StandardProject is
     ERC721Upgradeable,
-    IEditionSingleMintable,
+    IStandardProject,
     IERC2981Upgradeable,
     OwnableUpgradeable
 {
@@ -63,7 +54,7 @@ contract SingleEditionMintable is
     // Versions of Media Urls
     Versions.Set private versions;
 
-    // Total size of edition that can be minted
+    // Total number of editions that can be minted
     uint256 public editionSize;
     // Current token id minted
     CountersUpgradeable.Counter private atEditionId;
@@ -86,15 +77,15 @@ contract SingleEditionMintable is
     }
 
     /**
-      @param _owner User that owns and can mint the edition, gets royalty and sales payouts and can update the base url if needed.
-      @param _name Name of edition, used in the title as "$NAME NUMBER/TOTAL"
+      @param _owner User that owns and can mint the project, gets royalty and sales payouts and can update the base url if needed.
+      @param _name Name of project, used in the title as "$NAME NUMBER/TOTAL"
       @param _symbol Symbol of the new token contract
-      @param _description Description of edition, used in the description field of the NFT
+      @param _description Description of project, used in the description field of the NFT
       @param _version Version of the media consisting of urls and hashes of animation and image content
       @param _editionSize Number of editions that can be minted in total. If 0, unlimited editions can be minted.
       @param _royaltyBPS BPS of the royalty set on the contract. Can be 0 for no royalty.
-      @dev Function to create a new edition. Can only be called by the allowed creator
-           Sets the only allowed minter to the address that creates/owns the edition.
+      @dev Function to create a new project. Can only be called by the allowed creator
+           Sets the only allowed minter to the address that creates/owns the project.
            This can be re-assigned or updated later
      */
     function initialize(
@@ -125,17 +116,17 @@ contract SingleEditionMintable is
     }
 
 
-    /// @dev returns the number of minted tokens within the edition
+    /// @dev returns the number of minted editions within the project
     function totalSupply() public view returns (uint256) {
         return _totalSupply();
     }
     /**
         Simple eth-based sales function
-        More complex sales functions can be implemented through ISingleEditionMintable interface
+        More complex sales functions can be implemented through IStandardProject interface
      */
 
     /**
-      @dev This allows the user to purchase a edition edition
+      @dev This allows the user to purchase an edition
            at the given price in the contract.
      */
     function purchase() external payable returns (uint256) {
@@ -148,10 +139,10 @@ contract SingleEditionMintable is
     }
 
     /**
-      @param _salePrice if sale price is 0 sale is stopped, otherwise that amount 
+      @param _salePrice if sale price is 0 sale is stopped, otherwise that amount
                        of ETH is needed to start the sale.
       @dev This sets a simple ETH sales price
-           Setting a sales price allows users to mint the edition until it sells out.
+           Setting a sales price allows users to mint editions until the project sells out.
            For more granular sales, use an external sales contract.
      */
     function setSalePrice(uint256 _salePrice) external onlyOwner {
@@ -224,7 +215,7 @@ contract SingleEditionMintable is
     function owner()
         public
         view
-        override(OwnableUpgradeable, IEditionSingleMintable)
+        override(OwnableUpgradeable, IStandardProject)
         returns (address)
     {
         return super.owner();
@@ -497,7 +488,7 @@ contract SingleEditionMintable is
         returns (bool)
     {
         return
-            type(IEditionSingleMintable).interfaceId == interfaceId ||
+            type(IStandardProject).interfaceId == interfaceId ||
             type(IERC2981Upgradeable).interfaceId == interfaceId ||
             ERC721Upgradeable.supportsInterface(interfaceId);
     }

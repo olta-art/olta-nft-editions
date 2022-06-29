@@ -6,7 +6,7 @@ struct MintData {
   uint256 seed;
 }
 
-interface ISeededEditionSingleMintable {
+interface ISeededProject {
   function mintEdition(address to, uint256 seed) external returns (uint256);
   function mintEditions(MintData[] memory to) external returns (uint256);
   function numberCanMint() external view returns (uint256);

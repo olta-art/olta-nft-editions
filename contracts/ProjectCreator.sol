@@ -16,7 +16,7 @@ import {ClonesUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/Clone
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import {Versions} from "./Versions.sol";
 
-interface EditionMintable {
+interface IProject {
     function initialize(
         address _owner,
         string memory _name,
@@ -28,12 +28,12 @@ interface EditionMintable {
     ) external;
 }
 
-contract SingleEditionMintableCreator {
+contract ProjectCreator {
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     /// Important: None of these fields can be changed after calling
     /// urls can be updated and upgraded via the versions interface
-    struct EditionData {
+    struct ProjectData {
         string name; // Name of the edition contract
         string symbol; // Symbol of the edition contract
         string description; /// Metadata: Description of the edition entry
@@ -67,10 +67,10 @@ contract SingleEditionMintableCreator {
     }
 
     /// Creates a new edition contract as a factory with a deterministic address
-    /// @param editionData EditionData of the edition contract
-    /// @param implementation Implementation of the edition contract
-    function createEdition(
-        EditionData memory editionData,
+    /// @param projectData the data of the of the project being created
+    /// @param implementation Implementation of the project contract
+    function createProject(
+        ProjectData memory projectData,
         uint8 implementation
     ) external returns (uint256) {
         require(implementations.length > implementation, "implementation does not exist");
@@ -82,20 +82,20 @@ contract SingleEditionMintableCreator {
         );
 
         // Editions
-        EditionMintable(newContract).initialize(
+        IProject(newContract).initialize(
             msg.sender,
-            editionData.name,
-            editionData.symbol,
-            editionData.description,
-            editionData.version,
-            editionData.editionSize,
-            editionData.royaltyBPS
+            projectData.name,
+            projectData.symbol,
+            projectData.description,
+            projectData.version,
+            projectData.editionSize,
+            projectData.royaltyBPS
         );
 
-        emit CreatedEdition(
+        emit CreatedProject(
             newId,
             msg.sender,
-            editionData.editionSize,
+            projectData.editionSize,
             newContract,
             implementation
         );
@@ -107,9 +107,9 @@ contract SingleEditionMintableCreator {
     }
 
     /// Get edition given the created ID
-    /// @param editionId id of edition to get contract for
-    /// @return SingleEditionMintable Edition NFT contract
-    function getEditionAtId(uint256 editionId, uint8 implementation)
+    /// @param projectId id of edition to get contract for
+    /// @return project the contract of the project
+    function getProjectAtId(uint256 projectId, uint8 implementation)
         external
         view
         returns (address)
@@ -117,7 +117,7 @@ contract SingleEditionMintableCreator {
         return
             ClonesUpgradeable.predictDeterministicAddress(
                 implementations[implementation],
-                bytes32(abi.encodePacked(editionId)),
+                bytes32(abi.encodePacked(projectId)),
                 address(this)
             );
     }
@@ -147,7 +147,7 @@ contract SingleEditionMintableCreator {
 
     /// Emitted when a edition is created reserving the corresponding token IDs.
     /// @param editionId ID of newly created edition
-    event CreatedEdition(
+    event CreatedProject(
         uint256 indexed editionId,
         address indexed creator,
         uint256 editionSize,
