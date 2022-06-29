@@ -1,4 +1,4 @@
-# Olta NFT Editions [WIP]
+# Olta Editions [WIP]
 
 These are a fork of [Zora NFT Editions](https://github.com/ourzora/nft-editions) with a few additions with a specific focus on NFT's with webpage content.
 
@@ -10,7 +10,7 @@ Contributions are very welcome, you can reach out to us on discord or take a loo
 ### What have we changed?
 1. Added versioning for the animation and image urls. The implementation makes use of `Versions.sol` library contract to store a history of versions
 2. The contract address to the animation url for easier querying of subgraphs from within the NFT content.
-3. Support interface check for `IEditionSingleMintable.sol` useful for checking sales contracts.
+3. Support interface check for `IStandardProject.sol` useful for checking sales contracts.
 4. Added two implementations of the SingleEditionMintable contract and currently working on a structure to add more
 
 ### How does versioning work?
@@ -33,6 +33,11 @@ An example of a version:
          url: "https://url-of-live-artwork.com",
          sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
       },
+      // patch notes
+      {
+         url: "https://url-of-patch-notes-text-file.com",
+         sha256hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
+      },
    ],
    label: [0,0,1]
 }
@@ -41,10 +46,10 @@ An example of a version:
 
 
 ### What are these contracts?
-1. `SingleEditionMintable`
+1. `StandardProject`
    Each edition is a unique contract.
    This allows for easy royalty collection, clear ownership of the collection, and your own contract 🎉
-2. `SingleEditionMintableCreator`
+2. `ProjectCreator`
    Gas-optimized factory contract allowing you to easily + for a low gas transaction create your own edition mintable contract.
 3. `SharedNFTLogic`
    Contract that includes dynamic metadata generation for your editions removing the need for a centralized server.
@@ -57,7 +62,7 @@ An example of a version:
 
 ### How do I create a new edition?
 
-call `createEdition` with the given arguments to create a new editions contract:
+call `createProject` with the given arguments to create a new project:
 
 - EditionData: an object containing the following
 > - Name: Token Name Symbol (shows in etherscan)
