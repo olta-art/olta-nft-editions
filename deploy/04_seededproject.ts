@@ -4,7 +4,7 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
 
   const sharedNFTLogicAddress = (await deployments.get("SharedNFTLogic")).address;
 
-  await deploy("SeededSingleEditionMintable", {
+  await deploy("SeededProject", {
     from: deployer,
     args: [
       sharedNFTLogicAddress
@@ -12,5 +12,5 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
     log: true,
   });
 };
-module.exports.tags = ["SeededSingleEditionMintable"];
+module.exports.tags = ["SeededProject"];
 module.exports.dependencies = ["SharedNFTLogic"]
