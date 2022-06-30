@@ -27,8 +27,8 @@ export const parseUrlQuery = (url: string) => {
 }
 
 export enum Implementation {
-  editions,
-  seededEditions
+  standard,
+  seeded
 }
 
 export interface Version {
@@ -41,7 +41,7 @@ export interface Version {
 
 export type Label = [BigNumberish, BigNumberish, BigNumberish]
 
-export const editionData = (
+export const projectData = (
   name: string,
   symbol: string,
   description: string,
