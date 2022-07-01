@@ -13,7 +13,8 @@ import {
 import {
   projectData,
   Implementation,
-  Label
+  Label,
+  createApproval
 } from "./utils"
 
 
@@ -45,14 +46,13 @@ const defualtProjectData = projectData(
 )
 
 describe("ProjectCreator", () => {
-  let signer: SignerWithAddress;
-  let signerAddress: string;
-  let creatorContract: ProjectCreator;
+  let signer: SignerWithAddress
+  let creator: SignerWithAddress
+  let creatorContract: ProjectCreator
 
   beforeEach(async () => {
     const { ProjectCreator } = await deployments.fixture([
       "ProjectCreator",
-      "StandardProject",
     ]);
 
     creatorContract = (await ethers.getContractAt(
@@ -60,11 +60,19 @@ describe("ProjectCreator", () => {
       ProjectCreator.address
     )) as ProjectCreator
 
-    signer = (await ethers.getSigners())[0]
-    signerAddress = await signer.getAddress()
+    [signer, creator] = await ethers.getSigners()
   })
 
   describe("#createProject", () => {
+    it("reverts if not an approved creator", async () => {
+      await expect(
+        creatorContract.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.revertedWith("Only approved creators can call this function.")
+    })
+
     it("creates new edition with StandardProject implementation", async () => {
       await creatorContract.createProject(
         defualtProjectData,
@@ -119,7 +127,7 @@ describe("ProjectCreator", () => {
         "CreatedProject"
       ).withArgs(
           1,                // id
-          signerAddress,    // creator
+          signer.address,    // creator
           10,               // edition size
           expectedAddress,
           Implementation.standard
@@ -137,7 +145,7 @@ describe("ProjectCreator", () => {
         "CreatedProject"
       ).withArgs(
           0,              // id
-          signerAddress,  // creator
+          signer.address,  // creator
           10,             // edition size
           expectedAddress,
           Implementation.seeded
@@ -150,6 +158,26 @@ describe("ProjectCreator", () => {
           3
         )
       ).to.be.revertedWith("implementation does not exist")
+    })
+
+    it("can be called by anyone when zero address approved", async () => {
+      await expect(
+        creatorContract.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.revertedWith("Only approved creators can call this function.")
+
+      await creatorContract.setCreatorApprovals([
+        createApproval(ethers.constants.AddressZero, true)
+      ])
+
+      await expect(
+        creatorContract.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.emit(creatorContract, "CreatedProject")
     })
   })
 
@@ -220,6 +248,95 @@ describe("ProjectCreator", () => {
       )
     })
 
+  })
+
+  describe("#setCreatorApprovals", () => {
+    it("reverts if not owner", async () => {
+      await expect(
+        creatorContract.connect(creator).setCreatorApprovals([
+          createApproval(creator.address, true)
+        ])
+      ).to.be.revertedWith("Only owner can call this function.")
+    })
+
+    it("sets approval for creator", async () => {
+      // creator can't create a project
+      await expect(
+        creatorContract.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.reverted
+
+      // approve creator
+      await creatorContract.setCreatorApprovals([
+        createApproval(creator.address, true)
+      ])
+
+      // creator can now create projects
+      expect(
+        await creatorContract.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.emit(creatorContract, "CreatedProject")
+    })
+
+    it("sets approval for creators", async () => {
+      // creator can't create a project
+      await expect(
+        creatorContract.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.reverted
+
+      // approve creator
+      await creatorContract.setCreatorApprovals([
+        createApproval(creator.address, true),
+        createApproval(signer.address, false),
+      ])
+
+      // creator can now create projects
+      await expect(
+        creatorContract.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.emit(creatorContract, "CreatedProject")
+
+      // signer can now create projects
+      await expect(
+       creatorContract.connect(signer).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.reverted
+    })
+    it("emits a list of creator approval updates", async () => {
+
+      const tx = await creatorContract.setCreatorApprovals([
+        createApproval(creator.address, true),
+        createApproval(signer.address, true),
+      ])
+
+      const recpient = await tx.wait()
+      const events = recpient.events?.filter((x) => x.event == "CreatorApprovalsUpdated")
+      const eventArgs = events?.[0].args
+
+      expect(eventArgs).to.deep.equal([
+        [
+          [
+            creator.address,
+            true
+          ],
+          [
+            signer.address,
+            true
+          ]
+        ]
+      ])
+    })
   })
 
 })
