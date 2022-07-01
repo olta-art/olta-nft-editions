@@ -31,12 +31,24 @@ contract ProjectCreator {
         uint256 royaltyBPS; /// BPS amount of royalty
     }
 
+    struct creatorApproval {
+        address id;
+        bool approval;
+    }
+
     modifier onlyOwner {
         require(msg.sender == owner, "Only owner can call this function.");
         _;
     }
 
+    modifier onlyCreator {
+        require(creatorApprovals[address(0)] || creatorApprovals[msg.sender], "Only approved creators can call this function.");
+        _;
+    }
+
     address public owner;
+
+    mapping(address => bool) private creatorApprovals;
 
     /// Counter for current contract id upgraded
     mapping(uint8 => CountersUpgradeable.Counter) private atContracts;
@@ -52,6 +64,9 @@ contract ProjectCreator {
             implementations.push(_implementations[i]);
             atContracts[i] = CountersUpgradeable.Counter(0);
         }
+
+        // set creator approval for owner
+        creatorApprovals[address(msg.sender)] = true;
     }
 
     /// Creates a new edition contract as a factory with a deterministic address
@@ -60,7 +75,11 @@ contract ProjectCreator {
     function createProject(
         ProjectData memory projectData,
         uint8 implementation
-    ) external returns (uint256) {
+    )
+        external
+        onlyCreator
+        returns (uint256)
+    {
         require(implementations.length > implementation, "implementation does not exist");
 
         uint256 newId = atContracts[implementation].current();
@@ -126,6 +145,21 @@ contract ProjectCreator {
 
         return implementations.length;
     }
+
+    function setCreatorApprovals(creatorApproval[] memory creators)
+        external
+        onlyOwner
+    {
+        for (uint256 i = 0; i < creators.length; i++) {
+            creatorApprovals[creators[i].id] = creators[i].approval;
+        }
+
+        emit CreatorApprovalsUpdated(creators);
+    }
+
+    event CreatorApprovalsUpdated (
+        creatorApproval[] creators
+    );
 
     event ImplemnetationAdded(
         address indexed implementationContractAddress,
