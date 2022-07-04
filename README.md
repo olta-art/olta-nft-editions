@@ -58,7 +58,7 @@ An example of a version:
 ### Where is the factory contract deployed:
 | Chain | Name | Address |
 |---|---|---|
-| Mumbai | SingleEditionMintableCreator |0x9b95e22Cd51A17Eda833d5a0596a08e111F792c8 |
+| Mumbai | ProjectCreator | [0x0bEc046DDbA18894088Bf4130AbD8496b8dff154](https://mumbai.polygonscan.com/address/0x0bEc046DDbA18894088Bf4130AbD8496b8dff154) |
 
 ### How do I create a new edition?
 
