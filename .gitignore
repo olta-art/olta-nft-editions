@@ -7,3 +7,4 @@ typechain
 .DS_Store
 .env
 deployments/localhost
+abi

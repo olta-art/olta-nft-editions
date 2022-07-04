@@ -4,6 +4,7 @@ import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "hardhat-deploy";
 import "@nomiclabs/hardhat-etherscan";
+import "hardhat-abi-exporter";
 import "./tasks/generate-docs";
 import { HardhatUserConfig } from "hardhat/config";
 import networks from './networks';
