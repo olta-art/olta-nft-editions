@@ -1,3 +1,4 @@
+// @ts-nocheck
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
@@ -17,6 +18,16 @@ const config: HardhatUserConfig = {
   defaultNetwork: 'hardhat',
   etherscan: {
     apiKey: process.env.ETHERSCAN_API_KEY,
+    customChains: [
+      {
+        network: "mumbai",
+        chainId: 80001,
+        urls: {
+          apiURL: "https://api-testnet.polygonscan.com",
+          browserURL: "https://mumbai.polygonscan.com"
+        }
+      }
+    ]
   },
   gasReporter: {
     currency: 'GBP',
