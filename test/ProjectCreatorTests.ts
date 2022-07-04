@@ -13,7 +13,8 @@ import {
 import {
   projectData,
   Implementation,
-  Label
+  Label,
+  createApproval
 } from "./utils"
 
 
@@ -45,32 +46,39 @@ const defualtProjectData = projectData(
 )
 
 describe("ProjectCreator", () => {
-  let signer: SignerWithAddress;
-  let signerAddress: string;
-  let creatorContract: ProjectCreator;
+  let admin: SignerWithAddress
+  let creator: SignerWithAddress
+  let ProjectCreator: ProjectCreator
 
   beforeEach(async () => {
-    const { ProjectCreator } = await deployments.fixture([
+    const { ProjectCreator: ProjectCreatorContract } = await deployments.fixture([
       "ProjectCreator",
-      "StandardProject",
     ]);
 
-    creatorContract = (await ethers.getContractAt(
+    ProjectCreator = (await ethers.getContractAt(
       "ProjectCreator",
-      ProjectCreator.address
+      ProjectCreatorContract.address
     )) as ProjectCreator
 
-    signer = (await ethers.getSigners())[0]
-    signerAddress = await signer.getAddress()
+    [admin, creator] = await ethers.getSigners()
   })
 
   describe("#createProject", () => {
+    it("reverts if not an approved creator", async () => {
+      await expect(
+        ProjectCreator.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.revertedWith("Only approved creators can call this function.")
+    })
+
     it("creates new edition with StandardProject implementation", async () => {
-      await creatorContract.createProject(
+      await ProjectCreator.createProject(
         defualtProjectData,
         Implementation.standard
       )
-      const editionConractAddress01 = await creatorContract.getProjectAtId(0, Implementation.standard)
+      const editionConractAddress01 = await ProjectCreator.getProjectAtId(0, Implementation.standard)
       const editionsContract01 = (await ethers.getContractAt(
         "StandardProject",
         editionConractAddress01
@@ -83,11 +91,11 @@ describe("ProjectCreator", () => {
     })
 
     it("creates new edition with seededProject implementation", async () => {
-      await creatorContract.createProject(
+      await ProjectCreator.createProject(
         defualtProjectData,
         Implementation.seeded
       )
-      const editionConractAddress02 = await creatorContract.getProjectAtId(0, Implementation.seeded)
+      const editionConractAddress02 = await ProjectCreator.getProjectAtId(0, Implementation.seeded)
       const editionsContract02 = (await ethers.getContractAt(
         "SeededProject",
         editionConractAddress02
@@ -102,42 +110,42 @@ describe("ProjectCreator", () => {
     it("should increment a seperate id counter for each implementation", async () => {
 
        // create first edition
-      await creatorContract.createProject(
+      await ProjectCreator.createProject(
         defualtProjectData,
         Implementation.standard
       )
 
       // create second edition
-      let expectedAddress = await creatorContract.getProjectAtId(1, Implementation.standard)
+      let expectedAddress = await ProjectCreator.getProjectAtId(1, Implementation.standard)
       await expect(
-        creatorContract.createProject(
+        ProjectCreator.createProject(
           defualtProjectData,
           Implementation.standard
         )
       ).to.emit(
-        creatorContract,
+        ProjectCreator,
         "CreatedProject"
       ).withArgs(
           1,                // id
-          signerAddress,    // creator
+          admin.address,    // creator
           10,               // edition size
           expectedAddress,
           Implementation.standard
         )
 
       // create first seeded edition
-      expectedAddress = await creatorContract.getProjectAtId(0, Implementation.seeded)
+      expectedAddress = await ProjectCreator.getProjectAtId(0, Implementation.seeded)
       await expect(
-        creatorContract.createProject(
+        ProjectCreator.createProject(
           defualtProjectData,
           Implementation.seeded
         )
       ).to.emit(
-        creatorContract,
+        ProjectCreator,
         "CreatedProject"
       ).withArgs(
           0,              // id
-          signerAddress,  // creator
+          admin.address,  // creator
           10,             // edition size
           expectedAddress,
           Implementation.seeded
@@ -145,18 +153,38 @@ describe("ProjectCreator", () => {
     })
     it("reverts if implementation doesn't exist", async () => {
       await expect(
-        creatorContract.createProject(
+        ProjectCreator.createProject(
           defualtProjectData,
           3
         )
       ).to.be.revertedWith("implementation does not exist")
+    })
+
+    it("can be called by anyone when zero address approved", async () => {
+      await expect(
+        ProjectCreator.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.revertedWith("Only approved creators can call this function.")
+
+      await ProjectCreator.setCreatorApprovals([
+        createApproval(ethers.constants.AddressZero, true)
+      ])
+
+      await expect(
+        ProjectCreator.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.emit(ProjectCreator, "CreatedProject")
     })
   })
 
   describe("#addImplementation", () => {
     let newImplementation: StandardProject
 
-    const deployImplementation = async (s = signer) => {
+    const deployImplementation = async (s = admin) => {
       // deploy another Standard Project contract
       const { SharedNFTLogic } = await deployments.fixture(["SharedNFTLogic"])
       const StandardProject = await ethers.getContractFactory("StandardProject")
@@ -173,14 +201,14 @@ describe("ProjectCreator", () => {
     it("reverts if not deployer of contract", async () => {
       const notOwner = (await ethers.getSigners())[1]
       await expect(
-        creatorContract.connect(notOwner).addImplementation(newImplementation.address)
+        ProjectCreator.connect(notOwner).addImplementation(newImplementation.address)
       ).to.be.revertedWith("Only owner can call this function.")
     })
 
     it("adds an implementation", async () => {
-      await creatorContract.addImplementation(newImplementation.address)
+      await ProjectCreator.addImplementation(newImplementation.address)
       expect(
-        await creatorContract.implementations(2)
+        await ProjectCreator.implementations(2)
       ).to.be.equal(newImplementation.address)
     })
 
@@ -196,23 +224,23 @@ describe("ProjectCreator", () => {
       )
 
       // add 3rd implementation
-      await creatorContract.addImplementation(newImplementation.address)
+      await ProjectCreator.addImplementation(newImplementation.address)
       expect(
-        await creatorContract.implementations(2)
+        await ProjectCreator.implementations(2)
       ).to.be.equal(newImplementation.address)
 
       // add 4th implementation
-      await creatorContract.addImplementation(anotherNewImplementation.address)
+      await ProjectCreator.addImplementation(anotherNewImplementation.address)
       expect(
-        await creatorContract.implementations(3)
+        await ProjectCreator.implementations(3)
       ).to.be.equal(anotherNewImplementation.address)
     })
 
     it("emits ImplemnetationAdded event", async () => {
       await expect(
-        creatorContract.addImplementation(newImplementation.address)
+        ProjectCreator.addImplementation(newImplementation.address)
       ).to.emit(
-        creatorContract,
+        ProjectCreator,
         "ImplemnetationAdded"
       ).withArgs(
         newImplementation.address,
@@ -220,6 +248,95 @@ describe("ProjectCreator", () => {
       )
     })
 
+  })
+
+  describe("#setCreatorApprovals", () => {
+    it("reverts if not owner", async () => {
+      await expect(
+        ProjectCreator.connect(creator).setCreatorApprovals([
+          createApproval(creator.address, true)
+        ])
+      ).to.be.revertedWith("Only owner can call this function.")
+    })
+
+    it("sets approval for creator", async () => {
+      // creator can't create a project
+      await expect(
+        ProjectCreator.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.reverted
+
+      // approve creator
+      await ProjectCreator.setCreatorApprovals([
+        createApproval(creator.address, true)
+      ])
+
+      // creator can now create projects
+      expect(
+        await ProjectCreator.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.emit(ProjectCreator, "CreatedProject")
+    })
+
+    it("sets approval for creators", async () => {
+      // creator can't create a project
+      await expect(
+        ProjectCreator.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.reverted
+
+      // approve creator
+      await ProjectCreator.setCreatorApprovals([
+        createApproval(creator.address, true),
+        createApproval(admin.address, false),
+      ])
+
+      // creator can create projects
+      await expect(
+        ProjectCreator.connect(creator).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.emit(ProjectCreator, "CreatedProject")
+
+      // admin can't create projects
+      await expect(
+       ProjectCreator.connect(admin).createProject(
+          defualtProjectData,
+          Implementation.standard
+        )
+      ).to.be.reverted
+    })
+    it("emits a list of creator approval updates", async () => {
+
+      const tx = await ProjectCreator.setCreatorApprovals([
+        createApproval(creator.address, true),
+        createApproval(admin.address, true),
+      ])
+
+      const recpient = await tx.wait()
+      const events = recpient.events?.filter((x) => x.event == "CreatorApprovalsUpdated")
+      const eventArgs = events?.[0].args
+
+      expect(eventArgs).to.deep.equal([
+        [
+          [
+            creator.address,
+            true
+          ],
+          [
+            admin.address,
+            true
+          ]
+        ]
+      ])
+    })
   })
 
 })

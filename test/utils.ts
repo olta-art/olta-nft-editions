@@ -1,5 +1,6 @@
 import {utils , BigNumberish} from "ethers"
 import {URL} from "url"
+import { Address } from "hardhat-deploy/dist/types";
 export const getSeed = (tokenId: number, tokenAddress: string) => {
   const hash = utils.keccak256(
     utils.concat([
@@ -25,6 +26,8 @@ export const parseUrlQuery = (url: string) => {
     address
   }
 }
+
+export const createApproval = (id: Address, approval: boolean) => ({id, approval})
 
 export enum Implementation {
   standard,

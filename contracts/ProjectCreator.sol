@@ -1,15 +1,4 @@
 // SPDX-License-Identifier: GPL-3.0
-
-/**
-
-█▄░█ █▀▀ ▀█▀   █▀▀ █▀▄ █ ▀█▀ █ █▀█ █▄░█ █▀
-█░▀█ █▀░ ░█░   ██▄ █▄▀ █ ░█░ █ █▄█ █░▀█ ▄█
-
-▀█ █▀█ █▀█ ▄▀█
-█▄ █▄█ █▀▄ █▀█
-
- */
-
 pragma solidity ^0.8.6;
 
 import {ClonesUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
@@ -42,18 +31,29 @@ contract ProjectCreator {
         uint256 royaltyBPS; /// BPS amount of royalty
     }
 
+    struct creatorApproval {
+        address id;
+        bool approval;
+    }
+
     modifier onlyOwner {
         require(msg.sender == owner, "Only owner can call this function.");
         _;
     }
 
+    modifier onlyCreator {
+        require(creatorApprovals[address(0)] || creatorApprovals[msg.sender], "Only approved creators can call this function.");
+        _;
+    }
+
     address public owner;
+
+    mapping(address => bool) private creatorApprovals;
 
     /// Counter for current contract id upgraded
     mapping(uint8 => CountersUpgradeable.Counter) private atContracts;
 
     /// Address for implementation of SingleEditionMintable to clone
-    // TODO: a mapping with implementation name may clearer?
     address[] public implementations;
 
     /// Initializes factory with address of implementations logic
@@ -64,6 +64,9 @@ contract ProjectCreator {
             implementations.push(_implementations[i]);
             atContracts[i] = CountersUpgradeable.Counter(0);
         }
+
+        // set creator approval for owner
+        creatorApprovals[address(msg.sender)] = true;
     }
 
     /// Creates a new edition contract as a factory with a deterministic address
@@ -72,7 +75,11 @@ contract ProjectCreator {
     function createProject(
         ProjectData memory projectData,
         uint8 implementation
-    ) external returns (uint256) {
+    )
+        external
+        onlyCreator
+        returns (uint256)
+    {
         require(implementations.length > implementation, "implementation does not exist");
 
         uint256 newId = atContracts[implementation].current();
@@ -81,7 +88,6 @@ contract ProjectCreator {
             bytes32(abi.encodePacked(newId))
         );
 
-        // Editions
         IProject(newContract).initialize(
             msg.sender,
             projectData.name,
@@ -106,8 +112,8 @@ contract ProjectCreator {
         return newId;
     }
 
-    /// Get edition given the created ID
-    /// @param projectId id of edition to get contract for
+    /// Get project given the created ID
+    /// @param projectId id of the project to get
     /// @return project the contract of the project
     function getProjectAtId(uint256 projectId, uint8 implementation)
         external
@@ -140,18 +146,33 @@ contract ProjectCreator {
         return implementations.length;
     }
 
+    function setCreatorApprovals(creatorApproval[] memory creators)
+        external
+        onlyOwner
+    {
+        for (uint256 i = 0; i < creators.length; i++) {
+            creatorApprovals[creators[i].id] = creators[i].approval;
+        }
+
+        emit CreatorApprovalsUpdated(creators);
+    }
+
+    event CreatorApprovalsUpdated (
+        creatorApproval[] creators
+    );
+
     event ImplemnetationAdded(
         address indexed implementationContractAddress,
         uint8 implementation
     );
 
-    /// Emitted when a edition is created reserving the corresponding token IDs.
-    /// @param editionId ID of newly created edition
+    /// Emitted when a project is created reserving the corresponding token IDs.
+    /// @param projectId ID of newly created edition
     event CreatedProject(
-        uint256 indexed editionId,
+        uint256 indexed projectId,
         address indexed creator,
         uint256 editionSize,
-        address editionContractAddress,
+        address project,
         uint8 implementation
     );
 }
