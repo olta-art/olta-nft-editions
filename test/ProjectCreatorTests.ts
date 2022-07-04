@@ -297,7 +297,7 @@ describe("ProjectCreator", () => {
         createApproval(admin.address, false),
       ])
 
-      // creator can now create projects
+      // creator can create projects
       await expect(
         ProjectCreator.connect(creator).createProject(
           defualtProjectData,
@@ -305,7 +305,7 @@ describe("ProjectCreator", () => {
         )
       ).to.emit(ProjectCreator, "CreatedProject")
 
-      // signer can now create projects
+      // admin can't create projects
       await expect(
        ProjectCreator.connect(admin).createProject(
           defualtProjectData,
