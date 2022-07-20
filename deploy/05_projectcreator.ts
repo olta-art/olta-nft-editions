@@ -7,7 +7,13 @@ module.exports = async ({ getNamedAccounts, deployments }: any) => {
 
   await deploy("ProjectCreator", {
     from: deployer,
-    args: [[mintableAddress, seededMintableAddress]],
+    proxy: {
+      proxyContract: 'OpenZeppelinTransparentProxy',
+      execute: {
+        methodName: "initialize",
+        args: [[mintableAddress, seededMintableAddress]]
+      }
+    },
     log: true,
   });
 };
