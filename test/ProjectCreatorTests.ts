@@ -202,7 +202,7 @@ describe("ProjectCreator", () => {
       const notOwner = (await ethers.getSigners())[1]
       await expect(
         ProjectCreator.connect(notOwner).addImplementation(newImplementation.address)
-      ).to.be.revertedWith("Only owner can call this function.")
+      ).to.be.revertedWith("Ownable: caller is not the owner")
     })
 
     it("adds an implementation", async () => {
@@ -256,7 +256,7 @@ describe("ProjectCreator", () => {
         ProjectCreator.connect(creator).setCreatorApprovals([
           createApproval(creator.address, true)
         ])
-      ).to.be.revertedWith("Only owner can call this function.")
+      ).to.be.revertedWith("Ownable: caller is not the owner")
     })
 
     it("sets approval for creator", async () => {
@@ -339,4 +339,26 @@ describe("ProjectCreator", () => {
     })
   })
 
+  describe("#transferOwnership (OwnableUpgradable)", () => {
+    it("transfers ownership", async () => {
+      expect(
+        await ProjectCreator.connect(admin).transferOwnership(creator.address)
+      ).to.emit(
+        ProjectCreator, "OwnershipTransferred"
+      ).withArgs(admin.address, creator.address)
+
+      const zeroApproval = [{
+        id: ethers.constants.AddressZero,
+        approval: true
+      }]
+
+      await expect(
+        ProjectCreator.connect(admin).setCreatorApprovals(zeroApproval)
+      ).to.be.reverted
+
+      await expect(
+        ProjectCreator.connect(creator).setCreatorApprovals(zeroApproval)
+      ).to.not.be.reverted
+    })
+  })
 })
