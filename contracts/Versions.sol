@@ -3,9 +3,6 @@
 pragma solidity 0.8.6;
 
 import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol";
-/*
-    please note this is work in progress and not ready for production just yet
-*/
 
 /**
  @title A libary for versioning of NFT content and metadata
@@ -16,6 +13,7 @@ import {StringsUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/Stri
  Include with `using Versions for Versions.set;`
  @author george baldwin
  */
+
 library Versions {
 
     struct UrlHashPair {

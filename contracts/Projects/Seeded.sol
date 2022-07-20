@@ -14,15 +14,16 @@ import {ISeededProject, MintData} from "./ISeeded.sol";
 /**
     This is a smart contract for handling dynamic contract minting.
 
-    This is a fork of Zora NFT Editions
-    changes:
-        - Media urls are versioned allowing for updatable content preserving history
-        - The NFT contract address is included in edition url query for easyier access to query the graph from within the NFT
-        - SupportsInterface function includes project implementation interface
+    The contract is based on Zora NFT Editions: https://github.com/ourzora/nft-editions
+
+    - Content urls are versioned allowing for updatable content preserving history
+    - The project contract address is included in edition url for easyier access to query the graph from within the NFT
+    - SupportsInterface function includes project implementation interface
+    - A seed number is chosen on the minting of editions
 
     @dev This allows creators to mint a unique serial edition of the same media within a custom contract
-    @author iain nash
-    Repository: https://github.com/ourzora/nft-editions
+    @author george baldwin
+    Repository: https://github.com/olta-art/olta-nft-editions
 */
 contract SeededProject is
     ERC721Upgradeable,
@@ -110,7 +111,6 @@ contract SeededProject is
      */
     function initialize(
         address payable _owner,
-        // TODO: could add royalties recipient to reduce transactions needed
         string memory _name,
         string memory _symbol,
         string memory _description,
