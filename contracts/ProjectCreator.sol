@@ -3,6 +3,8 @@ pragma solidity ^0.8.6;
 
 import {ClonesUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol";
 import {CountersUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {Versions} from "./Versions.sol";
 
 interface IProject {
@@ -17,7 +19,7 @@ interface IProject {
     ) external;
 }
 
-contract ProjectCreator {
+contract ProjectCreator is Initializable, OwnableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
 
     /// Important: None of these fields can be changed after calling
@@ -36,17 +38,10 @@ contract ProjectCreator {
         bool approval;
     }
 
-    modifier onlyOwner {
-        require(msg.sender == owner, "Only owner can call this function.");
-        _;
-    }
-
     modifier onlyCreator {
         require(creatorApprovals[address(0)] || creatorApprovals[msg.sender], "Only approved creators can call this function.");
         _;
     }
-
-    address public owner;
 
     mapping(address => bool) private creatorApprovals;
 
@@ -58,12 +53,14 @@ contract ProjectCreator {
 
     /// Initializes factory with address of implementations logic
     /// @param _implementations Array of addresse for implementations of SingleEditionMintable like contracts to clone
-    constructor(address[] memory _implementations) {
-        owner = address(msg.sender);
+    function initialize(address[] memory _implementations) public initializer {
         for (uint8 i = 0; i < _implementations.length; i++) {
             implementations.push(_implementations[i]);
             atContracts[i] = CountersUpgradeable.Counter(0);
         }
+
+        // initilize ownable
+        __Ownable_init();
 
         // set creator approval for owner
         creatorApprovals[address(msg.sender)] = true;
