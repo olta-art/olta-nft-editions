@@ -55,10 +55,22 @@ An example of a version:
    Contract that includes dynamic metadata generation for your editions removing the need for a centralized server.
    imageUrl and animationUrl can be base64-encoded data-uris for these contracts totally removing the need for IPFS
 
-### Where is the factory contract deployed:
-| Chain | Name | Address |
-|---|---|---|
-| Mumbai | ProjectCreator | [0x0bEc046DDbA18894088Bf4130AbD8496b8dff154](https://mumbai.polygonscan.com/address/0x0bEc046DDbA18894088Bf4130AbD8496b8dff154) |
+### Where are the contracts deployed:
+
+#### polygon
+| Name | Address |
+|---|---|
+| ProjectCreator_Proxy | [0x17F92AE6d8770CE4Ee689f188Bcc83e1Ab1e58d4](https://polygonscan.com/address/0x17F92AE6d8770CE4Ee689f188Bcc83e1Ab1e58d4) |
+| StandardProject | [0xD68FFD0b6D54EB86A083eA167aF1c9e504075fCd](https://polygonscan.com/address/0xD68FFD0b6D54EB86A083eA167aF1c9e504075fCd) |
+| SeededProject | [0x321D8f554847bA2E0ad8fe6aF289620eedf95F67](https://polygonscan.com/address/0x321D8f554847bA2E0ad8fe6aF289620eedf95F67) |
+| SharedNFTLogic | [0x92419d3c2ce2EF407F8705cf1A85b131bBcebf01](https://polygonscan.com/address/0x92419d3c2ce2EF407F8705cf1A85b131bBcebf01) |
+| Versions | [0x26a7811cd374AE3140d302F64567Af2E3c18106e](https://polygonscan.com/address/0x26a7811cd374AE3140d302F64567Af2E3c18106e) |
+
+
+#### mumbai
+| Name | Address |
+|---|---|
+| ProjectCreator | [0x0bEc046DDbA18894088Bf4130AbD8496b8dff154](https://mumbai.polygonscan.com/address/0x0bEc046DDbA18894088Bf4130AbD8496b8dff154) |
 
 ### How do I create a new edition?
 
