@@ -1,0 +1,556 @@
+{
+  "address": "0x91c280448b1a8530ce1c3B9F1D4cb4E8e8FC32Dd",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "creator",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "editionSize",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "project",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "implementation",
+          "type": "uint8"
+        }
+      ],
+      "name": "CreatedProject",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "id",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "approval",
+              "type": "bool"
+            }
+          ],
+          "indexed": false,
+          "internalType": "struct ProjectCreator.creatorApproval[]",
+          "name": "creators",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "CreatorApprovalsUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "implementationContractAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "implementation",
+          "type": "uint8"
+        }
+      ],
+      "name": "ImplemnetationAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "implementation",
+          "type": "address"
+        }
+      ],
+      "name": "addImplementation",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "string",
+              "name": "name",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "symbol",
+              "type": "string"
+            },
+            {
+              "internalType": "string",
+              "name": "description",
+              "type": "string"
+            },
+            {
+              "components": [
+                {
+                  "components": [
+                    {
+                      "internalType": "string",
+                      "name": "url",
+                      "type": "string"
+                    },
+                    {
+                      "internalType": "bytes32",
+                      "name": "sha256hash",
+                      "type": "bytes32"
+                    }
+                  ],
+                  "internalType": "struct Versions.UrlHashPair[]",
+                  "name": "urls",
+                  "type": "tuple[]"
+                },
+                {
+                  "internalType": "uint8[3]",
+                  "name": "label",
+                  "type": "uint8[3]"
+                }
+              ],
+              "internalType": "struct Versions.Version",
+              "name": "version",
+              "type": "tuple"
+            },
+            {
+              "internalType": "uint256",
+              "name": "editionSize",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "royaltyBPS",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct ProjectCreator.ProjectData",
+          "name": "projectData",
+          "type": "tuple"
+        },
+        {
+          "internalType": "uint8",
+          "name": "implementation",
+          "type": "uint8"
+        }
+      ],
+      "name": "createProject",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "projectId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint8",
+          "name": "implementation",
+          "type": "uint8"
+        }
+      ],
+      "name": "getProjectAtId",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "implementations",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "_implementations",
+          "type": "address[]"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "id",
+              "type": "address"
+            },
+            {
+              "internalType": "bool",
+              "name": "approval",
+              "type": "bool"
+            }
+          ],
+          "internalType": "struct ProjectCreator.creatorApproval[]",
+          "name": "creators",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "setCreatorApprovals",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x1fec69e8f9f49bb358a8afa521c44515922a9cc7d8dcd7bfd9a4757e60e3b706",
+  "receipt": {
+    "to": null,
+    "from": "0x5712869b7C8ca52B00Af7F6D924D4C841781ccd4",
+    "contractAddress": "0x91c280448b1a8530ce1c3B9F1D4cb4E8e8FC32Dd",
+    "transactionIndex": 8,
+    "gasUsed": "1123571",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000008000000000000000000000000000000000000800000000000000000000100000000000000000000000000000000000000000000000000000000000080004000000000000100000000000000000000008000000000040000000000000000000000000000200000000000000000000000000000000000000000000000000000000000004000000000000000000001000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000100000",
+    "blockHash": "0x07c01ba0bde5e23b24277425072bfa34c8a406a7105dac1c9643bdaa55c50b6b",
+    "transactionHash": "0x1fec69e8f9f49bb358a8afa521c44515922a9cc7d8dcd7bfd9a4757e60e3b706",
+    "logs": [
+      {
+        "transactionIndex": 8,
+        "blockNumber": 30941628,
+        "transactionHash": "0x1fec69e8f9f49bb358a8afa521c44515922a9cc7d8dcd7bfd9a4757e60e3b706",
+        "address": "0x0000000000000000000000000000000000001010",
+        "topics": [
+          "0x4dfe1bbbcf077ddc3e01291eea2d5c70c2b422b415d95645b9adcfd678cb1d63",
+          "0x0000000000000000000000000000000000000000000000000000000000001010",
+          "0x0000000000000000000000005712869b7c8ca52b00af7f6d924d4c841781ccd4",
+          "0x00000000000000000000000000856730088a5c3191bd26eb482e45229555ce57"
+        ],
+        "data": "0x000000000000000000000000000000000000000000000000012ab65f066685bf00000000000000000000000000000000000000000000001f7e2cd88f945433b00000000000000000000000000000000000000000000003a06d4a2034fc47681600000000000000000000000000000000000000000000001f7d0222308dedadf10000000000000000000000000000000000000000000003a06e74d69402adedd5",
+        "logIndex": 55,
+        "blockHash": "0x07c01ba0bde5e23b24277425072bfa34c8a406a7105dac1c9643bdaa55c50b6b"
+      }
+    ],
+    "blockNumber": 30941628,
+    "cumulativeGasUsed": "2769651",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "solcInputHash": "f1085c5b85cb82252ad324af67a4fa4d",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.6+commit.11564f7e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"projectId\",\"type\":\"uint256\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"creator\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"editionSize\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"project\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"implementation\",\"type\":\"uint8\"}],\"name\":\"CreatedProject\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"id\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"approval\",\"type\":\"bool\"}],\"indexed\":false,\"internalType\":\"struct ProjectCreator.creatorApproval[]\",\"name\":\"creators\",\"type\":\"tuple[]\"}],\"name\":\"CreatorApprovalsUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"implementationContractAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"implementation\",\"type\":\"uint8\"}],\"name\":\"ImplemnetationAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"implementation\",\"type\":\"address\"}],\"name\":\"addImplementation\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"symbol\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"description\",\"type\":\"string\"},{\"components\":[{\"components\":[{\"internalType\":\"string\",\"name\":\"url\",\"type\":\"string\"},{\"internalType\":\"bytes32\",\"name\":\"sha256hash\",\"type\":\"bytes32\"}],\"internalType\":\"struct Versions.UrlHashPair[]\",\"name\":\"urls\",\"type\":\"tuple[]\"},{\"internalType\":\"uint8[3]\",\"name\":\"label\",\"type\":\"uint8[3]\"}],\"internalType\":\"struct Versions.Version\",\"name\":\"version\",\"type\":\"tuple\"},{\"internalType\":\"uint256\",\"name\":\"editionSize\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"royaltyBPS\",\"type\":\"uint256\"}],\"internalType\":\"struct ProjectCreator.ProjectData\",\"name\":\"projectData\",\"type\":\"tuple\"},{\"internalType\":\"uint8\",\"name\":\"implementation\",\"type\":\"uint8\"}],\"name\":\"createProject\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"projectId\",\"type\":\"uint256\"},{\"internalType\":\"uint8\",\"name\":\"implementation\",\"type\":\"uint8\"}],\"name\":\"getProjectAtId\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"implementations\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"_implementations\",\"type\":\"address[]\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"id\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"approval\",\"type\":\"bool\"}],\"internalType\":\"struct ProjectCreator.creatorApproval[]\",\"name\":\"creators\",\"type\":\"tuple[]\"}],\"name\":\"setCreatorApprovals\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"events\":{\"CreatedProject(uint256,address,uint256,address,uint8)\":{\"params\":{\"projectId\":\"ID of newly created edition\"}}},\"kind\":\"dev\",\"methods\":{\"createProject((string,string,string,((string,bytes32)[],uint8[3]),uint256,uint256),uint8)\":{\"params\":{\"implementation\":\"Implementation of the project contract\",\"projectData\":\"the data of the of the project being created\"}},\"getProjectAtId(uint256,uint8)\":{\"params\":{\"projectId\":\"id of the project to get\"},\"returns\":{\"_0\":\"project the contract of the project\"}},\"initialize(address[])\":{\"params\":{\"_implementations\":\"Array of addresse for implementations of SingleEditionMintable like contracts to clone\"}},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"events\":{\"CreatedProject(uint256,address,uint256,address,uint8)\":{\"notice\":\"Emitted when a project is created reserving the corresponding token IDs.\"}},\"kind\":\"user\",\"methods\":{\"createProject((string,string,string,((string,bytes32)[],uint8[3]),uint256,uint256),uint8)\":{\"notice\":\"Creates a new edition contract as a factory with a deterministic address\"},\"getProjectAtId(uint256,uint8)\":{\"notice\":\"Get project given the created ID\"},\"implementations(uint256)\":{\"notice\":\"Address for implementation of SingleEditionMintable to clone\"},\"initialize(address[])\":{\"notice\":\"Initializes factory with address of implementations logic\"}},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/ProjectCreator.sol\":\"ProjectCreator\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":100},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../utils/ContextUpgradeable.sol\\\";\\nimport \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * By default, the owner account will be the one that deploys the contract. This\\n * can later be changed with {transferOwnership}.\\n *\\n * This module is used through inheritance. It will make available the modifier\\n * `onlyOwner`, which can be applied to your functions to restrict their use to\\n * the owner.\\n */\\nabstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {\\n    address private _owner;\\n\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @dev Initializes the contract setting the deployer as the initial owner.\\n     */\\n    function __Ownable_init() internal initializer {\\n        __Context_init_unchained();\\n        __Ownable_init_unchained();\\n    }\\n\\n    function __Ownable_init_unchained() internal initializer {\\n        _setOwner(_msgSender());\\n    }\\n\\n    /**\\n     * @dev Returns the address of the current owner.\\n     */\\n    function owner() public view virtual returns (address) {\\n        return _owner;\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the owner.\\n     */\\n    modifier onlyOwner() {\\n        require(owner() == _msgSender(), \\\"Ownable: caller is not the owner\\\");\\n        _;\\n    }\\n\\n    /**\\n     * @dev Leaves the contract without owner. It will not be possible to call\\n     * `onlyOwner` functions anymore. Can only be called by the current owner.\\n     *\\n     * NOTE: Renouncing ownership will leave the contract without an owner,\\n     * thereby removing any functionality that is only available to the owner.\\n     */\\n    function renounceOwnership() public virtual onlyOwner {\\n        _setOwner(address(0));\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual onlyOwner {\\n        require(newOwner != address(0), \\\"Ownable: new owner is the zero address\\\");\\n        _setOwner(newOwner);\\n    }\\n\\n    function _setOwner(address newOwner) private {\\n        address oldOwner = _owner;\\n        _owner = newOwner;\\n        emit OwnershipTransferred(oldOwner, newOwner);\\n    }\\n    uint256[49] private __gap;\\n}\\n\",\"keccak256\":\"0x35b09b69aca3bc2633da8f47382a81ecf367efe57167a2114f60f9ec81988afa\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev https://eips.ethereum.org/EIPS/eip-1167[EIP 1167] is a standard for\\n * deploying minimal proxy contracts, also known as \\\"clones\\\".\\n *\\n * > To simply and cheaply clone contract functionality in an immutable way, this standard specifies\\n * > a minimal bytecode implementation that delegates all calls to a known, fixed address.\\n *\\n * The library includes functions to deploy a proxy using either `create` (traditional deployment) or `create2`\\n * (salted deterministic deployment). It also includes functions to predict the addresses of clones deployed using the\\n * deterministic method.\\n *\\n * _Available since v3.4._\\n */\\nlibrary ClonesUpgradeable {\\n    /**\\n     * @dev Deploys and returns the address of a clone that mimics the behaviour of `implementation`.\\n     *\\n     * This function uses the create opcode, which should never revert.\\n     */\\n    function clone(address implementation) internal returns (address instance) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            instance := create(0, ptr, 0x37)\\n        }\\n        require(instance != address(0), \\\"ERC1167: create failed\\\");\\n    }\\n\\n    /**\\n     * @dev Deploys and returns the address of a clone that mimics the behaviour of `implementation`.\\n     *\\n     * This function uses the create2 opcode and a `salt` to deterministically deploy\\n     * the clone. Using the same `implementation` and `salt` multiple time will revert, since\\n     * the clones cannot be deployed twice at the same address.\\n     */\\n    function cloneDeterministic(address implementation, bytes32 salt) internal returns (address instance) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)\\n            instance := create2(0, ptr, 0x37, salt)\\n        }\\n        require(instance != address(0), \\\"ERC1167: create2 failed\\\");\\n    }\\n\\n    /**\\n     * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.\\n     */\\n    function predictDeterministicAddress(\\n        address implementation,\\n        bytes32 salt,\\n        address deployer\\n    ) internal pure returns (address predicted) {\\n        assembly {\\n            let ptr := mload(0x40)\\n            mstore(ptr, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)\\n            mstore(add(ptr, 0x14), shl(0x60, implementation))\\n            mstore(add(ptr, 0x28), 0x5af43d82803e903d91602b57fd5bf3ff00000000000000000000000000000000)\\n            mstore(add(ptr, 0x38), shl(0x60, deployer))\\n            mstore(add(ptr, 0x4c), salt)\\n            mstore(add(ptr, 0x6c), keccak256(ptr, 0x37))\\n            predicted := keccak256(add(ptr, 0x37), 0x55)\\n        }\\n    }\\n\\n    /**\\n     * @dev Computes the address of a clone deployed using {Clones-cloneDeterministic}.\\n     */\\n    function predictDeterministicAddress(address implementation, bytes32 salt)\\n        internal\\n        view\\n        returns (address predicted)\\n    {\\n        return predictDeterministicAddress(implementation, salt, address(this));\\n    }\\n}\\n\",\"keccak256\":\"0xf4059b28b9d7c342804d33b16ea30c65ca6afd560e426b44ca727a0343c04c68\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed\\n * behind a proxy. Since a proxied contract can't have a constructor, it's common to move constructor logic to an\\n * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer\\n * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.\\n *\\n * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as\\n * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.\\n *\\n * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure\\n * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.\\n */\\nabstract contract Initializable {\\n    /**\\n     * @dev Indicates that the contract has been initialized.\\n     */\\n    bool private _initialized;\\n\\n    /**\\n     * @dev Indicates that the contract is in the process of being initialized.\\n     */\\n    bool private _initializing;\\n\\n    /**\\n     * @dev Modifier to protect an initializer function from being invoked twice.\\n     */\\n    modifier initializer() {\\n        require(_initializing || !_initialized, \\\"Initializable: contract is already initialized\\\");\\n\\n        bool isTopLevelCall = !_initializing;\\n        if (isTopLevelCall) {\\n            _initializing = true;\\n            _initialized = true;\\n        }\\n\\n        _;\\n\\n        if (isTopLevelCall) {\\n            _initializing = false;\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x8b2abd85d0ece7e866e100e9d47ca9cbec93c87cf71a8d267b2b93eb81f7d5e9\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\nimport \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract ContextUpgradeable is Initializable {\\n    function __Context_init() internal initializer {\\n        __Context_init_unchained();\\n    }\\n\\n    function __Context_init_unchained() internal initializer {\\n    }\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n    uint256[50] private __gap;\\n}\\n\",\"keccak256\":\"0x062b5a0f7cc6b0528fa350033759f3a15ba42afb57423d7c593753860f2c82e0\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @title Counters\\n * @author Matt Condon (@shrugs)\\n * @dev Provides counters that can only be incremented, decremented or reset. This can be used e.g. to track the number\\n * of elements in a mapping, issuing ERC721 ids, or counting request ids.\\n *\\n * Include with `using Counters for Counters.Counter;`\\n */\\nlibrary CountersUpgradeable {\\n    struct Counter {\\n        // This variable should never be directly accessed by users of the library: interactions must be restricted to\\n        // the library's function. As of Solidity v0.5.2, this cannot be enforced, though there is a proposal to add\\n        // this feature: see https://github.com/ethereum/solidity/issues/4637\\n        uint256 _value; // default: 0\\n    }\\n\\n    function current(Counter storage counter) internal view returns (uint256) {\\n        return counter._value;\\n    }\\n\\n    function increment(Counter storage counter) internal {\\n        unchecked {\\n            counter._value += 1;\\n        }\\n    }\\n\\n    function decrement(Counter storage counter) internal {\\n        uint256 value = counter._value;\\n        require(value > 0, \\\"Counter: decrement overflow\\\");\\n        unchecked {\\n            counter._value = value - 1;\\n        }\\n    }\\n\\n    function reset(Counter storage counter) internal {\\n        counter._value = 0;\\n    }\\n}\\n\",\"keccak256\":\"0x00c96e792d367a436015f12ce2665aa8e2a0d61d2c6045a82cbb37da20e5a042\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev String operations.\\n */\\nlibrary StringsUpgradeable {\\n    bytes16 private constant _HEX_SYMBOLS = \\\"0123456789abcdef\\\";\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` decimal representation.\\n     */\\n    function toString(uint256 value) internal pure returns (string memory) {\\n        // Inspired by OraclizeAPI's implementation - MIT licence\\n        // https://github.com/oraclize/ethereum-api/blob/b42146b063c7d6ee1358846c198246239e9360e8/oraclizeAPI_0.4.25.sol\\n\\n        if (value == 0) {\\n            return \\\"0\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 digits;\\n        while (temp != 0) {\\n            digits++;\\n            temp /= 10;\\n        }\\n        bytes memory buffer = new bytes(digits);\\n        while (value != 0) {\\n            digits -= 1;\\n            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));\\n            value /= 10;\\n        }\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(uint256 value) internal pure returns (string memory) {\\n        if (value == 0) {\\n            return \\\"0x00\\\";\\n        }\\n        uint256 temp = value;\\n        uint256 length = 0;\\n        while (temp != 0) {\\n            length++;\\n            temp >>= 8;\\n        }\\n        return toHexString(value, length);\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.\\n     */\\n    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {\\n        bytes memory buffer = new bytes(2 * length + 2);\\n        buffer[0] = \\\"0\\\";\\n        buffer[1] = \\\"x\\\";\\n        for (uint256 i = 2 * length + 1; i > 1; --i) {\\n            buffer[i] = _HEX_SYMBOLS[value & 0xf];\\n            value >>= 4;\\n        }\\n        require(value == 0, \\\"Strings: hex length insufficient\\\");\\n        return string(buffer);\\n    }\\n}\\n\",\"keccak256\":\"0xc7af08df3d3e818ce36f95aa879c13245772fed21b553e6033292ea4edc2a9f3\",\"license\":\"MIT\"},\"contracts/ProjectCreator.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\npragma solidity ^0.8.6;\\n\\nimport {ClonesUpgradeable} from \\\"@openzeppelin/contracts-upgradeable/proxy/ClonesUpgradeable.sol\\\";\\nimport {CountersUpgradeable} from \\\"@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol\\\";\\nimport \\\"@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol\\\";\\nimport \\\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\\\";\\nimport {Versions} from \\\"./Versions.sol\\\";\\n\\ninterface IProject {\\n    function initialize(\\n        address _owner,\\n        string memory _name,\\n        string memory _symbol,\\n        string memory _description,\\n        Versions.Version memory _version,\\n        uint256 _editionSize,\\n        uint256 _royaltyBPS\\n    ) external;\\n}\\n\\ncontract ProjectCreator is Initializable, OwnableUpgradeable {\\n    using CountersUpgradeable for CountersUpgradeable.Counter;\\n\\n    /// Important: None of these fields can be changed after calling\\n    /// urls can be updated and upgraded via the versions interface\\n    struct ProjectData {\\n        string name; // Name of the edition contract\\n        string symbol; // Symbol of the edition contract\\n        string description; /// Metadata: Description of the edition entry\\n        Versions.Version version; /// Version media with animation url, animation sha256hash, image url, image sha256hash\\n        uint256 editionSize; /// Total size of the edition (number of possible editions)\\n        uint256 royaltyBPS; /// BPS amount of royalty\\n    }\\n\\n    struct creatorApproval {\\n        address id;\\n        bool approval;\\n    }\\n\\n    modifier onlyCreator {\\n        require(creatorApprovals[address(0)] || creatorApprovals[msg.sender], \\\"Only approved creators can call this function.\\\");\\n        _;\\n    }\\n\\n    mapping(address => bool) private creatorApprovals;\\n\\n    /// Counter for current contract id upgraded\\n    mapping(uint8 => CountersUpgradeable.Counter) private atContracts;\\n\\n    /// Address for implementation of SingleEditionMintable to clone\\n    address[] public implementations;\\n\\n    /// Initializes factory with address of implementations logic\\n    /// @param _implementations Array of addresse for implementations of SingleEditionMintable like contracts to clone\\n    function initialize(address[] memory _implementations) public initializer {\\n        for (uint8 i = 0; i < _implementations.length; i++) {\\n            implementations.push(_implementations[i]);\\n            atContracts[i] = CountersUpgradeable.Counter(0);\\n        }\\n\\n        // initilize ownable\\n        __Ownable_init();\\n\\n        // set creator approval for owner\\n        creatorApprovals[address(msg.sender)] = true;\\n    }\\n\\n    /// Creates a new edition contract as a factory with a deterministic address\\n    /// @param projectData the data of the of the project being created\\n    /// @param implementation Implementation of the project contract\\n    function createProject(\\n        ProjectData memory projectData,\\n        uint8 implementation\\n    )\\n        external\\n        onlyCreator\\n        returns (uint256)\\n    {\\n        require(implementations.length > implementation, \\\"implementation does not exist\\\");\\n\\n        uint256 newId = atContracts[implementation].current();\\n        address newContract = ClonesUpgradeable.cloneDeterministic(\\n            implementations[implementation],\\n            bytes32(abi.encodePacked(newId))\\n        );\\n\\n        IProject(newContract).initialize(\\n            msg.sender,\\n            projectData.name,\\n            projectData.symbol,\\n            projectData.description,\\n            projectData.version,\\n            projectData.editionSize,\\n            projectData.royaltyBPS\\n        );\\n\\n        emit CreatedProject(\\n            newId,\\n            msg.sender,\\n            projectData.editionSize,\\n            newContract,\\n            implementation\\n        );\\n\\n        // increment for the next contract creation call\\n        atContracts[implementation].increment();\\n\\n        return newId;\\n    }\\n\\n    /// Get project given the created ID\\n    /// @param projectId id of the project to get\\n    /// @return project the contract of the project\\n    function getProjectAtId(uint256 projectId, uint8 implementation)\\n        external\\n        view\\n        returns (address)\\n    {\\n        return\\n            ClonesUpgradeable.predictDeterministicAddress(\\n                implementations[implementation],\\n                bytes32(abi.encodePacked(projectId)),\\n                address(this)\\n            );\\n    }\\n\\n    function addImplementation(address implementation)\\n        external\\n        onlyOwner\\n        returns (uint256)\\n    {\\n        // initilize counter for implementation\\n        atContracts[uint8(implementations.length)] = CountersUpgradeable.Counter(0);\\n        // add implementation to clonable implementations\\n        implementations.push(implementation);\\n\\n        emit ImplemnetationAdded(\\n            implementation,\\n            uint8(implementations.length - 1)\\n        );\\n\\n        return implementations.length;\\n    }\\n\\n    function setCreatorApprovals(creatorApproval[] memory creators)\\n        external\\n        onlyOwner\\n    {\\n        for (uint256 i = 0; i < creators.length; i++) {\\n            creatorApprovals[creators[i].id] = creators[i].approval;\\n        }\\n\\n        emit CreatorApprovalsUpdated(creators);\\n    }\\n\\n    event CreatorApprovalsUpdated (\\n        creatorApproval[] creators\\n    );\\n\\n    event ImplemnetationAdded(\\n        address indexed implementationContractAddress,\\n        uint8 implementation\\n    );\\n\\n    /// Emitted when a project is created reserving the corresponding token IDs.\\n    /// @param projectId ID of newly created edition\\n    event CreatedProject(\\n        uint256 indexed projectId,\\n        address indexed creator,\\n        uint256 editionSize,\\n        address project,\\n        uint8 implementation\\n    );\\n}\\n\",\"keccak256\":\"0xd20c7fcd6ad306308108af56a556b00be45135758ded5803a119876fcaba3eae\",\"license\":\"GPL-3.0\"},\"contracts/Versions.sol\":{\"content\":\"// SPDX-License-Identifier: GPL-3.0\\n\\npragma solidity 0.8.6;\\n\\nimport {StringsUpgradeable} from \\\"@openzeppelin/contracts-upgradeable/utils/StringsUpgradeable.sol\\\";\\n\\n/**\\n @title A libary for versioning of NFT content and metadata\\n @dev Provides versioning for nft content and follows the semantic labeling convention.\\n Each version contains an array of content and content hash pairs as well as a version label.\\n Versions can be added and urls can be updated along with getters to retrieve specific versions and history.\\n\\n Include with `using Versions for Versions.set;`\\n @author george baldwin\\n */\\n\\nlibrary Versions {\\n\\n    struct UrlHashPair {\\n        string url;\\n        bytes32 sha256hash;\\n    }\\n\\n    struct Version {\\n        UrlHashPair[] urls;\\n        uint8[3] label;\\n    }\\n\\n    struct Set {\\n        string[] labels;\\n        mapping(string => Version) versions;\\n    }\\n\\n    /**\\n     @dev creates a new version from array of url hashe pairs and a semantic label\\n     @param urls An array of urls with sha-256 hash of the content on that url\\n     @param label a version label in a semantic style\\n     */\\n    function createVersion(\\n        UrlHashPair[] memory urls,\\n        uint8[3] memory label\\n    )\\n        internal\\n        pure\\n        returns (Version memory)\\n    {\\n        Version memory version = Version(urls, label);\\n        return version;\\n    }\\n\\n    /**\\n     @dev adds a version to a given set by pushing the version label to an array\\n        and mapping the version to a string of that label. Will revert if the label already exists.\\n     @param set the set to add the version to\\n     @param version the version that will be stored\\n     */\\n    function addVersion(\\n        Set storage set,\\n        Version memory version\\n    ) internal {\\n\\n        string memory labelKey = uintArray3ToString(version.label);\\n\\n        require(\\n            set.versions[labelKey].urls.length == 0,\\n            \\\"#Versions: A version with that label already exists\\\"\\n        );\\n\\n        // add to labels array\\n        set.labels.push(labelKey);\\n\\n        // store urls and hashes in mapping\\n        for (uint256 i = 0; i < version.urls.length; i++){\\n            set.versions[labelKey].urls.push(version.urls[i]);\\n        }\\n\\n        // store label\\n        set.versions[labelKey].label = version.label;\\n    }\\n\\n    /**\\n     @dev gets a version from a given set. Will revert if the version doesn't exist.\\n     @param set The set to get the version from\\n     @param label The label of the requested version\\n     @return version The version corrosponeding to the label\\n     */\\n    function getVersion(\\n        Set storage set,\\n        uint8[3] memory label\\n    )\\n        internal\\n        view\\n        returns (Version memory)\\n    {\\n        Version memory version = set.versions[uintArray3ToString(label)];\\n        require(\\n            version.urls.length != 0,\\n            \\\"#Versions: The version does not exist\\\"\\n        );\\n        return version;\\n    }\\n\\n    /**\\n     @dev updates a url of a given version in a given set\\n     @param set The set containing the version of which the url will be updated\\n     @param label The label of the requested version\\n     @param index The index of the url\\n     @param newUrl The new url to be updated to\\n     */\\n    function updateVersionURL(\\n        Set storage set,\\n        uint8[3] memory label,\\n        uint256 index,\\n        string memory newUrl\\n    ) internal {\\n        string memory labelKey = uintArray3ToString(label);\\n        require(\\n            set.versions[labelKey].urls.length != 0,\\n            \\\"#Versions: The version does not exist\\\"\\n        );\\n        require(\\n            set.versions[labelKey].urls.length > index,\\n            \\\"#Versions: The url does not exist on that version\\\"\\n        );\\n        set.versions[labelKey].urls[index].url = newUrl;\\n    }\\n\\n    /**\\n     @dev gets all the version labels of a given set\\n     @param set The set containing the versions\\n     @return labels an array of labels as strings\\n    */\\n    function getAllLabels(\\n        Set storage set\\n    )\\n        internal\\n        view\\n        returns (string[] memory)\\n    {\\n        return set.labels;\\n    }\\n\\n    /**\\n     @dev gets all the versions of a given set\\n     @param set The set containing the versions\\n     @return versions an array of versions\\n    */\\n    function getAllVersions(\\n        Set storage set\\n    )\\n        internal\\n        view\\n        returns (Version[] memory)\\n    {\\n        return getVersionsFromLabels(set, set.labels);\\n    }\\n\\n    /**\\n     @dev gets the versions of a given array of labels as strings, reverts if no labels are given\\n     @param set The set containing the versions\\n     @return versions an array of versions\\n    */\\n    function getVersionsFromLabels(\\n        Set storage set,\\n        string[] memory _labels\\n    )\\n        internal\\n        view\\n        returns (Version[] memory)\\n    {\\n        require(_labels.length != 0, \\\"#Versions: No labels provided\\\");\\n        Version[] memory versionArray = new Version[](_labels.length);\\n\\n        for (uint256 i = 0; i < _labels.length; i++) {\\n                versionArray[i] = set.versions[_labels[i]];\\n        }\\n\\n        return versionArray;\\n    }\\n\\n    /**\\n     @dev gets the last added version of a given set, reverts if no versions are in the set\\n     @param set The set containing the versions\\n     @return version the last added version\\n    */\\n    function getLatestVersion(\\n        Set storage set\\n    )\\n        internal\\n        view\\n        returns (Version memory)\\n    {\\n        require(\\n            set.labels.length != 0,\\n            \\\"#Versions: No versions exist\\\"\\n        );\\n        return set.versions[\\n            set.labels[set.labels.length - 1]\\n        ];\\n    }\\n\\n    /**\\n     @dev A helper function to convert a three length array of numbers into a semantic style verison label\\n     @param label the label as a uint8[3] array\\n     @return label the label as a string\\n    */\\n    function uintArray3ToString (uint8[3] memory label)\\n        internal\\n        pure\\n        returns (string memory)\\n    {\\n        return string(abi.encodePacked(\\n            StringsUpgradeable.toString(label[0]),\\n            \\\".\\\",\\n            StringsUpgradeable.toString(label[1]),\\n            \\\".\\\",\\n            StringsUpgradeable.toString(label[2])\\n        ));\\n    }\\n}\",\"keccak256\":\"0x0c57f7a1764998753c382556ffee075a74875dc39460cb3bed3842bf5fbb9012\",\"license\":\"GPL-3.0\"}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b5061135e806100206000396000f3fe608060405234801561001057600080fd5b50600436106100835760003560e01c80633922fe501461008857806362ad2705146100b8578063715018a6146100cd578063845affc8146100d55780638da5cb5b146100e8578063a224cee7146100f0578063a34bda4d14610103578063c6e2a40014610124578063f2fde38b14610137575b600080fd5b61009b610096366004610f68565b61014a565b6040516001600160a01b0390911681526020015b60405180910390f35b6100cb6100c6366004610d8e565b610205565b005b6100cb6102fd565b61009b6100e3366004610f4f565b610338565b61009b610362565b6100cb6100fe366004610cf0565b610371565b610116610111366004610e50565b610491565b6040519081526020016100af565b610116610132366004610cd5565b6106f0565b6100cb610145366004610cd5565b6107e1565b60006101fc60678360ff1681548110610165576101656112fc565b600091825260209182902001546040805180840188905281518082039094018452810190526001600160a01b03169061019d90611284565b30604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b8152606093841b60148201526f5af43d82803e903d91602b57fd5bf3ff60801b6028820152921b6038830152604c8201526037808220606c830152605591012090565b90505b92915050565b3361020e610362565b6001600160a01b03161461023d5760405162461bcd60e51b81526004016102349061119b565b60405180910390fd5b60005b81518110156102c25781818151811061025b5761025b6112fc565b6020026020010151602001516065600084848151811061027d5761027d6112fc565b602090810291909101810151516001600160a01b03168252810191909152604001600020805460ff1916911515919091179055806102ba816112ab565b915050610240565b507f925382464b1217f3ef37d73d9d6cc7cb9b15ac584659265066e9d70c32915926816040516102f291906110f3565b60405180910390a150565b33610306610362565b6001600160a01b03161461032c5760405162461bcd60e51b81526004016102349061119b565b6103366000610881565b565b6067818154811061034857600080fd5b6000918252602090912001546001600160a01b0316905081565b6033546001600160a01b031690565b600054610100900460ff168061038a575060005460ff16155b6103a65760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff161580156103c8576000805461ffff19166101011790555b60005b82518160ff161015610458576067838260ff16815181106103ee576103ee6112fc565b602090810291909101810151825460018101845560009384528284200180546001600160a01b0319166001600160a01b0390921691909117905560408051808301825283815260ff8516845260669092529091209051905580610450816112c6565b9150506103cb565b506104616108d3565b336000908152606560205260409020805460ff19166001179055801561048d576000805461ff00191690555b5050565b600080805260656020527fffdfc1249c027f9191656349feb0761381bb32c9f557e01f419fd08754bf5a1b5460ff16806104da57503360009081526065602052604090205460ff165b61053d5760405162461bcd60e51b815260206004820152602e60248201527f4f6e6c7920617070726f7665642063726561746f72732063616e2063616c6c2060448201526d3a3434b990333ab731ba34b7b71760911b6064820152608401610234565b60675460ff8316106105915760405162461bcd60e51b815260206004820152601d60248201527f696d706c656d656e746174696f6e20646f6573206e6f742065786973740000006044820152606401610234565b60ff82166000818152606660205260408120546067805491936105f99281106105bc576105bc6112fc565b600091825260209182902001546040805180840187905281518082039094018452810190526001600160a01b0316906105f490611284565b61094e565b9050806001600160a01b03166313d2de32338760000151886020015189604001518a606001518b608001518c60a001516040518863ffffffff1660e01b815260040161064b9796959493929190611004565b600060405180830381600087803b15801561066557600080fd5b505af1158015610679573d6000803e3d6000fd5b505050506080850151604080519182526001600160a01b038316602083015260ff86168282015251339184917f7a938c735832c3f3357e2f3f107c4bf632b92eb414b872ab1cbf8e53be5f41f59181900360600190a360ff8416600090815260666020526040902080546001019055509392505050565b6000336106fb610362565b6001600160a01b0316146107215760405162461bcd60e51b81526004016102349061119b565b604080516020808201835260008083526067805460ff16825260669092529283209151909155805460018082018355928290527f9787eeb91fe3101235e4a76063c7023ecb40f923f97916639c598592fa30d6ae0180546001600160a01b0319166001600160a01b038616908117909155905490917f95546fd920b865e62727445387bac34d14a95020d23f5246361fda7a7e41a536916107c2919061126d565b60405160ff909116815260200160405180910390a2506067545b919050565b336107ea610362565b6001600160a01b0316146108105760405162461bcd60e51b81526004016102349061119b565b6001600160a01b0381166108755760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b6064820152608401610234565b61087e81610881565b50565b603380546001600160a01b038381166001600160a01b0319831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b600054610100900460ff16806108ec575060005460ff16155b6109085760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff1615801561092a576000805461ffff19166101011790555b6109326109e8565b61093a610a52565b801561087e576000805461ff001916905550565b6000604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b81528360601b60148201526e5af43d82803e903d91602b57fd5bf360881b6028820152826037826000f59150506001600160a01b0381166101ff5760405162461bcd60e51b8152602060048201526017602482015276115490cc4c4d8dce8818dc99585d194c8819985a5b1959604a1b6044820152606401610234565b600054610100900460ff1680610a01575060005460ff16155b610a1d5760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff1615801561093a576000805461ffff1916610101179055801561087e576000805461ff001916905550565b600054610100900460ff1680610a6b575060005460ff16155b610a875760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff16158015610aa9576000805461ffff19166101011790555b61093a33610881565b80356001600160a01b03811681146107dc57600080fd5b600082601f830112610ada57600080fd5b604051606081018181106001600160401b0382111715610afc57610afc611312565b604052808360608101861015610b1157600080fd5b60005b6003811015610b3b57610b2682610cc4565b83526020928301929190910190600101610b14565b509195945050505050565b600082601f830112610b5757600080fd5b81356001600160401b03811115610b7057610b70611312565b610b83601f8201601f191660200161121a565b818152846020838601011115610b9857600080fd5b816020850160208301376000918101602001919091529392505050565b600060808284031215610bc757600080fd5b610bcf6111d0565b905081356001600160401b0380821115610be857600080fd5b818401915084601f830112610bfc57600080fd5b81356020610c11610c0c8361124a565b61121a565b80838252828201915082860189848660051b8901011115610c3157600080fd5b60005b85811015610ca557813587811115610c4b57600080fd5b88016040818d03601f1901811315610c6257600080fd5b610c6a6111d0565b878301358a811115610c7b57600080fd5b610c898f8a83870101610b46565b8252509101358682015284529284019290840190600101610c34565b5050865250610cb687878301610ac9565b818601525050505092915050565b803560ff811681146107dc57600080fd5b600060208284031215610ce757600080fd5b6101fc82610ab2565b60006020808385031215610d0357600080fd5b82356001600160401b03811115610d1957600080fd5b8301601f81018513610d2a57600080fd5b8035610d38610c0c8261124a565b80828252848201915084840188868560051b8701011115610d5857600080fd5b600094505b83851015610d8257610d6e81610ab2565b835260019490940193918501918501610d5d565b50979650505050505050565b60006020808385031215610da157600080fd5b82356001600160401b03811115610db757600080fd5b8301601f81018513610dc857600080fd5b8035610dd6610c0c8261124a565b80828252848201915084840188868560061b8701011115610df657600080fd5b600094505b83851015610d8257604080828b031215610e1457600080fd5b610e1c6111d0565b610e2583610ab2565b8152878301358015158114610e3957600080fd5b818901528452600195909501949286019201610dfb565b60008060408385031215610e6357600080fd5b82356001600160401b0380821115610e7a57600080fd5b9084019060c08287031215610e8e57600080fd5b610e966111f8565b823582811115610ea557600080fd5b610eb188828601610b46565b825250602083013582811115610ec657600080fd5b610ed288828601610b46565b602083015250604083013582811115610eea57600080fd5b610ef688828601610b46565b604083015250606083013582811115610f0e57600080fd5b610f1a88828601610bb5565b6060830152506080830135608082015260a083013560a0820152809450505050610f4660208401610cc4565b90509250929050565b600060208284031215610f6157600080fd5b5035919050565b60008060408385031215610f7b57600080fd5b82359150610f4660208401610cc4565b8060005b6003811015610fb157815160ff16845260209384019390910190600101610f8f565b50505050565b6000815180845260005b81811015610fdd57602081850181015186830182015201610fc1565b81811115610fef576000602083870101525b50601f01601f19169290920160200192915050565b6001600160a01b038816815260e060208083018290526000916110299084018a610fb7565b60408482038186015261103c828b610fb7565b91508482036060860152611050828a610fb7565b915084820360808601526080820188516080845281815180845260a08601915060a08160051b8701019350868301925060005b818110156110c457868503609f19018352835180518787526110a788880182610fb7565b918a0151968a019690965294509287019291870191600101611083565b505050508389015191506110da84840183610f8b565b60a08601979097525050505060c0015295945050505050565b602080825282518282018190526000919060409081850190868401855b8281101561114057815180516001600160a01b031685528601511515868501529284019290850190600101611110565b5091979650505050505050565b6020808252602e908201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160408201526d191e481a5b9a5d1a585b1a5e995960921b606082015260800190565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b604080519081016001600160401b03811182821017156111f2576111f2611312565b60405290565b60405160c081016001600160401b03811182821017156111f2576111f2611312565b604051601f8201601f191681016001600160401b038111828210171561124257611242611312565b604052919050565b60006001600160401b0382111561126357611263611312565b5060051b60200190565b60008282101561127f5761127f6112e6565b500390565b805160208083015191908110156112a5576000198160200360031b1b821691505b50919050565b60006000198214156112bf576112bf6112e6565b5060010190565b600060ff821660ff8114156112dd576112dd6112e6565b60010192915050565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fdfea2646970667358221220dac65e6a650617f72a951974d9f1b68b10c622676ca5b2ec968f0eb10bffbe2664736f6c63430008060033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100835760003560e01c80633922fe501461008857806362ad2705146100b8578063715018a6146100cd578063845affc8146100d55780638da5cb5b146100e8578063a224cee7146100f0578063a34bda4d14610103578063c6e2a40014610124578063f2fde38b14610137575b600080fd5b61009b610096366004610f68565b61014a565b6040516001600160a01b0390911681526020015b60405180910390f35b6100cb6100c6366004610d8e565b610205565b005b6100cb6102fd565b61009b6100e3366004610f4f565b610338565b61009b610362565b6100cb6100fe366004610cf0565b610371565b610116610111366004610e50565b610491565b6040519081526020016100af565b610116610132366004610cd5565b6106f0565b6100cb610145366004610cd5565b6107e1565b60006101fc60678360ff1681548110610165576101656112fc565b600091825260209182902001546040805180840188905281518082039094018452810190526001600160a01b03169061019d90611284565b30604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b8152606093841b60148201526f5af43d82803e903d91602b57fd5bf3ff60801b6028820152921b6038830152604c8201526037808220606c830152605591012090565b90505b92915050565b3361020e610362565b6001600160a01b03161461023d5760405162461bcd60e51b81526004016102349061119b565b60405180910390fd5b60005b81518110156102c25781818151811061025b5761025b6112fc565b6020026020010151602001516065600084848151811061027d5761027d6112fc565b602090810291909101810151516001600160a01b03168252810191909152604001600020805460ff1916911515919091179055806102ba816112ab565b915050610240565b507f925382464b1217f3ef37d73d9d6cc7cb9b15ac584659265066e9d70c32915926816040516102f291906110f3565b60405180910390a150565b33610306610362565b6001600160a01b03161461032c5760405162461bcd60e51b81526004016102349061119b565b6103366000610881565b565b6067818154811061034857600080fd5b6000918252602090912001546001600160a01b0316905081565b6033546001600160a01b031690565b600054610100900460ff168061038a575060005460ff16155b6103a65760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff161580156103c8576000805461ffff19166101011790555b60005b82518160ff161015610458576067838260ff16815181106103ee576103ee6112fc565b602090810291909101810151825460018101845560009384528284200180546001600160a01b0319166001600160a01b0390921691909117905560408051808301825283815260ff8516845260669092529091209051905580610450816112c6565b9150506103cb565b506104616108d3565b336000908152606560205260409020805460ff19166001179055801561048d576000805461ff00191690555b5050565b600080805260656020527fffdfc1249c027f9191656349feb0761381bb32c9f557e01f419fd08754bf5a1b5460ff16806104da57503360009081526065602052604090205460ff165b61053d5760405162461bcd60e51b815260206004820152602e60248201527f4f6e6c7920617070726f7665642063726561746f72732063616e2063616c6c2060448201526d3a3434b990333ab731ba34b7b71760911b6064820152608401610234565b60675460ff8316106105915760405162461bcd60e51b815260206004820152601d60248201527f696d706c656d656e746174696f6e20646f6573206e6f742065786973740000006044820152606401610234565b60ff82166000818152606660205260408120546067805491936105f99281106105bc576105bc6112fc565b600091825260209182902001546040805180840187905281518082039094018452810190526001600160a01b0316906105f490611284565b61094e565b9050806001600160a01b03166313d2de32338760000151886020015189604001518a606001518b608001518c60a001516040518863ffffffff1660e01b815260040161064b9796959493929190611004565b600060405180830381600087803b15801561066557600080fd5b505af1158015610679573d6000803e3d6000fd5b505050506080850151604080519182526001600160a01b038316602083015260ff86168282015251339184917f7a938c735832c3f3357e2f3f107c4bf632b92eb414b872ab1cbf8e53be5f41f59181900360600190a360ff8416600090815260666020526040902080546001019055509392505050565b6000336106fb610362565b6001600160a01b0316146107215760405162461bcd60e51b81526004016102349061119b565b604080516020808201835260008083526067805460ff16825260669092529283209151909155805460018082018355928290527f9787eeb91fe3101235e4a76063c7023ecb40f923f97916639c598592fa30d6ae0180546001600160a01b0319166001600160a01b038616908117909155905490917f95546fd920b865e62727445387bac34d14a95020d23f5246361fda7a7e41a536916107c2919061126d565b60405160ff909116815260200160405180910390a2506067545b919050565b336107ea610362565b6001600160a01b0316146108105760405162461bcd60e51b81526004016102349061119b565b6001600160a01b0381166108755760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b6064820152608401610234565b61087e81610881565b50565b603380546001600160a01b038381166001600160a01b0319831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b600054610100900460ff16806108ec575060005460ff16155b6109085760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff1615801561092a576000805461ffff19166101011790555b6109326109e8565b61093a610a52565b801561087e576000805461ff001916905550565b6000604051733d602d80600a3d3981f3363d3d373d3d3d363d7360601b81528360601b60148201526e5af43d82803e903d91602b57fd5bf360881b6028820152826037826000f59150506001600160a01b0381166101ff5760405162461bcd60e51b8152602060048201526017602482015276115490cc4c4d8dce8818dc99585d194c8819985a5b1959604a1b6044820152606401610234565b600054610100900460ff1680610a01575060005460ff16155b610a1d5760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff1615801561093a576000805461ffff1916610101179055801561087e576000805461ff001916905550565b600054610100900460ff1680610a6b575060005460ff16155b610a875760405162461bcd60e51b81526004016102349061114d565b600054610100900460ff16158015610aa9576000805461ffff19166101011790555b61093a33610881565b80356001600160a01b03811681146107dc57600080fd5b600082601f830112610ada57600080fd5b604051606081018181106001600160401b0382111715610afc57610afc611312565b604052808360608101861015610b1157600080fd5b60005b6003811015610b3b57610b2682610cc4565b83526020928301929190910190600101610b14565b509195945050505050565b600082601f830112610b5757600080fd5b81356001600160401b03811115610b7057610b70611312565b610b83601f8201601f191660200161121a565b818152846020838601011115610b9857600080fd5b816020850160208301376000918101602001919091529392505050565b600060808284031215610bc757600080fd5b610bcf6111d0565b905081356001600160401b0380821115610be857600080fd5b818401915084601f830112610bfc57600080fd5b81356020610c11610c0c8361124a565b61121a565b80838252828201915082860189848660051b8901011115610c3157600080fd5b60005b85811015610ca557813587811115610c4b57600080fd5b88016040818d03601f1901811315610c6257600080fd5b610c6a6111d0565b878301358a811115610c7b57600080fd5b610c898f8a83870101610b46565b8252509101358682015284529284019290840190600101610c34565b5050865250610cb687878301610ac9565b818601525050505092915050565b803560ff811681146107dc57600080fd5b600060208284031215610ce757600080fd5b6101fc82610ab2565b60006020808385031215610d0357600080fd5b82356001600160401b03811115610d1957600080fd5b8301601f81018513610d2a57600080fd5b8035610d38610c0c8261124a565b80828252848201915084840188868560051b8701011115610d5857600080fd5b600094505b83851015610d8257610d6e81610ab2565b835260019490940193918501918501610d5d565b50979650505050505050565b60006020808385031215610da157600080fd5b82356001600160401b03811115610db757600080fd5b8301601f81018513610dc857600080fd5b8035610dd6610c0c8261124a565b80828252848201915084840188868560061b8701011115610df657600080fd5b600094505b83851015610d8257604080828b031215610e1457600080fd5b610e1c6111d0565b610e2583610ab2565b8152878301358015158114610e3957600080fd5b818901528452600195909501949286019201610dfb565b60008060408385031215610e6357600080fd5b82356001600160401b0380821115610e7a57600080fd5b9084019060c08287031215610e8e57600080fd5b610e966111f8565b823582811115610ea557600080fd5b610eb188828601610b46565b825250602083013582811115610ec657600080fd5b610ed288828601610b46565b602083015250604083013582811115610eea57600080fd5b610ef688828601610b46565b604083015250606083013582811115610f0e57600080fd5b610f1a88828601610bb5565b6060830152506080830135608082015260a083013560a0820152809450505050610f4660208401610cc4565b90509250929050565b600060208284031215610f6157600080fd5b5035919050565b60008060408385031215610f7b57600080fd5b82359150610f4660208401610cc4565b8060005b6003811015610fb157815160ff16845260209384019390910190600101610f8f565b50505050565b6000815180845260005b81811015610fdd57602081850181015186830182015201610fc1565b81811115610fef576000602083870101525b50601f01601f19169290920160200192915050565b6001600160a01b038816815260e060208083018290526000916110299084018a610fb7565b60408482038186015261103c828b610fb7565b91508482036060860152611050828a610fb7565b915084820360808601526080820188516080845281815180845260a08601915060a08160051b8701019350868301925060005b818110156110c457868503609f19018352835180518787526110a788880182610fb7565b918a0151968a019690965294509287019291870191600101611083565b505050508389015191506110da84840183610f8b565b60a08601979097525050505060c0015295945050505050565b602080825282518282018190526000919060409081850190868401855b8281101561114057815180516001600160a01b031685528601511515868501529284019290850190600101611110565b5091979650505050505050565b6020808252602e908201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160408201526d191e481a5b9a5d1a585b1a5e995960921b606082015260800190565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b604080519081016001600160401b03811182821017156111f2576111f2611312565b60405290565b60405160c081016001600160401b03811182821017156111f2576111f2611312565b604051601f8201601f191681016001600160401b038111828210171561124257611242611312565b604052919050565b60006001600160401b0382111561126357611263611312565b5060051b60200190565b60008282101561127f5761127f6112e6565b500390565b805160208083015191908110156112a5576000198160200360031b1b821691505b50919050565b60006000198214156112bf576112bf6112e6565b5060010190565b600060ff821660ff8114156112dd576112dd6112e6565b60010192915050565b634e487b7160e01b600052601160045260246000fd5b634e487b7160e01b600052603260045260246000fd5b634e487b7160e01b600052604160045260246000fdfea2646970667358221220dac65e6a650617f72a951974d9f1b68b10c622676ca5b2ec968f0eb10bffbe2664736f6c63430008060033",
+  "devdoc": {
+    "events": {
+      "CreatedProject(uint256,address,uint256,address,uint8)": {
+        "params": {
+          "projectId": "ID of newly created edition"
+        }
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "createProject((string,string,string,((string,bytes32)[],uint8[3]),uint256,uint256),uint8)": {
+        "params": {
+          "implementation": "Implementation of the project contract",
+          "projectData": "the data of the of the project being created"
+        }
+      },
+      "getProjectAtId(uint256,uint8)": {
+        "params": {
+          "projectId": "id of the project to get"
+        },
+        "returns": {
+          "_0": "project the contract of the project"
+        }
+      },
+      "initialize(address[])": {
+        "params": {
+          "_implementations": "Array of addresse for implementations of SingleEditionMintable like contracts to clone"
+        }
+      },
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "events": {
+      "CreatedProject(uint256,address,uint256,address,uint8)": {
+        "notice": "Emitted when a project is created reserving the corresponding token IDs."
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "createProject((string,string,string,((string,bytes32)[],uint8[3]),uint256,uint256),uint8)": {
+        "notice": "Creates a new edition contract as a factory with a deterministic address"
+      },
+      "getProjectAtId(uint256,uint8)": {
+        "notice": "Get project given the created ID"
+      },
+      "implementations(uint256)": {
+        "notice": "Address for implementation of SingleEditionMintable to clone"
+      },
+      "initialize(address[])": {
+        "notice": "Initializes factory with address of implementations logic"
+      }
+    },
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 232,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "_initialized",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 235,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "_initializing",
+        "offset": 1,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 1567,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_array(t_uint256)50_storage"
+      },
+      {
+        "astId": 10,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "51",
+        "type": "t_address"
+      },
+      {
+        "astId": 123,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "52",
+        "type": "t_array(t_uint256)49_storage"
+      },
+      {
+        "astId": 2063,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "creatorApprovals",
+        "offset": 0,
+        "slot": "101",
+        "type": "t_mapping(t_address,t_bool)"
+      },
+      {
+        "astId": 2069,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "atContracts",
+        "offset": 0,
+        "slot": "102",
+        "type": "t_mapping(t_uint8,t_struct(Counter)1574_storage)"
+      },
+      {
+        "astId": 2073,
+        "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+        "label": "implementations",
+        "offset": 0,
+        "slot": "103",
+        "type": "t_array(t_address)dyn_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_address)dyn_storage": {
+        "base": "t_address",
+        "encoding": "dynamic_array",
+        "label": "address[]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_uint256)49_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[49]",
+        "numberOfBytes": "1568"
+      },
+      "t_array(t_uint256)50_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[50]",
+        "numberOfBytes": "1600"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_mapping(t_address,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_address",
+        "label": "mapping(address => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_mapping(t_uint8,t_struct(Counter)1574_storage)": {
+        "encoding": "mapping",
+        "key": "t_uint8",
+        "label": "mapping(uint8 => struct CountersUpgradeable.Counter)",
+        "numberOfBytes": "32",
+        "value": "t_struct(Counter)1574_storage"
+      },
+      "t_struct(Counter)1574_storage": {
+        "encoding": "inplace",
+        "label": "struct CountersUpgradeable.Counter",
+        "members": [
+          {
+            "astId": 1573,
+            "contract": "contracts/ProjectCreator.sol:ProjectCreator",
+            "label": "_value",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint256"
+          }
+        ],
+        "numberOfBytes": "32"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "t_uint8": {
+        "encoding": "inplace",
+        "label": "uint8",
+        "numberOfBytes": "1"
+      }
+    }
+  }
+}
