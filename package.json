@@ -1,9 +1,9 @@
 {
-  "name": "@zoralabs/nft-editions-contracts",
-  "version": "1.0.1",
+  "name": "@olta-art/olta-nft-editions",
+  "version": "1.1.0",
   "description": "NFT Factory Contracts",
   "main": "index.js",
-  "author": "ZORA",
+  "author": "Olta.art",
   "license": "GPL-3.0",
   "private": false,
   "files": [

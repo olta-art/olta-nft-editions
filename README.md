@@ -2,16 +2,17 @@
 
 These are a fork of [Zora NFT Editions](https://github.com/ourzora/nft-editions) with a few additions with a specific focus on NFT's with webpage content.
 
-## This is still a work in progress!
-We are currently testing these contracts locally along with a Dutch Auction House and a subgraph. Mumbai deployments coming soon!
-
-Contributions are very welcome, you can reach out to us on discord or take a look at the current issues and create a pull request.
+## These contracts are in beta
+They are well tested in-house but they haven't been used in the wild all that much. It's advised to deploy and thoroughly test your project on mumbai first.
 
 ### What have we changed?
 1. Added versioning for the animation and image urls. The implementation makes use of `Versions.sol` library contract to store a history of versions
-2. The contract address to the animation url for easier querying of subgraphs from within the NFT content.
-3. Support interface check for `IStandardProject.sol` useful for checking sales contracts.
-4. Added two implementations of the SingleEditionMintable contract and currently working on a structure to add more
+2. Added the project contract address to the animation url for easier querying of subgraphs from within the NFT content.
+3. Support interface check for `IStandardProject.sol`/`ISeededProject.sol` useful for checking sales contracts.
+4. Added two project implementations with the ability to add more.
+5. The projectCreator contract is upgradable
+6. Mumbai deployments are open for anyone to create new projects
+7. Polygon is currently only curated artists only
 
 ### How does versioning work?
 - Each version consist of an animation url, animation content hash, image url, image content hash and a version label.
@@ -55,10 +56,22 @@ An example of a version:
    Contract that includes dynamic metadata generation for your editions removing the need for a centralized server.
    imageUrl and animationUrl can be base64-encoded data-uris for these contracts totally removing the need for IPFS
 
-### Where is the factory contract deployed:
-| Chain | Name | Address |
-|---|---|---|
-| Mumbai | ProjectCreator | [0x0bEc046DDbA18894088Bf4130AbD8496b8dff154](https://mumbai.polygonscan.com/address/0x0bEc046DDbA18894088Bf4130AbD8496b8dff154) |
+### Where are the contracts deployed:
+
+#### polygon
+| Name | Address |
+|---|---|
+| ProjectCreator_Proxy | [0x17F92AE6d8770CE4Ee689f188Bcc83e1Ab1e58d4](https://polygonscan.com/address/0x17F92AE6d8770CE4Ee689f188Bcc83e1Ab1e58d4) |
+| StandardProject | [0xD68FFD0b6D54EB86A083eA167aF1c9e504075fCd](https://polygonscan.com/address/0xD68FFD0b6D54EB86A083eA167aF1c9e504075fCd) |
+| SeededProject | [0x321D8f554847bA2E0ad8fe6aF289620eedf95F67](https://polygonscan.com/address/0x321D8f554847bA2E0ad8fe6aF289620eedf95F67) |
+| SharedNFTLogic | [0x92419d3c2ce2EF407F8705cf1A85b131bBcebf01](https://polygonscan.com/address/0x92419d3c2ce2EF407F8705cf1A85b131bBcebf01) |
+| Versions | [0x26a7811cd374AE3140d302F64567Af2E3c18106e](https://polygonscan.com/address/0x26a7811cd374AE3140d302F64567Af2E3c18106e) |
+
+
+#### mumbai
+| Name | Address |
+|---|---|
+| ProjectCreator | [0x0bEc046DDbA18894088Bf4130AbD8496b8dff154](https://mumbai.polygonscan.com/address/0x0bEc046DDbA18894088Bf4130AbD8496b8dff154) |
 
 ### How do I create a new edition?
 
