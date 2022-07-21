@@ -2,16 +2,17 @@
 
 These are a fork of [Zora NFT Editions](https://github.com/ourzora/nft-editions) with a few additions with a specific focus on NFT's with webpage content.
 
-## This is still a work in progress!
-We are currently testing these contracts locally along with a Dutch Auction House and a subgraph. Mumbai deployments coming soon!
-
-Contributions are very welcome, you can reach out to us on discord or take a look at the current issues and create a pull request.
+## These contracts are in beta
+They are well tested in-house but they haven't been used in the wild all that much. It's advised to deploy and thoroughly test your project on mumbai first.
 
 ### What have we changed?
 1. Added versioning for the animation and image urls. The implementation makes use of `Versions.sol` library contract to store a history of versions
-2. The contract address to the animation url for easier querying of subgraphs from within the NFT content.
-3. Support interface check for `IStandardProject.sol` useful for checking sales contracts.
-4. Added two implementations of the SingleEditionMintable contract and currently working on a structure to add more
+2. Added the project contract address to the animation url for easier querying of subgraphs from within the NFT content.
+3. Support interface check for `IStandardProject.sol`/`ISeededProject.sol` useful for checking sales contracts.
+4. Added two project implementations with the ability to add more.
+5. The projectCreator contract is upgradable
+6. Mumbai deployments are open for anyone to create new projects
+7. Polygon is currently only curated artists only
 
 ### How does versioning work?
 - Each version consist of an animation url, animation content hash, image url, image content hash and a version label.
