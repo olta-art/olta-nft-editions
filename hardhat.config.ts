@@ -27,6 +27,14 @@ const config: HardhatUserConfig = {
           apiURL: "https://api-testnet.polygonscan.com",
           browserURL: "https://mumbai.polygonscan.com"
         }
+      },
+      {
+        network: "polygon",
+        chainId: 137,
+        urls: {
+          apiURL: "https://api.polygonscan.com",
+          browserURL: "https://polygonscan.com"
+        }
       }
     ]
   },
